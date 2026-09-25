@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,maximum-scale=1"
+/>
 
 <title>NZX OSINT TOOL</title>
 
@@ -14,252 +17,286 @@
 }
 
 :root{
-    --bg:#030407;
-    --panel:rgba(10,12,18,.76);
-    --panel2:rgba(15,18,27,.88);
-    --border:rgba(255,255,255,.09);
-    --text:#f5f7fb;
-    --muted:#818896;
-    --accent:#8d5cff;
-    --accent2:#5d8cff;
-    --green:#4dff9b;
-    --red:#ff5577;
-    --yellow:#ffc857;
+    --bg:#05070d;
+    --panel:rgba(13,17,29,.78);
+    --panel2:rgba(19,24,39,.84);
+    --line:rgba(255,255,255,.08);
+    --text:#f5f7ff;
+    --muted:#8992aa;
+    --accent:#8b5cf6;
+    --accent2:#06b6d4;
+    --green:#22c55e;
+    --red:#ef4444;
+    --yellow:#f59e0b;
 }
 
 html,body{
     width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#020307;
+    min-height:100%;
+    background:var(--bg);
     color:var(--text);
-    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 }
 
-button,input{
+body{
+    overflow-x:hidden;
+}
+
+button,
+input{
     font:inherit;
 }
 
 button{
+    border:0;
+}
+
+button,
+.clickable{
     cursor:pointer;
 }
 
 #space{
     position:fixed;
     inset:0;
-    z-index:0;
+    z-index:-4;
     background:
-        radial-gradient(circle at 50% 50%,rgba(92,70,180,.08),transparent 35%),
-        #020307;
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(98,72,190,.16),
+            transparent 27%
+        ),
+        radial-gradient(
+            circle at 15% 90%,
+            rgba(6,182,212,.08),
+            transparent 28%
+        ),
+        #05070d;
 }
 
 #saturn{
     position:fixed;
-    width:720px;
-    height:720px;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
+    right:-120px;
+    top:40px;
+    width:620px;
+    height:620px;
+    z-index:-3;
+    opacity:.62;
     pointer-events:none;
-    z-index:0;
-    opacity:.72;
-    filter:blur(.1px);
 }
 
-#saturn canvas{
+#saturnCanvas{
     width:100%;
     height:100%;
 }
 
 .app{
-    position:relative;
-    z-index:2;
-    width:100%;
-    height:100%;
-    display:flex;
-    flex-direction:column;
-}
-
-.topbar{
-    height:72px;
-    flex-shrink:0;
-    display:flex;
-    align-items:center;
-    gap:16px;
-    padding:0 20px;
-    background:rgba(3,4,8,.68);
-    backdrop-filter:blur(24px);
-    border-bottom:1px solid var(--border);
-}
-
-.logo{
-    min-width:220px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    font-weight:800;
-    letter-spacing:.08em;
-    font-size:14px;
-}
-
-.logoMark{
-    width:35px;
-    height:35px;
-    border-radius:11px;
-    background:
-        linear-gradient(135deg,#a877ff,#4b72ff);
-    box-shadow:
-        0 0 25px rgba(130,88,255,.4);
-    display:grid;
-    place-items:center;
-    font-size:14px;
-}
-
-.search{
-    flex:1;
-    max-width:560px;
-    position:relative;
-}
-
-.search input{
-    width:100%;
-    height:42px;
-    border-radius:13px;
-    border:1px solid var(--border);
-    background:rgba(255,255,255,.045);
-    outline:none;
-    color:white;
-    padding:0 15px 0 42px;
-    transition:.2s;
-}
-
-.search input:focus{
-    border-color:rgba(141,92,255,.65);
-    box-shadow:0 0 0 4px rgba(141,92,255,.08);
-}
-
-.searchIcon{
-    position:absolute;
-    left:15px;
-    top:12px;
-    color:#777d89;
-}
-
-.topActions{
-    margin-left:auto;
-    display:flex;
-    gap:8px;
-}
-
-.btn{
-    height:40px;
-    border:1px solid var(--border);
-    color:#e8eaf0;
-    background:rgba(255,255,255,.05);
-    border-radius:11px;
-    padding:0 14px;
-    transition:.18s;
-}
-
-.btn:hover{
-    background:rgba(255,255,255,.09);
-    border-color:rgba(255,255,255,.15);
-    transform:translateY(-1px);
-}
-
-.btn.primary{
-    border:0;
-    color:white;
-    background:linear-gradient(135deg,#8655ff,#566dff);
-    box-shadow:0 8px 28px rgba(111,77,255,.25);
-}
-
-.content{
-    flex:1;
-    min-height:0;
+    min-height:100vh;
     display:flex;
 }
 
 .sidebar{
-    width:250px;
-    flex-shrink:0;
-    padding:16px;
-    border-right:1px solid var(--border);
-    background:rgba(4,5,9,.62);
-    backdrop-filter:blur(20px);
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    width:245px;
+    padding:22px 15px;
+    border-right:1px solid var(--line);
+    background:
+        linear-gradient(
+            180deg,
+            rgba(7,10,18,.94),
+            rgba(7,10,18,.72)
+        );
+    backdrop-filter:blur(22px);
+    z-index:20;
 }
 
-.navTitle{
+.logo{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin:5px 10px 30px;
+}
+
+.logo-mark{
+    width:39px;
+    height:39px;
+    display:grid;
+    place-items:center;
+    border-radius:13px;
+    background:
+        linear-gradient(
+            135deg,
+            #8b5cf6,
+            #06b6d4
+        );
+    box-shadow:
+        0 0 30px rgba(139,92,246,.3);
+    font-weight:900;
+}
+
+.logo-text{
+    font-weight:900;
+    letter-spacing:.5px;
+}
+
+.logo-sub{
+    color:var(--muted);
     font-size:10px;
-    text-transform:uppercase;
-    letter-spacing:.15em;
-    color:#555b68;
-    padding:10px 10px 7px;
+    margin-top:2px;
 }
 
 .nav{
     display:flex;
     flex-direction:column;
-    gap:4px;
+    gap:5px;
 }
 
 .nav button{
-    border:1px solid transparent;
-    background:transparent;
-    color:#969ba7;
-    border-radius:11px;
-    height:43px;
-    padding:0 12px;
+    width:100%;
     display:flex;
     align-items:center;
-    gap:11px;
+    gap:12px;
+    padding:12px 13px;
+    color:#9da6bb;
+    background:transparent;
+    border-radius:13px;
     text-align:left;
+    transition:.2s ease;
 }
 
 .nav button:hover{
-    color:white;
-    background:rgba(255,255,255,.045);
+    background:rgba(255,255,255,.05);
+    color:#fff;
+    transform:translateX(3px);
 }
 
 .nav button.active{
-    color:white;
-    background:linear-gradient(
-        90deg,
-        rgba(141,92,255,.18),
-        rgba(141,92,255,.04)
-    );
-    border-color:rgba(141,92,255,.17);
+    background:
+        linear-gradient(
+            90deg,
+            rgba(139,92,246,.2),
+            rgba(6,182,212,.07)
+        );
+    color:#fff;
+    box-shadow:
+        inset 2px 0 0 #8b5cf6;
 }
 
-.navIcon{
-    width:20px;
+.nav-icon{
+    width:21px;
     text-align:center;
 }
 
 .main{
+    width:calc(100% - 245px);
+    margin-left:245px;
+    min-height:100vh;
+}
+
+.topbar{
+    height:76px;
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:0 27px;
+    border-bottom:1px solid var(--line);
+    background:rgba(5,7,13,.45);
+    backdrop-filter:blur(18px);
+    position:sticky;
+    top:0;
+    z-index:15;
+}
+
+.global-search{
     flex:1;
-    min-width:0;
+    max-width:600px;
     position:relative;
-    overflow:hidden;
+}
+
+.global-search input{
+    width:100%;
+    padding:12px 16px 12px 43px;
+    color:#fff;
+    border:1px solid var(--line);
+    outline:none;
+    border-radius:14px;
+    background:rgba(255,255,255,.045);
+    transition:.2s;
+}
+
+.global-search input:focus{
+    border-color:rgba(139,92,246,.6);
+    box-shadow:
+        0 0 0 3px rgba(139,92,246,.1);
+}
+
+.search-icon{
+    position:absolute;
+    left:15px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#788197;
+}
+
+.user-area{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.user-pill{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:7px 10px;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,.04);
+    border-radius:14px;
+}
+
+.avatar{
+    width:34px;
+    height:34px;
+    border-radius:11px;
+    object-fit:cover;
+    background:
+        linear-gradient(
+            135deg,
+            #8b5cf6,
+            #06b6d4
+        );
+}
+
+.content{
+    padding:30px;
+    max-width:1600px;
+    margin:auto;
 }
 
 .page{
-    position:absolute;
-    inset:0;
-    overflow:auto;
-    padding:25px;
     display:none;
+    animation:pageIn .35s ease;
 }
 
 .page.active{
     display:block;
-    animation:pageIn .3s ease;
 }
 
 @keyframes pageIn{
     from{
         opacity:0;
-        transform:translateY(8px);
+        transform:translateY(12px);
     }
     to{
         opacity:1;
@@ -268,206 +305,243 @@ button{
 }
 
 .hero{
-    max-width:1050px;
-    margin:0 auto;
-}
-
-.heroTitle{
-    font-size:42px;
-    font-weight:850;
-    letter-spacing:-.04em;
-    margin-bottom:10px;
-}
-
-.heroTitle span{
-    background:linear-gradient(90deg,#fff,#9873ff);
-    -webkit-background-clip:text;
-    color:transparent;
-}
-
-.heroText{
-    color:#858b98;
-    max-width:650px;
-    line-height:1.6;
-}
-
-.cards{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:12px;
-    margin-top:26px;
-}
-
-.card{
-    background:rgba(9,11,17,.75);
-    border:1px solid var(--border);
-    border-radius:17px;
-    padding:18px;
-    backdrop-filter:blur(18px);
-    box-shadow:0 15px 50px rgba(0,0,0,.15);
-}
-
-.card:hover{
-    border-color:rgba(141,92,255,.22);
-}
-
-.stat{
-    color:#656b77;
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:.12em;
-}
-
-.statValue{
-    margin-top:8px;
-    font-size:27px;
-    font-weight:800;
-}
-
-.section{
-    margin-top:18px;
-    background:rgba(7,9,14,.74);
-    border:1px solid var(--border);
-    border-radius:19px;
-    overflow:hidden;
-}
-
-.sectionHead{
-    padding:17px 19px;
-    border-bottom:1px solid var(--border);
     display:flex;
-    align-items:center;
+    align-items:flex-end;
     justify-content:space-between;
+    gap:20px;
+    margin-bottom:25px;
 }
 
-.sectionTitle{
-    font-size:14px;
-    font-weight:750;
+h1{
+    font-size:34px;
+    letter-spacing:-1.4px;
 }
 
-.sectionBody{
-    padding:19px;
+.hero p{
+    margin-top:7px;
+    color:var(--muted);
 }
 
-.toolGrid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:14px;
-}
-
-.tool{
-    border:1px solid var(--border);
-    background:rgba(255,255,255,.025);
-    border-radius:16px;
-    padding:20px;
+.btn{
+    padding:11px 16px;
+    border-radius:12px;
+    color:white;
+    background:
+        linear-gradient(
+            135deg,
+            #8b5cf6,
+            #6d4bd8
+        );
+    box-shadow:
+        0 10px 30px rgba(139,92,246,.16);
     transition:.2s;
 }
 
-.tool:hover{
+.btn:hover{
     transform:translateY(-2px);
-    border-color:rgba(141,92,255,.28);
+    box-shadow:
+        0 15px 35px rgba(139,92,246,.25);
 }
 
-.tool h3{
-    font-size:16px;
-    margin-bottom:7px;
+.btn.secondary{
+    background:rgba(255,255,255,.06);
+    border:1px solid var(--line);
+    box-shadow:none;
 }
 
-.tool p{
-    color:#7d8390;
-    line-height:1.55;
+.btn.danger{
+    background:rgba(239,68,68,.12);
+    border:1px solid rgba(239,68,68,.25);
+    color:#ff8c8c;
+    box-shadow:none;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:18px;
+}
+
+.card{
+    border:1px solid var(--line);
+    border-radius:19px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(18,23,37,.86),
+            rgba(9,12,21,.72)
+        );
+    backdrop-filter:blur(16px);
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.15);
+}
+
+.stat{
+    padding:20px;
+    min-height:135px;
+    position:relative;
+    overflow:hidden;
+}
+
+.stat::after{
+    content:"";
+    position:absolute;
+    width:100px;
+    height:100px;
+    right:-40px;
+    bottom:-40px;
+    border-radius:50%;
+    background:
+        radial-gradient(
+            circle,
+            rgba(139,92,246,.25),
+            transparent 65%
+        );
+}
+
+.stat-label{
+    color:var(--muted);
     font-size:13px;
 }
 
-.tool button{
-    margin-top:16px;
+.stat-number{
+    font-size:34px;
+    font-weight:900;
+    margin-top:18px;
 }
 
-.field{
+.grid2{
+    display:grid;
+    grid-template-columns:1.4fr .9fr;
+    gap:18px;
+}
+
+.panel{
+    padding:21px;
+}
+
+.panel-head{
     display:flex;
-    gap:9px;
-    margin-bottom:12px;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:18px;
 }
 
-.field input{
+.panel-title{
+    font-weight:800;
+}
+
+.panel-sub{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:3px;
+}
+
+.form{
+    display:flex;
+    gap:10px;
+}
+
+.input{
     flex:1;
     min-width:0;
-    height:46px;
-    padding:0 14px;
-    border:1px solid var(--border);
+    padding:12px 14px;
     border-radius:12px;
-    outline:none;
     color:white;
     background:rgba(255,255,255,.045);
+    border:1px solid var(--line);
+    outline:none;
 }
 
-.field input:focus{
-    border-color:rgba(141,92,255,.55);
+.input:focus{
+    border-color:rgba(139,92,246,.55);
 }
 
-.resultList{
+.result-list{
     display:flex;
     flex-direction:column;
-    gap:8px;
+    gap:9px;
 }
 
 .result{
-    min-height:52px;
-    border:1px solid var(--border);
-    background:rgba(255,255,255,.025);
-    border-radius:12px;
-    padding:12px 14px;
     display:flex;
     align-items:center;
     gap:12px;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:13px;
+    background:rgba(255,255,255,.025);
+    animation:resultIn .3s ease both;
 }
 
-.resultService{
-    flex:1;
-    font-weight:700;
+@keyframes resultIn{
+    from{
+        opacity:0;
+        transform:translateX(-12px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
 }
 
 .status{
+    margin-left:auto;
+    padding:5px 9px;
+    border-radius:8px;
     font-size:10px;
+    font-weight:900;
+    letter-spacing:.6px;
+}
+
+.status.FOUND{
+    color:#86efac;
+    background:rgba(34,197,94,.1);
+}
+
+.status.NOT_FOUND{
+    color:#fca5a5;
+    background:rgba(239,68,68,.1);
+}
+
+.status.UNKNOWN{
+    color:#fcd34d;
+    background:rgba(245,158,11,.1);
+}
+
+.service{
     font-weight:800;
-    letter-spacing:.1em;
-    padding:6px 9px;
-    border-radius:7px;
+    font-size:13px;
 }
 
-.status.found{
-    color:var(--green);
-    background:rgba(77,255,155,.08);
+.reason{
+    color:var(--muted);
+    font-size:11px;
+    margin-top:3px;
 }
 
-.status.not{
-    color:#ff6b88;
-    background:rgba(255,85,119,.08);
-}
-
-.status.unknown{
-    color:var(--yellow);
-    background:rgba(255,200,87,.08);
-}
-
-#graphPage{
-    padding:0;
+.graph-wrap{
+    position:relative;
+    height:650px;
     overflow:hidden;
+    border:1px solid var(--line);
+    border-radius:22px;
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(139,92,246,.08),
+            transparent 42%
+        ),
+        rgba(7,10,18,.65);
 }
 
-.graph{
+#graph{
     position:absolute;
     inset:0;
-    overflow:hidden;
-    cursor:grab;
-    background:
-        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
-    background-size:40px 40px;
-}
-
-.graph:active{
-    cursor:grabbing;
+    width:100%;
+    height:100%;
 }
 
 #links{
@@ -476,464 +550,463 @@ button{
     width:100%;
     height:100%;
     pointer-events:none;
-    overflow:visible;
 }
 
-.link{
-    stroke:rgba(143,102,255,.55);
-    stroke-width:1.5;
-    fill:none;
-    filter:drop-shadow(0 0 5px rgba(141,92,255,.3));
+.graph-toolbar{
+    position:absolute;
+    top:15px;
+    left:15px;
+    right:15px;
+    z-index:4;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
 }
 
-.link.animate{
-    stroke-dasharray:7 9;
-    animation:flow 1.3s linear infinite;
-}
-
-@keyframes flow{
-    to{
-        stroke-dashoffset:-32;
-    }
+.graph-toolbar input{
+    width:220px;
 }
 
 .node{
     position:absolute;
-    width:190px;
-    min-height:76px;
-    padding:13px 14px;
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:15px;
+    min-width:150px;
+    max-width:230px;
+    padding:13px;
+    border-radius:16px;
+    border:1px solid rgba(139,92,246,.25);
     background:
         linear-gradient(
-            135deg,
-            rgba(20,22,32,.94),
-            rgba(8,10,16,.94)
+            145deg,
+            rgba(23,27,45,.97),
+            rgba(10,13,23,.97)
         );
     box-shadow:
-        0 18px 50px rgba(0,0,0,.3),
-        inset 0 1px 0 rgba(255,255,255,.035);
+        0 15px 45px rgba(0,0,0,.35);
+    cursor:grab;
     user-select:none;
-    animation:nodeIn .35s cubic-bezier(.2,.8,.2,1);
+    transition:
+        box-shadow .2s,
+        border-color .2s,
+        transform .2s;
     z-index:3;
 }
 
-@keyframes nodeIn{
-    from{
-        opacity:0;
-        transform:scale(.75) translateY(12px);
-    }
-    to{
-        opacity:1;
-        transform:none;
-    }
-}
-
-.node.selected{
-    border-color:#986fff;
+.node:hover{
+    border-color:rgba(139,92,246,.7);
     box-shadow:
-        0 0 0 1px rgba(152,111,255,.3),
-        0 0 35px rgba(120,78,255,.18);
+        0 0 35px rgba(139,92,246,.17),
+        0 20px 50px rgba(0,0,0,.4);
 }
 
-.node.blink{
-    animation:
-        nodeBlink .55s ease-in-out 6;
+.node.dragging{
+    cursor:grabbing;
+    transform:scale(1.03);
 }
 
-@keyframes nodeBlink{
+.node.match{
+    animation:nodePulse 1s ease infinite;
+}
+
+@keyframes nodePulse{
+    0%,100%{
+        box-shadow:
+            0 0 0 rgba(139,92,246,0);
+    }
     50%{
         box-shadow:
-            0 0 0 3px rgba(151,105,255,.65),
-            0 0 45px rgba(151,105,255,.7);
+            0 0 35px rgba(139,92,246,.7);
     }
 }
 
-.nodeTitle{
-    font-weight:800;
-    font-size:13px;
-    margin-bottom:5px;
+.node-top{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-bottom:7px;
 }
 
-.nodeText{
-    color:#777e8d;
+.node-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#8b5cf6;
+    box-shadow:0 0 12px #8b5cf6;
+}
+
+.node-title{
+    font-size:12px;
+    font-weight:900;
+}
+
+.node-content{
+    color:#9ea7ba;
     font-size:11px;
     line-height:1.4;
-    max-height:32px;
-    overflow:hidden;
+    word-break:break-word;
 }
 
-.nodeDot{
+.node-remove{
     position:absolute;
-    width:9px;
-    height:9px;
-    right:-5px;
-    top:50%;
-    transform:translateY(-50%);
-    border-radius:50%;
-    background:#9564ff;
-    box-shadow:0 0 12px #9564ff;
+    right:7px;
+    top:7px;
+    width:20px;
+    height:20px;
+    border-radius:7px;
+    background:rgba(255,255,255,.05);
+    color:#8c95aa;
+    opacity:0;
 }
 
-.graphTools{
-    position:absolute;
-    left:18px;
-    top:18px;
-    display:flex;
-    gap:8px;
-    z-index:20;
+.node:hover .node-remove{
+    opacity:1;
 }
 
-.graphName{
-    position:absolute;
-    left:50%;
-    top:18px;
-    transform:translateX(-50%);
-    z-index:20;
-    padding:9px 15px;
-    border:1px solid var(--border);
-    background:rgba(5,6,10,.75);
-    backdrop-filter:blur(15px);
-    border-radius:11px;
-    color:#aeb4c1;
-    font-size:11px;
-}
-
-.mapBox{
-    height:520px;
-    position:relative;
-    overflow:hidden;
-    border-radius:16px;
-    border:1px solid var(--border);
-    background:#080b10;
-}
-
-#mapFrame{
+#map{
     width:100%;
-    height:100%;
+    height:520px;
     border:0;
-    background:#080b10;
+    border-radius:17px;
+    background:#080b12;
 }
 
-.mapResults{
-    position:absolute;
-    left:12px;
-    top:12px;
-    width:350px;
-    max-height:420px;
-    overflow:auto;
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-    z-index:5;
+.map-results{
+    margin-top:14px;
 }
 
-.mapResult{
+.map-item{
     padding:12px;
+    border:1px solid var(--line);
     border-radius:12px;
-    border:1px solid var(--border);
-    background:rgba(5,7,11,.88);
-    backdrop-filter:blur(15px);
+    margin-bottom:8px;
     cursor:pointer;
+    transition:.2s;
 }
 
-.mapResult:hover{
-    border-color:rgba(141,92,255,.45);
-}
-
-.mapResult strong{
-    font-size:12px;
-}
-
-.mapResult small{
-    display:block;
-    color:#777e8a;
-    margin-top:4px;
+.map-item:hover{
+    background:rgba(255,255,255,.04);
+    transform:translateX(3px);
 }
 
 .profile{
-    max-width:760px;
-    margin:auto;
+    max-width:700px;
 }
 
-.profileTop{
-    display:flex;
-    align-items:center;
-    gap:18px;
+.profile-avatar{
+    width:90px;
+    height:90px;
+    border-radius:25px;
+    object-fit:cover;
     margin-bottom:20px;
 }
 
-.avatar{
-    width:80px;
-    height:80px;
-    border-radius:22px;
-    border:1px solid var(--border);
-    object-fit:cover;
-    background:linear-gradient(135deg,#8655ff,#4f6cff);
-}
-
-.profileName{
-    font-size:25px;
-    font-weight:800;
-}
-
-.muted{
-    color:#777e8b;
-    font-size:13px;
-}
-
-.userRow{
-    display:flex;
-    align-items:center;
+.user-results{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
     gap:12px;
-    padding:11px;
-    border:1px solid var(--border);
-    border-radius:12px;
-    background:rgba(255,255,255,.025);
 }
 
-.userAvatar{
-    width:38px;
-    height:38px;
-    border-radius:11px;
+.user-card{
+    padding:15px;
+    display:flex;
+    gap:11px;
+    align-items:center;
+}
+
+.user-card img{
+    width:45px;
+    height:45px;
+    border-radius:13px;
     object-fit:cover;
-    background:linear-gradient(135deg,#8055ff,#4c6dff);
 }
 
 .modal{
     position:fixed;
     inset:0;
-    z-index:100;
-    background:rgba(0,0,0,.62);
-    backdrop-filter:blur(12px);
     display:none;
-    align-items:center;
-    justify-content:center;
+    place-items:center;
+    background:rgba(0,0,0,.68);
+    backdrop-filter:blur(12px);
+    z-index:100;
     padding:20px;
 }
 
-.modal.open{
-    display:flex;
+.modal.show{
+    display:grid;
 }
 
-.modalBox{
-    width:430px;
-    max-width:100%;
-    border:1px solid var(--border);
-    border-radius:20px;
-    background:#0b0e15;
+.modal-box{
+    width:100%;
+    max-width:410px;
+    padding:25px;
+    border:1px solid var(--line);
+    border-radius:22px;
+    background:#0d111d;
     box-shadow:0 30px 100px rgba(0,0,0,.55);
-    padding:22px;
-    animation:modalIn .25s ease;
 }
 
-@keyframes modalIn{
-    from{
-        opacity:0;
-        transform:scale(.94) translateY(12px);
-    }
-}
-
-.modalTitle{
-    font-size:19px;
-    font-weight:800;
-    margin-bottom:17px;
-}
-
-.modalActions{
+.modal-head{
     display:flex;
-    justify-content:flex-end;
-    gap:8px;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+.close{
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    color:#aaa;
+    background:rgba(255,255,255,.05);
+}
+
+.modal .input{
+    width:100%;
+    margin-bottom:10px;
+}
+
+.modal .btn{
+    width:100%;
+}
+
+.switch{
     margin-top:15px;
+    color:#8e97aa;
+    text-align:center;
+    font-size:12px;
+}
+
+.switch span{
+    color:#a78bfa;
+    cursor:pointer;
 }
 
 .toast{
     position:fixed;
     right:20px;
     bottom:20px;
-    z-index:500;
-    padding:13px 16px;
-    border:1px solid var(--border);
-    border-radius:12px;
-    background:rgba(11,13,19,.92);
-    box-shadow:0 15px 50px rgba(0,0,0,.4);
-    color:#e9ebf1;
-    transform:translateY(20px);
+    z-index:200;
+    min-width:250px;
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:#111624;
+    box-shadow:0 20px 50px rgba(0,0,0,.4);
+    transform:translateY(120px);
     opacity:0;
-    pointer-events:none;
-    transition:.25s;
+    transition:.3s;
 }
 
 .toast.show{
-    opacity:1;
     transform:none;
+    opacity:1;
 }
 
-.auth{
-    position:fixed;
-    inset:0;
-    z-index:1000;
-    background:#020307;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-}
-
-.auth.show{
+.loading{
     display:flex;
+    align-items:center;
+    gap:9px;
+    color:#9da6b8;
+    padding:15px;
 }
 
-.authBox{
-    width:420px;
-    max-width:100%;
-    border:1px solid var(--border);
-    border-radius:22px;
-    background:
-        radial-gradient(
-            circle at 50% 0%,
-            rgba(130,84,255,.12),
-            transparent 45%
-        ),
-        rgba(8,10,16,.95);
-    padding:28px;
-    box-shadow:0 35px 120px rgba(0,0,0,.65);
+.spinner{
+    width:17px;
+    height:17px;
+    border:2px solid rgba(255,255,255,.1);
+    border-top-color:#8b5cf6;
+    border-radius:50%;
+    animation:spin .7s linear infinite;
 }
 
-.authLogo{
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.empty{
+    padding:30px;
     text-align:center;
-    margin-bottom:25px;
+    color:#727c91;
 }
 
-.authLogo .logoMark{
-    margin:auto;
-    width:50px;
-    height:50px;
-    font-size:18px;
+.chain-list{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:13px;
 }
 
-.authLogo h1{
-    margin-top:14px;
-    font-size:22px;
+.chain-card{
+    padding:18px;
 }
 
-.authLogo p{
-    margin-top:5px;
-    color:#6e7480;
+.chain-card h3{
+    margin-bottom:5px;
+}
+
+.chain-card p{
+    color:var(--muted);
     font-size:12px;
 }
 
-.authTabs{
+.chain-actions{
     display:flex;
-    gap:5px;
-    padding:4px;
+    gap:7px;
+    margin-top:15px;
+}
+
+.chain-actions button{
+    padding:7px 10px;
+    border-radius:8px;
+    color:#c4cada;
+    background:rgba(255,255,255,.05);
+}
+
+.notice{
+    padding:13px;
     border-radius:12px;
-    background:rgba(255,255,255,.04);
-    margin-bottom:17px;
+    color:#aeb6c8;
+    background:rgba(139,92,246,.07);
+    border:1px solid rgba(139,92,246,.13);
+    font-size:12px;
+    line-height:1.5;
 }
 
-.authTabs button{
-    flex:1;
-    border:0;
-    background:transparent;
-    color:#777e89;
-    border-radius:9px;
-    height:37px;
-}
-
-.authTabs button.active{
-    background:rgba(255,255,255,.08);
-    color:white;
-}
-
-.hidden{
-    display:none!important;
-}
-
-.mobileMenu{
-    display:none;
-}
-
-@media(max-width:950px){
-
+@media(max-width:1000px){
     .sidebar{
-        width:210px;
+        width:78px;
     }
 
-    .cards{
+    .logo-text,
+    .logo-sub,
+    .nav span:not(.nav-icon){
+        display:none;
+    }
+
+    .logo{
+        justify-content:center;
+        margin-left:0;
+        margin-right:0;
+    }
+
+    .nav button{
+        justify-content:center;
+    }
+
+    .main{
+        width:calc(100% - 78px);
+        margin-left:78px;
+    }
+
+    .stats{
         grid-template-columns:repeat(2,1fr);
     }
 
-    .toolGrid{
+    .grid2{
         grid-template-columns:1fr;
+    }
+
+    .user-results,
+    .chain-list{
+        grid-template-columns:repeat(2,1fr);
     }
 }
 
 @media(max-width:700px){
-
-    .topbar{
-        height:62px;
-        padding:0 12px;
+    .sidebar{
+        top:auto;
+        width:100%;
+        height:67px;
+        padding:5px 7px;
+        border-right:0;
+        border-top:1px solid var(--line);
+        z-index:50;
     }
 
     .logo{
-        min-width:auto;
-    }
-
-    .logoText{
         display:none;
     }
 
-    .search{
-        max-width:none;
+    .nav{
+        height:100%;
+        flex-direction:row;
+        justify-content:space-around;
+        align-items:center;
     }
 
-    .topActions .btn:not(.primary){
-        display:none;
+    .nav button{
+        width:auto;
+        height:55px;
+        padding:7px 9px;
+        flex-direction:column;
+        gap:3px;
+        font-size:9px;
     }
 
-    .sidebar{
-        position:absolute;
-        z-index:50;
-        top:62px;
-        bottom:0;
-        left:0;
-        transform:translateX(-100%);
-        transition:.25s;
-        width:245px;
+    .nav button.active{
+        box-shadow:
+            inset 0 -2px 0 #8b5cf6;
     }
 
-    .sidebar.open{
-        transform:none;
-    }
-
-    .mobileMenu{
+    .nav span:not(.nav-icon){
         display:block;
     }
 
-    .page{
-        padding:16px;
+    .main{
+        width:100%;
+        margin-left:0;
+        padding-bottom:67px;
     }
 
-    .heroTitle{
-        font-size:31px;
+    .topbar{
+        padding:0 12px;
     }
 
-    .cards{
-        grid-template-columns:1fr 1fr;
+    .content{
+        padding:18px 12px;
     }
 
-    .field{
+    h1{
+        font-size:27px;
+    }
+
+    .hero{
+        align-items:flex-start;
         flex-direction:column;
     }
 
-    .mapResults{
-        width:calc(100% - 24px);
+    .stats{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .stat{
+        min-height:115px;
+    }
+
+    .stat-number{
+        font-size:27px;
+    }
+
+    .graph-wrap{
+        height:560px;
+    }
+
+    .user-results,
+    .chain-list{
+        grid-template-columns:1fr;
     }
 
     #saturn{
-        width:500px;
-        height:500px;
+        right:-240px;
+        top:70px;
+        opacity:.32;
+    }
+
+    .global-search{
+        max-width:none;
+    }
+
+    .user-pill{
+        display:none;
     }
 }
 </style>
@@ -941,7 +1014,7 @@ button{
 
 <body>
 
-<canvas id="space"></canvas>
+<div id="space"></div>
 
 <div id="saturn">
     <canvas id="saturnCanvas"></canvas>
@@ -949,842 +1022,681 @@ button{
 
 <div class="app">
 
-<header class="topbar">
-
-    <button
-        class="btn mobileMenu"
-        onclick="toggleSidebar()"
-    >☰</button>
+<aside class="sidebar">
 
     <div class="logo">
-        <div class="logoMark">NX</div>
-        <div class="logoText">NZX OSINT TOOL</div>
+        <div class="logo-mark">N</div>
+        <div>
+            <div class="logo-text">NZX</div>
+            <div class="logo-sub">OSINT TOOL</div>
+        </div>
     </div>
 
-    <div class="search">
-        <span class="searchIcon">⌕</span>
-        <input
-            id="globalSearch"
-            placeholder="Search nodes, chains, users..."
-            oninput="globalSearch()"
-        >
-    </div>
+    <nav class="nav">
 
-    <div class="topActions">
-        <button class="btn" onclick="openPage('profile')">
-            Profile
+        <button class="active" onclick="page('dashboard',this)">
+            <span class="nav-icon">⌂</span>
+            <span>Dashboard</span>
         </button>
 
-        <button
-            class="btn primary"
-            onclick="openAuth()"
-            id="authButton"
-        >
-            Login
-        </button>
-    </div>
-
-</header>
-
-<div class="content">
-
-<aside class="sidebar" id="sidebar">
-
-    <div class="navTitle">Workspace</div>
-
-    <div class="nav">
-
-        <button
-            class="active"
-            data-page="home"
-            onclick="openPage('home')"
-        >
-            <span class="navIcon">⌂</span>
-            Dashboard
+        <button onclick="page('graph',this)">
+            <span class="nav-icon">◈</span>
+            <span>OSINT Graph</span>
         </button>
 
-        <button
-            data-page="graph"
-            onclick="openPage('graph')"
-        >
-            <span class="navIcon">◈</span>
-            OSINT Graph
+        <button onclick="page('email',this)">
+            <span class="nav-icon">✉</span>
+            <span>Email</span>
         </button>
 
-        <button
-            data-page="email"
-            onclick="openPage('email')"
-        >
-            <span class="navIcon">@</span>
-            Email Search
+        <button onclick="page('phone',this)">
+            <span class="nav-icon">☎</span>
+            <span>Phone</span>
         </button>
 
-        <button
-            data-page="phone"
-            onclick="openPage('phone')"
-        >
-            <span class="navIcon">⌕</span>
-            Phone Check
+        <button onclick="page('map-page',this)">
+            <span class="nav-icon">⌖</span>
+            <span>Map</span>
         </button>
 
-        <button
-            data-page="map"
-            onclick="openPage('map')"
-        >
-            <span class="navIcon">⌖</span>
-            Map Search
+        <button onclick="page('chains',this)">
+            <span class="nav-icon">◇</span>
+            <span>Chains</span>
         </button>
 
-    </div>
-
-    <div class="navTitle">Account</div>
-
-    <div class="nav">
-
-        <button
-            data-page="chains"
-            onclick="openPage('chains')"
-        >
-            <span class="navIcon">☷</span>
-            My Chains
+        <button onclick="page('users',this)">
+            <span class="nav-icon">◎</span>
+            <span>Users</span>
         </button>
 
-        <button
-            data-page="users"
-            onclick="openPage('users')"
-        >
-            <span class="navIcon">◎</span>
-            Users
+        <button onclick="page('profile',this)">
+            <span class="nav-icon">●</span>
+            <span>Profile</span>
         </button>
 
-        <button
-            data-page="profile"
-            onclick="openPage('profile')"
-        >
-            <span class="navIcon">◉</span>
-            Profile
-        </button>
-
-    </div>
+    </nav>
 
 </aside>
 
 <main class="main">
 
-<!-- ======================================================
-     DASHBOARD
-====================================================== -->
-
-<section
-    class="page active"
-    id="homePage"
->
-
-<div class="hero">
-
-    <div class="heroTitle">
-        Welcome to <span>NZX OSINT TOOL</span>
-    </div>
-
-    <div class="heroText">
-        Интерактивная рабочая среда для построения OSINT-цепочек,
-        анализа открытых данных, поиска адресов и визуализации
-        взаимосвязей.
-    </div>
-
-    <div class="cards">
-
-        <div class="card">
-            <div class="stat">Nodes</div>
-            <div
-                class="statValue"
-                id="statNodes"
-            >0</div>
-        </div>
-
-        <div class="card">
-            <div class="stat">Chains</div>
-            <div
-                class="statValue"
-                id="statChains"
-            >0</div>
-        </div>
-
-        <div class="card">
-            <div class="stat">Searches</div>
-            <div
-                class="statValue"
-                id="statSearches"
-            >0</div>
-        </div>
-
-        <div class="card">
-            <div class="stat">System</div>
-            <div
-                class="statValue"
-                style="color:var(--green)"
-            >ONLINE</div>
-        </div>
-
-    </div>
-
-    <div class="section">
-
-        <div class="sectionHead">
-            <div class="sectionTitle">
-                Quick tools
-            </div>
-        </div>
-
-        <div class="sectionBody">
-
-            <div class="toolGrid">
-
-                <div class="tool">
-                    <h3>◈ OSINT Graph</h3>
-                    <p>
-                        Создавай узлы и связывай их в интерактивную
-                        цепочку с автоматическими линиями.
-                    </p>
-
-                    <button
-                        class="btn primary"
-                        onclick="openPage('graph')"
-                    >
-                        Open Graph
-                    </button>
-                </div>
-
-                <div class="tool">
-                    <h3>@ Email Intelligence</h3>
-                    <p>
-                        Проверка формата, домена и публичных
-                        сигналов, доступных без авторизации.
-                    </p>
-
-                    <button
-                        class="btn primary"
-                        onclick="openPage('email')"
-                    >
-                        Search Email
-                    </button>
-                </div>
-
-                <div class="tool">
-                    <h3>⌖ Address Intelligence</h3>
-                    <p>
-                        Поиск адресов и координат через открытый
-                        картографический источник.
-                    </p>
-
-                    <button
-                        class="btn primary"
-                        onclick="openPage('map')"
-                    >
-                        Open Map
-                    </button>
-                </div>
-
-                <div class="tool">
-                    <h3>⌕ Phone Check</h3>
-                    <p>
-                        Нормализация номера и проверка
-                        базового международного формата.
-                    </p>
-
-                    <button
-                        class="btn primary"
-                        onclick="openPage('phone')"
-                    >
-                        Check Phone
-                    </button>
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-</section>
-
-
-<!-- ======================================================
-     GRAPH
-====================================================== -->
-
-<section
-    class="page"
-    id="graphPage"
->
-
-<div
-    class="graph"
-    id="graph"
->
-
-<svg id="links"></svg>
-
-<div class="graphName">
-    NZX OSINT GRAPH
-</div>
-
-<div class="graphTools">
-
-    <button
-        class="btn primary"
-        onclick="newNode()"
-    >
-        + Node
-    </button>
-
-    <button
-        class="btn"
-        onclick="saveCurrentChain()"
-    >
-        Save
-    </button>
-
-    <button
-        class="btn"
-        onclick="clearGraph()"
-    >
-        Clear
-    </button>
-
-</div>
-
-</div>
-
-</section>
-
-
-<!-- ======================================================
-     EMAIL
-====================================================== -->
-
-<section
-    class="page"
-    id="emailPage"
->
-
-<div class="hero">
-
-    <div class="heroTitle">
-        Email <span>Intelligence</span>
-    </div>
-
-    <div class="heroText">
-        Введите email. Система последовательно показывает
-        результаты публичных проверок.
-    </div>
-
-    <div class="section">
-
-        <div class="sectionBody">
-
-            <div class="field">
-
-                <input
-                    id="emailInput"
-                    type="email"
-                    placeholder="example@gmail.com"
-                >
-
-                <button
-                    class="btn primary"
-                    onclick="emailSearch()"
-                >
-                    Start Search
-                </button>
-
-            </div>
-
-            <div
-                id="emailResults"
-                class="resultList"
-            ></div>
-
-        </div>
-
-    </div>
-
-</div>
-
-</section>
-
-
-<!-- ======================================================
-     PHONE
-====================================================== -->
-
-<section
-    class="page"
-    id="phonePage"
->
-
-<div class="hero">
-
-    <div class="heroTitle">
-        Phone <span>Check</span>
-    </div>
-
-    <div class="heroText">
-        Проверка базовой структуры международного номера.
-        Формат OK не означает, что номер активен.
-    </div>
-
-    <div class="section">
-
-        <div class="sectionBody">
-
-            <div class="field">
-
-                <input
-                    id="phoneInput"
-                    placeholder="+374 99 123456"
-                >
-
-                <button
-                    class="btn primary"
-                    onclick="phoneSearch()"
-                >
-                    Check
-                </button>
-
-            </div>
-
-            <div
-                id="phoneResult"
-                class="resultList"
-            ></div>
-
-        </div>
-
-    </div>
-
-</div>
-
-</section>
-
-
-<!-- ======================================================
-     MAP
-====================================================== -->
-
-<section
-    class="page"
-    id="mapPage"
->
-
-<div class="hero">
-
-    <div class="heroTitle">
-        Address <span>Search</span>
-    </div>
-
-    <div class="heroText">
-        Поиск адреса и координат. Можно вводить улицу,
-        город, здание или приблизительное описание.
-    </div>
-
-    <div class="section">
-
-        <div class="sectionBody">
-
-            <div class="field">
-
-                <input
-                    id="mapInput"
-                    placeholder="Yerevan, Republic Square"
-                    onkeydown="if(event.key==='Enter') mapSearch()"
-                >
-
-                <button
-                    class="btn primary"
-                    onclick="mapSearch()"
-                >
-                    Search
-                </button>
-
-            </div>
-
-            <div class="mapBox">
-
-                <iframe
-                    id="mapFrame"
-                    src="about:blank"
-                ></iframe>
-
-                <div
-                    id="mapResults"
-                    class="mapResults"
-                ></div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-</section>
-
-
-<!-- ======================================================
-     CHAINS
-====================================================== -->
-
-<section
-    class="page"
-    id="chainsPage"
->
-
-<div class="hero">
-
-    <div class="heroTitle">
-        My <span>Chains</span>
-    </div>
-
-    <div class="heroText">
-        Сохранённые OSINT-цепочки.
-    </div>
-
-    <div
-        class="section"
-        style="margin-top:25px"
-    >
-
-        <div
-            class="sectionBody"
-            id="chainsList"
+<header class="topbar">
+
+    <div class="global-search">
+        <span class="search-icon">⌕</span>
+        <input
+            id="globalSearch"
+            placeholder="Search email, phone, address..."
+            onkeydown="globalKey(event)"
         >
-            Loading...
-        </div>
-
     </div>
 
-</div>
+    <div class="user-area">
 
-</section>
-
-
-<!-- ======================================================
-     USERS
-====================================================== -->
-
-<section
-    class="page"
-    id="usersPage"
->
-
-<div class="hero">
-
-    <div class="heroTitle">
-        Search <span>Users</span>
-    </div>
-
-    <div class="heroText">
-        Поиск пользователей зарегистрированных в NZX.
-    </div>
-
-    <div class="section">
-
-        <div class="sectionBody">
-
-            <div class="field">
-
-                <input
-                    id="userSearchInput"
-                    placeholder="username"
-                    oninput="searchUsers()"
-                >
-
-            </div>
-
-            <div
-                class="resultList"
-                id="usersResults"
-            ></div>
-
-        </div>
-
-    </div>
-
-</div>
-
-</section>
-
-
-<!-- ======================================================
-     PROFILE
-====================================================== -->
-
-<section
-    class="page"
-    id="profilePage"
->
-
-<div class="profile">
-
-    <div class="heroTitle">
-        My <span>Profile</span>
-    </div>
-
-    <div class="section">
-
-        <div class="sectionBody">
-
-            <div class="profileTop">
-
-                <img
-                    class="avatar"
-                    id="profileAvatar"
-                    src=""
-                    onerror="this.style.display='none'"
-                >
-
-                <div>
-                    <div
-                        class="profileName"
-                        id="profileName"
-                    >
-                        Guest
-                    </div>
-
-                    <div
-                        class="muted"
-                        id="profileEmail"
-                    >
-                        Not logged in
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="field">
-
-                <input
-                    id="profileUsername"
-                    placeholder="Username"
-                >
-
-            </div>
-
-            <div class="field">
-
-                <input
-                    id="profileAvatarInput"
-                    placeholder="Avatar URL"
-                >
-
-            </div>
-
-            <button
-                class="btn primary"
-                onclick="saveProfile()"
+        <div class="user-pill" id="userPill">
+            <img
+                id="topAvatar"
+                class="avatar"
+                src=""
+                alt=""
             >
-                Save Profile
-            </button>
-
-            <button
-                class="btn"
-                onclick="logout()"
-                style="margin-left:6px"
-            >
-                Logout
-            </button>
-
+            <span id="topUsername">Guest</span>
         </div>
-
-    </div>
-
-</div>
-
-</section>
-
-</main>
-
-</div>
-
-</div>
-
-
-<!-- ======================================================
-     AUTH
-====================================================== -->
-
-<div
-    class="auth"
-    id="auth"
->
-
-<div class="authBox">
-
-    <div class="authLogo">
-
-        <div class="logoMark">
-            NX
-        </div>
-
-        <h1>NZX OSINT TOOL</h1>
-
-        <p>
-            Secure workspace
-        </p>
-
-    </div>
-
-    <div class="authTabs">
 
         <button
-            id="loginTab"
-            class="active"
-            onclick="switchAuth('login')"
+            class="btn"
+            id="authButton"
+            onclick="openAuth()"
         >
             Login
         </button>
 
-        <button
-            id="registerTab"
-            onclick="switchAuth('register')"
-        >
-            Register
+    </div>
+
+</header>
+
+
+<div class="content">
+
+
+<!-- ========================================================
+     DASHBOARD
+========================================================= -->
+
+<section class="page active" id="page-dashboard">
+
+    <div class="hero">
+
+        <div>
+            <h1>NZX OSINT TOOL</h1>
+            <p>
+                Real-source investigation workspace.
+                No fabricated account results.
+            </p>
+        </div>
+
+        <button class="btn" onclick="pageByName('graph')">
+            Open Graph
         </button>
 
     </div>
 
+    <div class="stats">
 
-    <div id="loginForm">
-
-        <div class="field">
-            <input
-                id="loginValue"
-                placeholder="Username or email"
-            >
+        <div class="card stat">
+            <div class="stat-label">Investigations</div>
+            <div class="stat-number" id="statChains">0</div>
         </div>
 
-        <div class="field">
-            <input
-                id="loginPassword"
-                type="password"
-                placeholder="Password"
-            >
+        <div class="card stat">
+            <div class="stat-label">Graph Nodes</div>
+            <div class="stat-number" id="statNodes">0</div>
         </div>
 
-        <button
-            class="btn primary"
-            style="width:100%"
-            onclick="login()"
-        >
-            Enter
+        <div class="card stat">
+            <div class="stat-label">User Status</div>
+            <div class="stat-number" id="statAuth">—</div>
+        </div>
+
+        <div class="card stat">
+            <div class="stat-label">Backend</div>
+            <div class="stat-number">LIVE</div>
+        </div>
+
+    </div>
+
+    <div class="grid2">
+
+        <div class="card panel">
+
+            <div class="panel-head">
+                <div>
+                    <div class="panel-title">Quick Email Search</div>
+                    <div class="panel-sub">
+                        Real checks only
+                    </div>
+                </div>
+            </div>
+
+            <div class="form">
+
+                <input
+                    class="input"
+                    id="quickEmail"
+                    placeholder="name@example.com"
+                >
+
+                <button
+                    class="btn"
+                    onclick="runQuickEmail()"
+                >
+                    Scan
+                </button>
+
+            </div>
+
+            <div
+                id="quickResults"
+                class="result-list"
+                style="margin-top:15px"
+            ></div>
+
+        </div>
+
+
+        <div class="card panel">
+
+            <div class="panel-head">
+                <div>
+                    <div class="panel-title">System</div>
+                    <div class="panel-sub">
+                        NZX backend information
+                    </div>
+                </div>
+            </div>
+
+            <div class="notice">
+                <b>FOUND</b> means a provider returned a positive
+                result.<br><br>
+                <b>NOT FOUND</b> means the provider returned a
+                negative result.<br><br>
+                <b>UNKNOWN</b> means there was no reliable answer.
+                NZX does not convert UNKNOWN into FOUND.
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     GRAPH
+========================================================= -->
+
+<section class="page" id="page-graph">
+
+    <div class="hero">
+
+        <div>
+            <h1>OSINT Graph</h1>
+            <p>
+                Build an investigation chain from real results.
+            </p>
+        </div>
+
+        <button class="btn" onclick="saveChain()">
+            Save Chain
         </button>
 
     </div>
 
+    <div class="card panel">
 
-    <div
-        id="registerForm"
-        class="hidden"
-    >
+        <div class="graph-wrap" id="graphWrap">
 
-        <div class="field">
-            <input
-                id="registerUsername"
-                placeholder="Username"
-            >
+            <svg id="links"></svg>
+
+            <div class="graph-toolbar">
+
+                <input
+                    class="input"
+                    id="nodeTitle"
+                    placeholder="Node name"
+                >
+
+                <input
+                    class="input"
+                    id="nodeContent"
+                    placeholder="Node value"
+                >
+
+                <button
+                    class="btn"
+                    onclick="addNode()"
+                >
+                    + Node
+                </button>
+
+                <input
+                    class="input"
+                    id="chainSearch"
+                    placeholder="Find node..."
+                    oninput="searchGraph(this.value)"
+                >
+
+                <button
+                    class="btn secondary"
+                    onclick="autoLayout()"
+                >
+                    Auto Layout
+                </button>
+
+                <button
+                    class="btn danger"
+                    onclick="clearGraph()"
+                >
+                    Clear
+                </button>
+
+            </div>
+
+            <div id="graph"></div>
+
         </div>
 
-        <div class="field">
-            <input
-                id="registerEmail"
-                type="email"
-                placeholder="Email"
-            >
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     EMAIL
+========================================================= -->
+
+<section class="page" id="page-email">
+
+    <div class="hero">
+
+        <div>
+            <h1>Email Intelligence</h1>
+            <p>
+                Enter an email and inspect real available signals.
+            </p>
         </div>
 
-        <div class="field">
+    </div>
+
+    <div class="card panel">
+
+        <div class="form">
+
             <input
-                id="registerPassword"
-                type="password"
-                placeholder="Password"
+                class="input"
+                id="emailInput"
+                placeholder="example@gmail.com"
             >
+
+            <button
+                class="btn"
+                onclick="scanEmail()"
+            >
+                Start Scan
+            </button>
+
         </div>
 
-        <button
-            class="btn primary"
-            style="width:100%"
-            onclick="register()"
+        <div
+            id="emailSummary"
+            style="margin-top:15px"
+        ></div>
+
+        <div
+            id="emailResults"
+            class="result-list"
+            style="margin-top:12px"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     PHONE
+========================================================= -->
+
+<section class="page" id="page-phone">
+
+    <div class="hero">
+
+        <div>
+            <h1>Phone Intelligence</h1>
+            <p>
+                Number normalization and provider validation.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="card panel">
+
+        <div class="form">
+
+            <input
+                class="input"
+                id="phoneInput"
+                placeholder="+374..."
+            >
+
+            <button
+                class="btn"
+                onclick="scanPhone()"
+            >
+                Check
+            </button>
+
+        </div>
+
+        <div
+            id="phoneResults"
+            class="result-list"
+            style="margin-top:15px"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     MAP
+========================================================= -->
+
+<section class="page" id="page-map-page">
+
+    <div class="hero">
+
+        <div>
+            <h1>Map Intelligence</h1>
+            <p>
+                Search real geographic locations.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="card panel">
+
+        <div class="form">
+
+            <input
+                class="input"
+                id="mapInput"
+                placeholder="Yerevan, Armenia..."
+                onkeydown="mapEnter(event)"
+            >
+
+            <button
+                class="btn"
+                onclick="searchMap()"
+            >
+                Search
+            </button>
+
+        </div>
+
+        <div
+            id="mapResults"
+            class="map-results"
+        ></div>
+
+        <iframe
+            id="map"
+            loading="lazy"
+            src="https://www.openstreetmap.org/export/embed.html?bbox=44.45%2C40.15%2C44.65%2C40.25&layer=mapnik"
+        ></iframe>
+
+        <div
+            style="
+                color:#687187;
+                font-size:10px;
+                margin-top:7px;
+            "
         >
-            Create Account
-        </button>
+            Map data © OpenStreetMap contributors
+        </div>
 
     </div>
 
-    <button
-        class="btn"
-        style="width:100%;margin-top:9px"
-        onclick="closeAuth()"
-    >
-        Close
-    </button>
-
-</div>
-
-</div>
+</section>
 
 
-<!-- ======================================================
-     NODE MODAL
-====================================================== -->
+<!-- ========================================================
+     CHAINS
+========================================================= -->
 
-<div
-    class="modal"
-    id="nodeModal"
->
+<section class="page" id="page-chains">
 
-<div class="modalBox">
+    <div class="hero">
 
-    <div class="modalTitle">
-        Create Node
-    </div>
-
-    <div class="field">
-        <input
-            id="nodeTitle"
-            placeholder="Node name"
-        >
-    </div>
-
-    <div class="field">
-        <input
-            id="nodeContent"
-            placeholder="Description / data"
-        >
-    </div>
-
-    <div class="modalActions">
+        <div>
+            <h1>My Chains</h1>
+            <p>
+                Saved investigations.
+            </p>
+        </div>
 
         <button
             class="btn"
-            onclick="closeNodeModal()"
+            onclick="saveChain()"
         >
-            Cancel
-        </button>
-
-        <button
-            class="btn primary"
-            onclick="createNode()"
-        >
-            Create
+            Save Current
         </button>
 
     </div>
 
+    <div
+        id="chainList"
+        class="chain-list"
+    ></div>
+
+</section>
+
+
+<!-- ========================================================
+     USERS
+========================================================= -->
+
+<section class="page" id="page-users">
+
+    <div class="hero">
+
+        <div>
+            <h1>Users</h1>
+            <p>
+                Search users registered inside NZX.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="card panel">
+
+        <div class="form">
+
+            <input
+                class="input"
+                id="userSearch"
+                placeholder="Username..."
+                oninput="searchUsers()"
+            >
+
+        </div>
+
+        <div
+            id="userResults"
+            class="user-results"
+            style="margin-top:15px"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<!-- ========================================================
+     PROFILE
+========================================================= -->
+
+<section class="page" id="page-profile">
+
+    <div class="hero">
+
+        <div>
+            <h1>Profile</h1>
+            <p>
+                Manage your NZX account.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="card panel profile">
+
+        <img
+            id="profileAvatar"
+            class="profile-avatar"
+            src=""
+            alt=""
+        >
+
+        <input
+            class="input"
+            id="profileUsername"
+            placeholder="Username"
+        >
+
+        <input
+            class="input"
+            id="profileAvatarInput"
+            placeholder="Avatar URL"
+            style="margin-top:10px"
+        >
+
+        <button
+            class="btn"
+            onclick="saveProfile()"
+            style="margin-top:10px"
+        >
+            Save Profile
+        </button>
+
+        <button
+            class="btn danger"
+            onclick="logout()"
+            style="margin-top:10px;width:100%"
+        >
+            Logout
+        </button>
+
+    </div>
+
+</section>
+
+
 </div>
+</main>
+</div>
+
+
+<!-- ========================================================
+     AUTH MODAL
+========================================================= -->
+
+<div
+    class="modal"
+    id="authModal"
+    onclick="closeAuthOutside(event)"
+>
+
+    <div
+        class="modal-box"
+        onclick="event.stopPropagation()"
+    >
+
+        <div class="modal-head">
+
+            <div>
+                <h2 id="authTitle">Login</h2>
+                <div
+                    class="panel-sub"
+                    style="margin-top:5px"
+                >
+                    NZX OSINT TOOL
+                </div>
+            </div>
+
+            <button
+                class="close"
+                onclick="closeAuth()"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div id="registerFields" style="display:none">
+
+            <input
+                class="input"
+                id="registerUsername"
+                placeholder="Username"
+            >
+
+        </div>
+
+        <input
+            class="input"
+            id="authLogin"
+            placeholder="Email or username"
+        >
+
+        <input
+            class="input"
+            id="authEmail"
+            placeholder="Email"
+            style="display:none"
+        >
+
+        <input
+            class="input"
+            id="authPassword"
+            placeholder="Password"
+            type="password"
+        >
+
+        <button
+            class="btn"
+            id="authSubmit"
+            onclick="submitAuth()"
+        >
+            Login
+        </button>
+
+        <div class="switch">
+
+            <span
+                id="switchText"
+                onclick="switchAuth()"
+            >
+                Create account
+            </span>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -1796,324 +1708,400 @@ button{
 
 
 <script>
-
-/* ==========================================================
-   GLOBAL
-========================================================== */
+/* ============================================================
+   NZX FRONTEND
+============================================================ */
 
 const $ = id => document.getElementById(id);
 
 let currentUser = null;
 
-let searches = 0;
+let nodes = [];
 
-let graphNodes = [];
-let graphLinks = [];
+let nodeCounter = 0;
 
-let graphOffsetX = 0;
-let graphOffsetY = 0;
+let dragging = null;
 
-let graphScale = 1;
+let dragOffsetX = 0;
 
-let draggingNode = null;
-let dragDX = 0;
-let dragDY = 0;
+let dragOffsetY = 0;
 
-let panning = false;
-let panStartX = 0;
-let panStartY = 0;
+let authMode = "login";
 
-let currentChainName = "Untitled Chain";
-
-let editingNode = null;
+let chains = [];
 
 
-/* ==========================================================
-   TOAST
-========================================================== */
+/* ============================================================
+   HELPERS
+============================================================ */
 
-let toastTimer;
-
-function toast(message){
-
-    const el = $("toast");
-
-    el.textContent = message;
-    el.classList.add("show");
-
-    clearTimeout(toastTimer);
-
-    toastTimer = setTimeout(()=>{
-        el.classList.remove("show");
-    },2600);
+function escapeHTML(value){
+    return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
 }
 
 
-/* ==========================================================
-   NAVIGATION
-========================================================== */
+function toast(message){
+    const el = $("toast");
 
-function openPage(name){
+    el.textContent = message;
 
-    document.querySelectorAll(".page")
-        .forEach(x=>x.classList.remove("active"));
+    el.classList.add("show");
 
-    document.querySelectorAll(".nav button")
-        .forEach(x=>x.classList.remove("active"));
+    clearTimeout(window.__toast);
 
-    const page = $(name + "Page");
+    window.__toast = setTimeout(() => {
+        el.classList.remove("show");
+    }, 2800);
+}
 
-    if(page){
-        page.classList.add("active");
+
+async function api(url, options = {}){
+    const response = await fetch(url,{
+        credentials:"include",
+        headers:{
+            "Content-Type":"application/json",
+            ...(options.headers || {})
+        },
+        ...options
+    });
+
+    let data = {};
+
+    try{
+        data = await response.json();
+    }catch{}
+
+    if(!response.ok){
+        throw new Error(
+            data.detail ||
+            data.error ||
+            `HTTP ${response.status}`
+        );
     }
 
-    const button = document.querySelector(
-        `.nav button[data-page="${name}"]`
-    );
+    return data;
+}
+
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+
+function page(name, button){
+
+    document.querySelectorAll(".page")
+        .forEach(x => x.classList.remove("active"));
+
+    const target = $("page-" + name);
+
+    if(target){
+        target.classList.add("active");
+    }
+
+    document.querySelectorAll(".nav button")
+        .forEach(x => x.classList.remove("active"));
 
     if(button){
         button.classList.add("active");
     }
-
-    $("sidebar").classList.remove("open");
 
     if(name === "chains"){
         loadChains();
     }
 
     if(name === "profile"){
-        renderProfile();
+        loadProfile();
+    }
+
+    if(name === "dashboard"){
+        updateStats();
     }
 }
 
-function toggleSidebar(){
-    $("sidebar").classList.toggle("open");
+
+function pageByName(name){
+
+    const map = {
+        dashboard:0,
+        graph:1,
+        email:2,
+        phone:3,
+        "map-page":4,
+        chains:5,
+        users:6,
+        profile:7
+    };
+
+    const buttons =
+        document.querySelectorAll(".nav button");
+
+    if(buttons[map[name]]){
+        page(name,buttons[map[name]]);
+    }
 }
 
 
-/* ==========================================================
-   AUTH UI
-========================================================== */
+/* ============================================================
+   AUTH
+============================================================ */
 
 function openAuth(){
-
-    if(currentUser){
-        openPage("profile");
-        return;
-    }
-
-    $("auth").classList.add("show");
+    $("authModal").classList.add("show");
 }
+
 
 function closeAuth(){
-    $("auth").classList.remove("show");
+    $("authModal").classList.remove("show");
 }
 
-function switchAuth(type){
 
-    if(type === "login"){
+function closeAuthOutside(event){
+    if(event.target === $("authModal")){
+        closeAuth();
+    }
+}
 
-        $("loginForm").classList.remove("hidden");
-        $("registerForm").classList.add("hidden");
 
-        $("loginTab").classList.add("active");
-        $("registerTab").classList.remove("active");
+function switchAuth(){
+
+    authMode =
+        authMode === "login"
+            ? "register"
+            : "login";
+
+    if(authMode === "login"){
+
+        $("authTitle").textContent = "Login";
+
+        $("registerFields").style.display = "none";
+
+        $("authLogin").style.display = "block";
+
+        $("authEmail").style.display = "none";
+
+        $("authLogin").placeholder =
+            "Email or username";
+
+        $("authSubmit").textContent = "Login";
+
+        $("switchText").textContent =
+            "Create account";
 
     }else{
 
-        $("loginForm").classList.add("hidden");
-        $("registerForm").classList.remove("hidden");
+        $("authTitle").textContent =
+            "Create account";
 
-        $("loginTab").classList.remove("active");
-        $("registerTab").classList.add("active");
+        $("registerFields").style.display =
+            "block";
+
+        $("authLogin").style.display =
+            "none";
+
+        $("authEmail").style.display =
+            "block";
+
+        $("authSubmit").textContent =
+            "Register";
+
+        $("switchText").textContent =
+            "Already have an account";
+
     }
 }
 
 
-/* ==========================================================
-   LOGIN
-========================================================== */
-
-async function login(){
-
-    const loginValue = $("loginValue").value.trim();
-    const password = $("loginPassword").value;
-
-    if(!loginValue || !password){
-        toast("Заполни поля");
-        return;
-    }
+async function submitAuth(){
 
     try{
 
-        const r = await fetch("/api/login",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                login:loginValue,
-                password
-            })
-        });
+        if(authMode === "login"){
 
-        const data = await r.json();
+            const login =
+                $("authLogin").value.trim();
 
-        if(!data.ok){
-            toast(data.error || "Ошибка");
-            return;
+            const password =
+                $("authPassword").value;
+
+            if(!login || !password){
+                toast("Enter login and password");
+                return;
+            }
+
+            await api("/api/login",{
+                method:"POST",
+                body:JSON.stringify({
+                    login,
+                    password
+                })
+            });
+
+            toast("Logged in");
+
+        }else{
+
+            const username =
+                $("registerUsername").value.trim();
+
+            const email =
+                $("authEmail").value.trim();
+
+            const password =
+                $("authPassword").value;
+
+            if(!username || !email || !password){
+                toast("Fill all fields");
+                return;
+            }
+
+            await api("/api/register",{
+                method:"POST",
+                body:JSON.stringify({
+                    username,
+                    email,
+                    password
+                })
+            });
+
+            toast("Account created");
         }
-
-        currentUser = data.user;
 
         closeAuth();
 
-        updateAuthButton();
+        await loadMe();
 
-        renderProfile();
+    }catch(error){
 
-        toast("Добро пожаловать, " + currentUser.username);
+        toast(error.message);
 
-    }catch(e){
-
-        toast("Ошибка подключения");
     }
 }
 
-
-/* ==========================================================
-   REGISTER
-========================================================== */
-
-async function register(){
-
-    const username = $("registerUsername").value.trim();
-    const email = $("registerEmail").value.trim();
-    const password = $("registerPassword").value;
-
-    if(!username || !email || !password){
-        toast("Заполни все поля");
-        return;
-    }
-
-    try{
-
-        const r = await fetch("/api/register",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                username,
-                email,
-                password
-            })
-        });
-
-        const data = await r.json();
-
-        if(!data.ok){
-            toast(data.error || "Ошибка");
-            return;
-        }
-
-        currentUser = data.user;
-
-        closeAuth();
-
-        updateAuthButton();
-
-        renderProfile();
-
-        toast("Аккаунт создан");
-
-    }catch(e){
-
-        toast("Ошибка подключения");
-    }
-}
-
-
-/* ==========================================================
-   LOGOUT
-========================================================== */
 
 async function logout(){
 
-    await fetch("/api/logout",{
-        method:"POST"
-    });
+    try{
 
-    currentUser = null;
+        await api("/api/logout",{
+            method:"POST"
+        });
 
-    updateAuthButton();
+        currentUser = null;
 
-    renderProfile();
+        updateUserUI();
 
-    toast("Вы вышли из аккаунта");
+        toast("Logged out");
+
+        pageByName("dashboard");
+
+    }catch(error){
+
+        toast(error.message);
+
+    }
 }
 
-function updateAuthButton(){
-
-    $("authButton").textContent =
-        currentUser
-        ? currentUser.username
-        : "Login";
-}
-
-
-/* ==========================================================
-   CURRENT USER
-========================================================== */
 
 async function loadMe(){
 
     try{
 
-        const r = await fetch("/api/me");
+        const data =
+            await api("/api/me");
 
-        const data = await r.json();
+        currentUser =
+            data.authenticated
+                ? data.user
+                : null;
 
-        if(data.logged){
+        updateUserUI();
 
-            currentUser = data.user;
+        updateStats();
 
-        }else{
+    }catch(error){
 
-            currentUser = null;
-        }
+        currentUser = null;
 
-        updateAuthButton();
-        renderProfile();
+        updateUserUI();
 
-    }catch(e){}
+    }
 }
 
 
-/* ==========================================================
-   PROFILE
-========================================================== */
+function updateUserUI(){
 
-function renderProfile(){
+    const authButton = $("authButton");
+
+    if(currentUser){
+
+        $("topUsername").textContent =
+            currentUser.username;
+
+        $("topAvatar").src =
+            currentUser.avatar ||
+            avatarFallback(currentUser.username);
+
+        $("profileAvatar").src =
+            currentUser.avatar ||
+            avatarFallback(currentUser.username);
+
+        $("profileUsername").value =
+            currentUser.username;
+
+        $("profileAvatarInput").value =
+            currentUser.avatar || "";
+
+        authButton.textContent =
+            "Profile";
+
+        authButton.onclick = () =>
+            pageByName("profile");
+
+    }else{
+
+        $("topUsername").textContent =
+            "Guest";
+
+        $("topAvatar").src =
+            avatarFallback("Guest");
+
+        authButton.textContent =
+            "Login";
+
+        authButton.onclick =
+            openAuth;
+
+    }
+}
+
+
+function avatarFallback(name){
+
+    return (
+        "https://ui-avatars.com/api/"
+        + "?name="
+        + encodeURIComponent(name)
+        + "&background=111827"
+        + "&color=ffffff"
+    );
+}
+
+
+async function loadProfile(){
 
     if(!currentUser){
 
-        $("profileName").textContent = "Guest";
-        $("profileEmail").textContent = "Not logged in";
+        toast("Login required");
 
-        $("profileUsername").value = "";
-        $("profileAvatarInput").value = "";
-
-        $("profileAvatar").style.display = "none";
+        openAuth();
 
         return;
     }
-
-    $("profileName").textContent =
-        "@" + currentUser.username;
-
-    $("profileEmail").textContent =
-        currentUser.email;
 
     $("profileUsername").value =
         currentUser.username;
@@ -2121,19 +2109,9 @@ function renderProfile(){
     $("profileAvatarInput").value =
         currentUser.avatar || "";
 
-    if(currentUser.avatar){
-
-        $("profileAvatar").src =
-            currentUser.avatar;
-
-        $("profileAvatar").style.display =
-            "block";
-
-    }else{
-
-        $("profileAvatar").style.display =
-            "none";
-    }
+    $("profileAvatar").src =
+        currentUser.avatar ||
+        avatarFallback(currentUser.username);
 }
 
 
@@ -2144,538 +2122,480 @@ async function saveProfile(){
         return;
     }
 
-    const username =
-        $("profileUsername").value.trim();
+    try{
 
-    const avatar =
-        $("profileAvatarInput").value.trim();
+        const username =
+            $("profileUsername").value.trim();
 
-    const r = await fetch("/api/profile",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body:JSON.stringify({
-            username,
-            avatar
-        })
-    });
+        const avatar =
+            $("profileAvatarInput").value.trim();
 
-    const data = await r.json();
+        const result =
+            await api("/api/profile",{
+                method:"POST",
+                body:JSON.stringify({
+                    username,
+                    avatar
+                })
+            });
 
-    if(!data.ok){
+        currentUser.username =
+            result.username;
 
-        toast(data.error || "Ошибка");
-        return;
+        currentUser.avatar =
+            result.avatar;
+
+        updateUserUI();
+
+        toast("Profile saved");
+
+    }catch(error){
+
+        toast(error.message);
+
     }
-
-    currentUser.username = data.username;
-    currentUser.avatar = data.avatar;
-
-    updateAuthButton();
-    renderProfile();
-
-    toast("Профиль сохранён");
 }
 
 
-/* ==========================================================
-   EMAIL OSINT
-========================================================== */
+/* ============================================================
+   EMAIL
+============================================================ */
 
-async function emailSearch(){
+async function runQuickEmail(){
+
+    const email =
+        $("quickEmail").value.trim();
+
+    if(!email){
+        toast("Enter an email");
+        return;
+    }
+
+    $("quickResults").innerHTML =
+        loadingHTML();
+
+    try{
+
+        const data =
+            await api("/api/osint/email",{
+                method:"POST",
+                body:JSON.stringify({
+                    email
+                })
+            });
+
+        renderResults(
+            data.results,
+            $("quickResults")
+        );
+
+    }catch(error){
+
+        $("quickResults").innerHTML =
+            errorHTML(error.message);
+
+    }
+}
+
+
+async function scanEmail(){
 
     const email =
         $("emailInput").value.trim();
 
     if(!email){
-        toast("Введите email");
+        toast("Enter an email");
         return;
     }
 
-    const box =
-        $("emailResults");
+    $("emailResults").innerHTML =
+        loadingHTML();
 
-    box.innerHTML = "";
-
-    searches++;
-    updateStats();
-
-    addResult(
-        box,
-        "INITIALIZING",
-        "UNKNOWN"
-    );
-
-    try{
-
-        const r = await fetch(
-            "/api/osint/email",
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({email})
-            }
-        );
-
-        const data = await r.json();
-
-        box.innerHTML = "";
-
-        if(!data.ok){
-
-            addResult(
-                box,
-                "SYSTEM",
-                "UNKNOWN"
-            );
-
-            return;
-        }
-
-        for(const result of data.results){
-
-            await sleep(350);
-
-            addResult(
-                box,
-                result.service,
-                result.status,
-                result.url
-            );
-        }
-
-        toast("Email scan finished");
-
-    }catch(e){
-
-        addResult(
-            box,
-            "NETWORK",
-            "UNKNOWN"
-        );
-    }
-}
-
-
-function addResult(box,service,status,url){
-
-    const row =
-        document.createElement("div");
-
-    row.className = "result";
-
-    let cls = "unknown";
-
-    if(status === "FOUND"){
-        cls = "found";
-    }
-
-    if(status === "NOT FOUND"){
-        cls = "not";
-    }
-
-    row.innerHTML = `
-        <div class="resultService">
-            ${escapeHtml(service)}
-        </div>
-        <div class="status ${cls}">
-            ${escapeHtml(status)}
-        </div>
-    `;
-
-    if(url){
-
-        row.style.cursor = "pointer";
-
-        row.onclick = ()=>{
-            window.open(
-                url,
-                "_blank",
-                "noopener,noreferrer"
-            );
-        };
-    }
-
-    box.appendChild(row);
-}
-
-
-/* ==========================================================
-   PHONE
-========================================================== */
-
-async function phoneSearch(){
-
-    const phone =
-        $("phoneInput").value.trim();
-
-    if(!phone){
-        toast("Введите номер");
-        return;
-    }
-
-    searches++;
-    updateStats();
-
-    const box =
-        $("phoneResult");
-
-    box.innerHTML =
-        `<div class="result">
-            <div class="resultService">
-                Checking...
-            </div>
-        </div>`;
-
-    try{
-
-        const r = await fetch(
-            "/api/osint/phone",
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({phone})
-            }
-        );
-
-        const data = await r.json();
-
-        box.innerHTML = "";
-
-        addResult(
-            box,
-            "PHONE FORMAT",
-            data.valid
-                ? "FOUND"
-                : "NOT FOUND"
-        );
-
-        const normalized =
-            document.createElement("div");
-
-        normalized.className = "result";
-
-        normalized.innerHTML = `
-            <div class="resultService">
-                Normalized
-            </div>
-            <div>
-                ${escapeHtml(
-                    data.normalized || phone
-                )}
-            </div>
-        `;
-
-        box.appendChild(normalized);
-
-        const note =
-            document.createElement("div");
-
-        note.className = "result";
-
-        note.innerHTML = `
-            <div class="resultService">
-                Note
-            </div>
-            <div class="muted">
-                ${escapeHtml(data.message || "")}
-            </div>
-        `;
-
-        box.appendChild(note);
-
-    }catch(e){
-
-        box.innerHTML = "";
-
-        addResult(
-            box,
-            "NETWORK",
-            "UNKNOWN"
-        );
-    }
-}
-
-
-/* ==========================================================
-   MAP
-========================================================== */
-
-async function mapSearch(){
-
-    const q =
-        $("mapInput").value.trim();
-
-    if(!q){
-        toast("Введите адрес");
-        return;
-    }
-
-    searches++;
-    updateStats();
-
-    const results =
-        $("mapResults");
-
-    results.innerHTML = `
-        <div class="mapResult">
-            <strong>Searching...</strong>
-        </div>
-    `;
-
-    try{
-
-        const r = await fetch(
-            "/api/map/search?q=" +
-            encodeURIComponent(q)
-        );
-
-        const data = await r.json();
-
-        results.innerHTML = "";
-
-        if(!data.ok || !data.results.length){
-
-            results.innerHTML = `
-                <div class="mapResult">
-                    <strong>No results</strong>
-                    <small>
-                        Попробуй более точный запрос.
-                    </small>
-                </div>
-            `;
-
-            return;
-        }
-
-        data.results.forEach((item,index)=>{
-
-            const el =
-                document.createElement("div");
-
-            el.className = "mapResult";
-
-            el.innerHTML = `
-                <strong>
-                    ${escapeHtml(item.display_name)}
-                </strong>
-                <small>
-                    ${item.lat.toFixed(6)},
-                    ${item.lon.toFixed(6)}
-                </small>
-            `;
-
-            el.onclick = ()=>{
-                showMap(item.lat,item.lon);
-            };
-
-            results.appendChild(el);
-
-            if(index === 0){
-
-                showMap(
-                    item.lat,
-                    item.lon
-                );
-            }
-        });
-
-    }catch(e){
-
-        results.innerHTML = `
-            <div class="mapResult">
-                <strong>Map error</strong>
-            </div>
-        `;
-    }
-}
-
-
-function showMap(lat,lon){
-
-    /*
-       OpenStreetMap embed.
-       No API key is required.
-    */
-
-    const delta = .01;
-
-    const bbox = [
-        lon-delta,
-        lat-delta,
-        lon+delta,
-        lat+delta
-    ].join(",");
-
-    $("mapFrame").src =
-        "https://www.openstreetmap.org/export/embed.html?" +
-        "bbox=" + encodeURIComponent(bbox) +
-        "&layer=mapnik" +
-        "&marker=" +
-        encodeURIComponent(lat + "," + lon);
-}
-
-
-/* ==========================================================
-   USERS
-========================================================== */
-
-let userSearchTimer;
-
-function searchUsers(){
-
-    clearTimeout(userSearchTimer);
-
-    userSearchTimer =
-        setTimeout(async()=>{
-
-            const q =
-                $("userSearchInput").value.trim();
-
-            const box =
-                $("usersResults");
-
-            if(q.length < 2){
-
-                box.innerHTML = "";
-
-                return;
-            }
-
-            try{
-
-                const r = await fetch(
-                    "/api/users/search?q=" +
-                    encodeURIComponent(q)
-                );
-
-                const data = await r.json();
-
-                box.innerHTML = "";
-
-                data.users.forEach(user=>{
-
-                    const row =
-                        document.createElement("div");
-
-                    row.className =
-                        "userRow";
-
-                    row.innerHTML = `
-
-                        ${
-                            user.avatar
-                            ? `<img class="userAvatar"
-                                    src="${escapeAttr(user.avatar)}">`
-                            : `<div class="userAvatar"></div>`
-                        }
-
-                        <div>
-                            <strong>
-                                @${escapeHtml(user.username)}
-                            </strong>
-
-                            <div class="muted">
-                                NZX user
-                            </div>
-                        </div>
-                    `;
-
-                    box.appendChild(row);
-                });
-
-            }catch(e){}
-
-        },250);
-}
-
-
-/* ==========================================================
-   GRAPH
-========================================================== */
-
-function loadGraph(){
-
-    const saved =
-        localStorage.getItem(
-            "nzx-osint-graph"
-        );
-
-    if(!saved){
-
-        graphNodes = [];
-
-        graphLinks = [];
-
-        return;
-    }
+    $("emailSummary").innerHTML = "";
 
     try{
 
         const data =
-            JSON.parse(saved);
+            await api("/api/osint/email",{
+                method:"POST",
+                body:JSON.stringify({
+                    email
+                })
+            });
 
-        graphNodes =
-            data.nodes || [];
+        const s = data.summary;
 
-        graphLinks =
-            data.links || [];
+        $("emailSummary").innerHTML = `
+            <div class="notice">
+                <b>${escapeHTML(data.query)}</b>
+                ·
+                FOUND ${s.found}
+                ·
+                NOT FOUND ${s.not_found}
+                ·
+                UNKNOWN ${s.unknown}
+                ·
+                ${data.elapsed_ms} ms
+            </div>
+        `;
 
-    }catch(e){
+        renderResults(
+            data.results,
+            $("emailResults")
+        );
 
-        graphNodes = [];
-        graphLinks = [];
+        buildEmailGraph(data);
+
+    }catch(error){
+
+        $("emailResults").innerHTML =
+            errorHTML(error.message);
+
     }
+}
+
+
+function buildEmailGraph(data){
+
+    pageByName("graph");
+
+    nodes = [];
+
+    nodeCounter = 0;
+
+    addGraphNode(
+        "EMAIL",
+        data.query,
+        430,
+        260
+    );
+
+    let x = 120;
+
+    let y = 120;
+
+    data.results.forEach((result,index) => {
+
+        addGraphNode(
+            result.service,
+            result.status,
+            x,
+            y
+        );
+
+        x += 180;
+
+        if(x > 900){
+            x = 120;
+            y += 150;
+        }
+
+    });
 
     renderGraph();
 }
 
 
-function saveGraphLocal(){
+function renderResults(results, container){
 
-    localStorage.setItem(
-        "nzx-osint-graph",
-        JSON.stringify({
-            nodes:graphNodes,
-            links:graphLinks
-        })
+    container.innerHTML = "";
+
+    if(!results || !results.length){
+
+        container.innerHTML =
+            `<div class="empty">No results.</div>`;
+
+        return;
+    }
+
+    results.forEach((item,index) => {
+
+        setTimeout(() => {
+
+            const div =
+                document.createElement("div");
+
+            div.className = "result";
+
+            const status =
+                item.status || "UNKNOWN";
+
+            div.innerHTML = `
+                <div>
+                    <div class="service">
+                        ${escapeHTML(
+                            item.service || "Source"
+                        )}
+                    </div>
+
+                    <div class="reason">
+                        ${escapeHTML(
+                            item.reason || ""
+                        )}
+                    </div>
+
+                    ${
+                        item.value
+                            ? `
+                                <div class="reason">
+                                    ${escapeHTML(item.value)}
+                                </div>
+                            `
+                            : ""
+                    }
+
+                    ${
+                        item.profile
+                            ? `
+                                <div class="reason">
+                                    Profile data returned
+                                </div>
+                            `
+                            : ""
+                    }
+                </div>
+
+                <div class="status ${status}">
+                    ${status}
+                </div>
+            `;
+
+            container.appendChild(div);
+
+        },index * 120);
+
+    });
+}
+
+
+function loadingHTML(){
+
+    return `
+        <div class="loading">
+            <div class="spinner"></div>
+            Checking real sources...
+        </div>
+    `;
+}
+
+
+function errorHTML(message){
+
+    return `
+        <div class="result">
+            <div>
+                <div class="service">
+                    Request failed
+                </div>
+                <div class="reason">
+                    ${escapeHTML(message)}
+                </div>
+            </div>
+            <div class="status UNKNOWN">
+                UNKNOWN
+            </div>
+        </div>
+    `;
+}
+
+
+/* ============================================================
+   PHONE
+============================================================ */
+
+async function scanPhone(){
+
+    const phone =
+        $("phoneInput").value.trim();
+
+    if(!phone){
+        toast("Enter a phone number");
+        return;
+    }
+
+    $("phoneResults").innerHTML =
+        loadingHTML();
+
+    try{
+
+        const data =
+            await api("/api/osint/phone",{
+                method:"POST",
+                body:JSON.stringify({
+                    phone
+                })
+            });
+
+        renderResults(
+            data.results,
+            $("phoneResults")
+        );
+
+        addPhoneGraph(data);
+
+    }catch(error){
+
+        $("phoneResults").innerHTML =
+            errorHTML(error.message);
+
+    }
+}
+
+
+function addPhoneGraph(data){
+
+    pageByName("graph");
+
+    nodes = [];
+
+    nodeCounter = 0;
+
+    addGraphNode(
+        "PHONE",
+        data.normalized,
+        430,
+        260
     );
 
-    updateStats();
+    let y = 130;
+
+    data.results.forEach(item => {
+
+        addGraphNode(
+            item.service,
+            item.status,
+            150,
+            y
+        );
+
+        y += 150;
+
+    });
+
+    renderGraph();
 }
 
 
-function newNode(){
+/* ============================================================
+   MAP
+============================================================ */
 
-    editingNode = null;
+function mapEnter(event){
 
-    $("nodeTitle").value = "";
-    $("nodeContent").value = "";
-
-    $("nodeModal")
-        .classList
-        .add("open");
-
-    setTimeout(()=>{
-        $("nodeTitle").focus();
-    },100);
+    if(event.key === "Enter"){
+        searchMap();
+    }
 }
 
 
-function closeNodeModal(){
+async function searchMap(){
 
-    $("nodeModal")
-        .classList
-        .remove("open");
+    const q =
+        $("mapInput").value.trim();
+
+    if(!q){
+        toast("Enter location");
+        return;
+    }
+
+    $("mapResults").innerHTML =
+        loadingHTML();
+
+    try{
+
+        const data =
+            await api(
+                "/api/map/search?q="
+                + encodeURIComponent(q)
+            );
+
+        $("mapResults").innerHTML = "";
+
+        if(!data.results.length){
+
+            $("mapResults").innerHTML =
+                `<div class="empty">
+                    No geographic result found.
+                </div>`;
+
+            return;
+        }
+
+        data.results.forEach(item => {
+
+            const div =
+                document.createElement("div");
+
+            div.className =
+                "map-item";
+
+            div.innerHTML = `
+                <b>
+                    ${escapeHTML(item.display_name)}
+                </b>
+
+                <div class="reason">
+                    ${item.lat},
+                    ${item.lon}
+                </div>
+            `;
+
+            div.onclick = () => {
+
+                const lat =
+                    item.lat;
+
+                const lon =
+                    item.lon;
+
+                const delta = .012;
+
+                const bbox = [
+                    lon-delta,
+                    lat-delta,
+                    lon+delta,
+                    lat+delta
+                ].join("%2C");
+
+                $("map").src =
+                    "https://www.openstreetmap.org/"
+                    + "export/embed.html?"
+                    + "bbox="
+                    + bbox
+                    + "&layer=mapnik"
+                    + "&marker="
+                    + lat
+                    + "%2C"
+                    + lon;
+
+                addGraphNode(
+                    "LOCATION",
+                    item.display_name,
+                    500,
+                    320
+                );
+
+                toast("Location added to graph");
+            };
+
+            $("mapResults").appendChild(div);
+
+        });
+
+    }catch(error){
+
+        $("mapResults").innerHTML =
+            errorHTML(error.message);
+
+    }
 }
 
 
-function createNode(){
+/* ============================================================
+   GRAPH
+============================================================ */
+
+function addNode(){
 
     const title =
         $("nodeTitle").value.trim();
@@ -2683,55 +2603,47 @@ function createNode(){
     const content =
         $("nodeContent").value.trim();
 
-    if(!title){
+    if(!title && !content){
 
-        toast("Введите название");
+        toast("Enter node name or value");
 
         return;
     }
 
-    const graph =
-        $("graph").getBoundingClientRect();
+    addGraphNode(
+        title || "NODE",
+        content,
+        180 + Math.random() * 500,
+        150 + Math.random() * 300
+    );
 
-    const centerX =
-        graph.width / 2;
+    $("nodeTitle").value = "";
 
-    const centerY =
-        graph.height / 2;
+    $("nodeContent").value = "";
+
+    renderGraph();
+}
+
+
+function addGraphNode(title,content,x,y){
 
     const node = {
 
-        id:
-            crypto.randomUUID
-            ? crypto.randomUUID()
-            : Date.now().toString(),
+        id:++nodeCounter,
 
-        title,
+        title:title || "NODE",
 
-        content,
+        content:content || "",
 
-        x:
-            centerX -
-            95 -
-            graphOffsetX,
+        x,
 
-        y:
-            centerY -
-            38 -
-            graphOffsetY
+        y
+
     };
 
-    graphNodes.push(node);
+    nodes.push(node);
 
-    closeNodeModal();
-
-    saveGraphLocal();
-
-    renderGraph();
-
-    autoConnect();
-
-    toast("Node created");
+    return node;
 }
 
 
@@ -2740,19 +2652,16 @@ function renderGraph(){
     const graph =
         $("graph");
 
-    graph
-        .querySelectorAll(".node")
-        .forEach(x=>x.remove());
+    graph.innerHTML = "";
 
-    graphNodes.forEach(node=>{
+    nodes.forEach(node => {
 
         const el =
             document.createElement("div");
 
         el.className = "node";
 
-        el.dataset.id =
-            node.id;
+        el.dataset.id = node.id;
 
         el.style.left =
             node.x + "px";
@@ -2761,802 +2670,915 @@ function renderGraph(){
             node.y + "px";
 
         el.innerHTML = `
+            <button
+                class="node-remove"
+                onclick="removeNode(event,${node.id})"
+            >
+                ×
+            </button>
 
-            <div class="nodeTitle">
-                ${escapeHtml(node.title)}
+            <div class="node-top">
+
+                <div class="node-dot"></div>
+
+                <div class="node-title">
+                    ${escapeHTML(node.title)}
+                </div>
+
             </div>
 
-            <div class="nodeText">
-                ${escapeHtml(node.content || "")}
+            <div class="node-content">
+                ${escapeHTML(node.content)}
             </div>
-
-            <div class="nodeDot"></div>
         `;
 
         el.addEventListener(
-            "mousedown",
-            e=>{
-                if(e.target.classList.contains("nodeDot")){
-                    return;
-                }
-
-                startNodeDrag(
-                    e,
-                    node,
-                    el
-                );
-            }
-        );
-
-        el.addEventListener(
-            "dblclick",
-            ()=>{
-                editNode(node);
-            }
+            "pointerdown",
+            startDrag
         );
 
         graph.appendChild(el);
+
     });
 
-    renderLinks();
+    drawLinks();
 
     updateStats();
 }
 
 
-function editNode(node){
+function startDrag(event){
 
-    const title =
-        prompt(
-            "Node name:",
-            node.title
-        );
-
-    if(title === null){
+    if(
+        event.target.classList.contains(
+            "node-remove"
+        )
+    ){
         return;
     }
 
-    const content =
-        prompt(
-            "Node content:",
-            node.content || ""
-        );
+    const el =
+        event.currentTarget;
 
-    if(content === null){
+    const id =
+        Number(el.dataset.id);
+
+    const node =
+        nodes.find(x => x.id === id);
+
+    if(!node){
         return;
     }
 
-    node.title = title;
-    node.content = content;
+    dragging = {
+        node,
+        el
+    };
 
-    saveGraphLocal();
+    const rect =
+        $("graphWrap").getBoundingClientRect();
+
+    dragOffsetX =
+        event.clientX -
+        rect.left -
+        node.x;
+
+    dragOffsetY =
+        event.clientY -
+        rect.top -
+        node.y;
+
+    el.classList.add("dragging");
+
+    el.setPointerCapture(
+        event.pointerId
+    );
+
+    el.addEventListener(
+        "pointermove",
+        moveDrag
+    );
+
+    el.addEventListener(
+        "pointerup",
+        stopDrag,
+        {once:true}
+    );
+}
+
+
+function moveDrag(event){
+
+    if(!dragging){
+        return;
+    }
+
+    const rect =
+        $("graphWrap").getBoundingClientRect();
+
+    dragging.node.x =
+        Math.max(
+            5,
+            Math.min(
+                rect.width - 170,
+                event.clientX -
+                rect.left -
+                dragOffsetX
+            )
+        );
+
+    dragging.node.y =
+        Math.max(
+            75,
+            Math.min(
+                rect.height - 90,
+                event.clientY -
+                rect.top -
+                dragOffsetY
+            )
+        );
+
+    dragging.el.style.left =
+        dragging.node.x + "px";
+
+    dragging.el.style.top =
+        dragging.node.y + "px";
+
+    drawLinks();
+}
+
+
+function stopDrag(event){
+
+    if(!dragging){
+        return;
+    }
+
+    dragging.el.classList.remove(
+        "dragging"
+    );
+
+    dragging.el.removeEventListener(
+        "pointermove",
+        moveDrag
+    );
+
+    dragging = null;
+
+    drawLinks();
+}
+
+
+function removeNode(event,id){
+
+    event.stopPropagation();
+
+    nodes =
+        nodes.filter(
+            x => x.id !== id
+        );
 
     renderGraph();
 }
 
 
-function startNodeDrag(e,node,el){
+function clearGraph(){
 
-    e.preventDefault();
+    nodes = [];
 
-    draggingNode = node;
+    nodeCounter = 0;
 
-    const rect =
-        $("graph").getBoundingClientRect();
+    renderGraph();
 
-    dragDX =
-        e.clientX -
-        rect.left -
-        node.x;
-
-    dragDY =
-        e.clientY -
-        rect.top -
-        node.y;
-
-    el.classList.add("selected");
-
-    document.addEventListener(
-        "mousemove",
-        moveNode
-    );
-
-    document.addEventListener(
-        "mouseup",
-        stopNodeDrag
-    );
+    toast("Graph cleared");
 }
 
 
-function moveNode(e){
+function searchGraph(value){
 
-    if(!draggingNode){
-        return;
-    }
-
-    const rect =
-        $("graph").getBoundingClientRect();
-
-    draggingNode.x =
-        e.clientX -
-        rect.left -
-        dragDX;
-
-    draggingNode.y =
-        e.clientY -
-        rect.top -
-        dragDY;
-
-    const el =
-        document.querySelector(
-            `.node[data-id="${draggingNode.id}"]`
-        );
-
-    if(el){
-
-        el.style.left =
-            draggingNode.x + "px";
-
-        el.style.top =
-            draggingNode.y + "px";
-    }
-
-    renderLinks();
-
-    autoConnect();
-}
-
-
-function stopNodeDrag(){
-
-    if(!draggingNode){
-        return;
-    }
-
-    draggingNode = null;
+    value =
+        value.trim().toLowerCase();
 
     document
         .querySelectorAll(".node")
-        .forEach(x=>
-            x.classList.remove("selected")
-        );
+        .forEach(el => {
 
-    document.removeEventListener(
-        "mousemove",
-        moveNode
-    );
+            const id =
+                Number(el.dataset.id);
 
-    document.removeEventListener(
-        "mouseup",
-        stopNodeDrag
-    );
+            const node =
+                nodes.find(x => x.id === id);
 
-    saveGraphLocal();
+            const match =
+                value &&
+                (
+                    node.title
+                        .toLowerCase()
+                        .includes(value)
+                    ||
+                    node.content
+                        .toLowerCase()
+                        .includes(value)
+                );
+
+            el.classList.toggle(
+                "match",
+                !!match
+            );
+
+        });
 }
 
 
-function autoConnect(){
+function autoLayout(){
 
-    const threshold = 250;
+    const wrap =
+        $("graphWrap");
 
-    for(let i=0;i<graphNodes.length;i++){
+    const rect =
+        wrap.getBoundingClientRect();
 
-        for(let j=i+1;j<graphNodes.length;j++){
+    const cx =
+        rect.width / 2;
 
-            const a =
-                graphNodes[i];
+    const cy =
+        rect.height / 2;
 
-            const b =
-                graphNodes[j];
+    if(!nodes.length){
+        return;
+    }
 
-            const dx =
-                a.x - b.x;
+    nodes.forEach((node,index) => {
 
-            const dy =
-                a.y - b.y;
+        if(index === 0){
+
+            node.x =
+                cx - 90;
+
+            node.y =
+                cy - 60;
+
+            return;
+        }
+
+        const angle =
+            (
+                (index-1)
+                /
+                Math.max(1,nodes.length-1)
+            )
+            * Math.PI * 2;
+
+        const radius =
+            Math.min(
+                220,
+                100 + nodes.length * 9
+            );
+
+        node.x =
+            cx +
+            Math.cos(angle) *
+            radius -
+            80;
+
+        node.y =
+            cy +
+            Math.sin(angle) *
+            radius -
+            45;
+
+    });
+
+    renderGraph();
+}
+
+
+function drawLinks(){
+
+    const svg =
+        $("links");
+
+    const wrap =
+        $("graphWrap");
+
+    if(!svg || !wrap){
+        return;
+    }
+
+    const rect =
+        wrap.getBoundingClientRect();
+
+    svg.setAttribute(
+        "viewBox",
+        `0 0 ${rect.width} ${rect.height}`
+    );
+
+    svg.innerHTML = `
+        <defs>
+
+            <linearGradient
+                id="linkGradient"
+                x1="0"
+                x2="1"
+            >
+
+                <stop
+                    offset="0%"
+                    stop-color="#8b5cf6"
+                />
+
+                <stop
+                    offset="100%"
+                    stop-color="#06b6d4"
+                />
+
+            </linearGradient>
+
+            <filter
+                id="glow"
+                x="-50%"
+                y="-50%"
+                width="200%"
+                height="200%"
+            >
+
+                <feGaussianBlur
+                    stdDeviation="3"
+                    result="blur"
+                />
+
+                <feMerge>
+
+                    <feMergeNode
+                        in="blur"
+                    />
+
+                    <feMergeNode
+                        in="SourceGraphic"
+                    />
+
+                </feMerge>
+
+            </filter>
+
+        </defs>
+    `;
+
+    const maxDistance = 280;
+
+    for(let i=0;i<nodes.length;i++){
+
+        for(let j=i+1;j<nodes.length;j++){
+
+            const a = nodes[i];
+
+            const b = nodes[j];
+
+            const ax = a.x + 75;
+
+            const ay = a.y + 30;
+
+            const bx = b.x + 75;
+
+            const by = b.y + 30;
+
+            const dx = bx-ax;
+
+            const dy = by-ay;
 
             const distance =
                 Math.sqrt(
                     dx*dx + dy*dy
                 );
 
-            const exists =
-                graphLinks.some(
-                    l=>
-                        (
-                            l.a===a.id &&
-                            l.b===b.id
-                        ) ||
-                        (
-                            l.a===b.id &&
-                            l.b===a.id
-                        )
+            if(distance > maxDistance){
+                continue;
+            }
+
+            const midX =
+                (ax+bx)/2;
+
+            const midY =
+                (ay+by)/2;
+
+            const curve =
+                Math.min(
+                    80,
+                    distance/3
                 );
 
-            if(
-                distance < threshold &&
-                !exists
-            ){
+            const path =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "path"
+                );
 
-                graphLinks.push({
-                    a:a.id,
-                    b:b.id,
-                    animated:true
-                });
+            path.setAttribute(
+                "d",
+                `M ${ax} ${ay}
+                 Q ${midX} ${midY-curve}
+                 ${bx} ${by}`
+            );
 
-                renderLinks();
-            }
+            path.setAttribute(
+                "fill",
+                "none"
+            );
+
+            path.setAttribute(
+                "stroke",
+                "url(#linkGradient)"
+            );
+
+            path.setAttribute(
+                "stroke-width",
+                "1.6"
+            );
+
+            path.setAttribute(
+                "stroke-opacity",
+                ".55"
+            );
+
+            path.setAttribute(
+                "filter",
+                "url(#glow)"
+            );
+
+            path.style.strokeDasharray =
+                "7 8";
+
+            path.style.animation =
+                "flow 2.2s linear infinite";
+
+            svg.appendChild(path);
+
         }
-    }
 
-    saveGraphLocal();
+    }
 }
 
 
-function renderLinks(){
+const flowStyle =
+document.createElement("style");
 
-    const svg =
-        $("links");
-
-    svg.innerHTML = "";
-
-    graphLinks.forEach(link=>{
-
-        const a =
-            graphNodes.find(
-                n=>n.id===link.a
-            );
-
-        const b =
-            graphNodes.find(
-                n=>n.id===link.b
-            );
-
-        if(!a || !b){
-            return;
-        }
-
-        const line =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "line"
-            );
-
-        line.setAttribute(
-            "x1",
-            a.x + 95
-        );
-
-        line.setAttribute(
-            "y1",
-            a.y + 38
-        );
-
-        line.setAttribute(
-            "x2",
-            b.x + 95
-        );
-
-        line.setAttribute(
-            "y2",
-            b.y + 38
-        );
-
-        line.classList.add("link");
-
-        if(link.animated){
-            line.classList.add("animate");
-        }
-
-        svg.appendChild(line);
-    });
+flowStyle.textContent = `
+@keyframes flow{
+    to{
+        stroke-dashoffset:-30;
+    }
 }
+`;
+
+document.head.appendChild(flowStyle);
 
 
-/* ==========================================================
-   GRAPH PAN / ZOOM
-========================================================== */
+/* ============================================================
+   CHAINS
+============================================================ */
 
-$("graph").addEventListener(
-    "mousedown",
-    e=>{
-
-        if(
-            e.target.closest(".node") ||
-            e.target.closest(".graphTools")
-        ){
-            return;
-        }
-
-        panning = true;
-
-        panStartX =
-            e.clientX -
-            graphOffsetX;
-
-        panStartY =
-            e.clientY -
-            graphOffsetY;
-    }
-);
-
-window.addEventListener(
-    "mousemove",
-    e=>{
-
-        if(!panning){
-            return;
-        }
-
-        graphOffsetX =
-            e.clientX -
-            panStartX;
-
-        graphOffsetY =
-            e.clientY -
-            panStartY;
-
-        $("graph").style.transform =
-            `translate(${graphOffsetX}px,${graphOffsetY}px)`;
-    }
-);
-
-window.addEventListener(
-    "mouseup",
-    ()=>{
-
-        if(panning){
-
-            panning = false;
-        }
-    }
-);
-
-
-/* ==========================================================
-   CLEAR GRAPH
-========================================================== */
-
-function clearGraph(){
-
-    if(
-        !confirm(
-            "Удалить все узлы?"
-        )
-    ){
-        return;
-    }
-
-    graphNodes = [];
-    graphLinks = [];
-
-    saveGraphLocal();
-
-    renderGraph();
-}
-
-
-/* ==========================================================
-   SAVE CHAIN
-========================================================== */
-
-async function saveCurrentChain(){
+async function saveChain(){
 
     if(!currentUser){
 
+        toast("Login required to save chains");
+
         openAuth();
 
-        toast(
-            "Войди, чтобы сохранять цепочки"
-        );
+        return;
+    }
+
+    if(!nodes.length){
+
+        toast("Graph is empty");
 
         return;
     }
 
     const name =
         prompt(
-            "Название цепочки:",
-            currentChainName
+            "Chain name:",
+            "Investigation " +
+            new Date().toLocaleDateString()
         );
 
-    if(name === null){
+    if(!name){
         return;
     }
 
-    currentChainName =
-        name.trim() ||
-        "Untitled Chain";
+    try{
 
-    const r =
-        await fetch(
-            "/api/chains",
-            {
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-                    name:currentChainName,
-                    data:{
-                        nodes:graphNodes,
-                        links:graphLinks
-                    }
-                })
-            }
-        );
+        await api("/api/chains",{
+            method:"POST",
+            body:JSON.stringify({
+                name,
+                data:{
+                    nodes
+                }
+            })
+        });
 
-    const data =
-        await r.json();
+        toast("Chain saved");
 
-    if(data.ok){
+        await loadChains();
 
-        toast("Цепочка сохранена");
+        updateStats();
 
-    }else{
+    }catch(error){
 
-        toast(
-            data.error ||
-            "Ошибка сохранения"
-        );
+        toast(error.message);
+
     }
 }
 
 
-/* ==========================================================
-   LOAD CHAINS
-========================================================== */
-
 async function loadChains(){
-
-    const box =
-        $("chainsList");
 
     if(!currentUser){
 
-        box.innerHTML = `
-            <div class="muted">
-                Войди в аккаунт, чтобы увидеть
-                сохранённые цепочки.
+        $("chainList").innerHTML = `
+            <div class="empty">
+                Login to see saved chains.
             </div>
         `;
 
         return;
     }
 
-    box.innerHTML = "Loading...";
-
     try{
 
-        const r =
-            await fetch("/api/chains");
-
         const data =
-            await r.json();
+            await api("/api/chains");
 
-        box.innerHTML = "";
+        chains =
+            data.chains || [];
 
-        if(!data.chains.length){
+        renderChains();
 
-            box.innerHTML = `
-                <div class="muted">
-                    У тебя пока нет сохранённых цепочек.
-                </div>
-            `;
+        updateStats();
 
-            return;
-        }
+    }catch(error){
 
-        data.chains.forEach(chain=>{
+        $("chainList").innerHTML =
+            errorHTML(error.message);
 
-            const row =
-                document.createElement("div");
+    }
+}
 
-            row.className =
-                "userRow";
 
-            row.style.marginBottom =
-                "8px";
+function renderChains(){
 
-            row.innerHTML = `
+    const box =
+        $("chainList");
 
-                <div
-                    style="
-                    width:40px;
-                    height:40px;
-                    border-radius:11px;
-                    display:grid;
-                    place-items:center;
-                    background:rgba(141,92,255,.12);
-                    "
-                >
-                    ◈
-                </div>
+    box.innerHTML = "";
 
-                <div style="flex:1">
-                    <strong>
-                        ${escapeHtml(chain.name)}
-                    </strong>
+    if(!chains.length){
 
-                    <div class="muted">
-                        ${chain.data.nodes?.length || 0}
-                        nodes
-                    </div>
-                </div>
+        box.innerHTML = `
+            <div class="empty">
+                No saved chains yet.
+            </div>
+        `;
+
+        return;
+    }
+
+    chains.forEach(chain => {
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "card chain-card";
+
+        const count =
+            chain.data &&
+            Array.isArray(chain.data.nodes)
+                ? chain.data.nodes.length
+                : 0;
+
+        div.innerHTML = `
+            <h3>
+                ${escapeHTML(chain.name)}
+            </h3>
+
+            <p>
+                ${count} nodes
+            </p>
+
+            <p>
+                ${new Date(
+                    chain.updated_at
+                ).toLocaleString()}
+            </p>
+
+            <div class="chain-actions">
 
                 <button
-                    class="btn"
-                    onclick='openSavedChain(${JSON.stringify(chain.data)})'
+                    onclick="openChain(${chain.id})"
                 >
                     Open
                 </button>
 
-            `;
+                <button
+                    onclick="deleteChain(${chain.id})"
+                >
+                    Delete
+                </button>
 
-            box.appendChild(row);
-        });
+            </div>
+        `;
 
-    }catch(e){
+        box.appendChild(div);
 
-        box.innerHTML =
-            "Failed to load chains";
+    });
+}
+
+
+function openChain(id){
+
+    const chain =
+        chains.find(
+            x => x.id === id
+        );
+
+    if(!chain){
+        return;
+    }
+
+    nodes =
+        Array.isArray(chain.data?.nodes)
+            ? chain.data.nodes
+            : [];
+
+    nodeCounter =
+        nodes.reduce(
+            (m,n) =>
+                Math.max(m,n.id || 0),
+            0
+        );
+
+    pageByName("graph");
+
+    renderGraph();
+
+    toast(
+        `Loaded ${chain.name}`
+    );
+}
+
+
+async function deleteChain(id){
+
+    if(!confirm(
+        "Delete this chain?"
+    )){
+        return;
+    }
+
+    try{
+
+        await api(
+            `/api/chains/${id}`,
+            {
+                method:"DELETE"
+            }
+        );
+
+        toast("Chain deleted");
+
+        loadChains();
+
+    }catch(error){
+
+        toast(error.message);
+
     }
 }
 
 
-function openSavedChain(data){
+/* ============================================================
+   USERS
+============================================================ */
 
-    graphNodes =
-        data.nodes || [];
+let userTimer = null;
 
-    graphLinks =
-        data.links || [];
 
-    localStorage.setItem(
-        "nzx-osint-graph",
-        JSON.stringify({
-            nodes:graphNodes,
-            links:graphLinks
-        })
-    );
+function searchUsers(){
 
-    openPage("graph");
+    clearTimeout(userTimer);
 
-    renderGraph();
-
-    toast("Chain opened");
+    userTimer =
+        setTimeout(
+            performUserSearch,
+            250
+        );
 }
 
 
-/* ==========================================================
-   GLOBAL SEARCH
-========================================================== */
+async function performUserSearch(){
 
-function globalSearch(){
+    const q =
+        $("userSearch").value.trim();
+
+    if(!q){
+
+        $("userResults").innerHTML =
+            "";
+
+        return;
+    }
+
+    try{
+
+        const data =
+            await api(
+                "/api/users/search?q="
+                + encodeURIComponent(q)
+            );
+
+        const box =
+            $("userResults");
+
+        box.innerHTML = "";
+
+        if(!data.results.length){
+
+            box.innerHTML =
+                `<div class="empty">
+                    No users found.
+                </div>`;
+
+            return;
+        }
+
+        data.results.forEach(user => {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "card user-card";
+
+            card.innerHTML = `
+                <img
+                    src="${
+                        user.avatar ||
+                        avatarFallback(user.username)
+                    }"
+                >
+
+                <div>
+
+                    <b>
+                        ${escapeHTML(user.username)}
+                    </b>
+
+                    <div class="reason">
+                        User #${user.id}
+                    </div>
+
+                </div>
+            `;
+
+            box.appendChild(card);
+
+        });
+
+    }catch(error){
+
+        toast(error.message);
+
+    }
+}
+
+
+/* ============================================================
+   GLOBAL SEARCH
+============================================================ */
+
+function globalKey(event){
+
+    if(event.key !== "Enter"){
+        return;
+    }
 
     const q =
         $("globalSearch")
             .value
-            .trim()
-            .toLowerCase();
+            .trim();
 
-    document
-        .querySelectorAll(".node")
-        .forEach(node=>{
+    if(!q){
+        return;
+    }
 
-            const id =
-                node.dataset.id;
+    if(
+        q.includes("@")
+    ){
 
-            const data =
-                graphNodes.find(
-                    n=>n.id===id
-                );
+        $("emailInput").value = q;
 
-            if(!q){
+        pageByName("email");
 
-                node.classList.remove(
-                    "blink"
-                );
+        scanEmail();
 
-                return;
-            }
+        return;
+    }
 
-            const match =
-                data &&
-                (
-                    data.title
-                        .toLowerCase()
-                        .includes(q)
-                    ||
-                    (data.content || "")
-                        .toLowerCase()
-                        .includes(q)
-                );
+    if(
+        /^\+?[\d\s().-]{7,}$/.test(q)
+    ){
 
-            if(match){
+        $("phoneInput").value = q;
 
-                node.classList.add(
-                    "blink"
-                );
+        pageByName("phone");
 
-            }else{
+        scanPhone();
 
-                node.classList.remove(
-                    "blink"
-                );
-            }
-        });
+        return;
+    }
+
+    $("mapInput").value = q;
+
+    pageByName("map-page");
+
+    searchMap();
 }
 
 
-/* ==========================================================
+/* ============================================================
    STATS
-========================================================== */
+============================================================ */
 
-function updateStats(){
+async function updateStats(){
 
     $("statNodes").textContent =
-        graphNodes.length;
+        nodes.length;
 
-    $("statSearches").textContent =
-        searches;
+    $("statAuth").textContent =
+        currentUser
+            ? "AUTH"
+            : "GUEST";
+
+    if(currentUser){
+
+        try{
+
+            const data =
+                await api("/api/chains");
+
+            $("statChains").textContent =
+                data.chains.length;
+
+        }catch{
+
+            $("statChains").textContent =
+                "0";
+        }
+
+    }else{
+
+        $("statChains").textContent =
+            "0";
+
+    }
 }
 
 
-/* ==========================================================
+/* ============================================================
    SATURN PARTICLE BACKGROUND
-========================================================== */
+============================================================ */
 
-const space =
-    $("space");
-
-const sctx =
-    space.getContext("2d");
-
-let stars = [];
-
-function resizeSpace(){
-
-    space.width =
-        window.innerWidth *
-        devicePixelRatio;
-
-    space.height =
-        window.innerHeight *
-        devicePixelRatio;
-
-    sctx.setTransform(
-        devicePixelRatio,
-        0,
-        0,
-        devicePixelRatio,
-        0,
-        0
-    );
-
-    stars = [];
-
-    const count =
-        Math.min(
-            180,
-            Math.floor(
-                window.innerWidth *
-                window.innerHeight /
-                7000
-            )
-        );
-
-    for(let i=0;i<count;i++){
-
-        stars.push({
-
-            x:Math.random() *
-                window.innerWidth,
-
-            y:Math.random() *
-                window.innerHeight,
-
-            r:Math.random()*1.3,
-
-            a:.1 +
-                Math.random()*.4,
-
-            s:.001 +
-                Math.random()*.004
-        });
-    }
-}
-
-function animateSpace(t){
-
-    const w =
-        window.innerWidth;
-
-    const h =
-        window.innerHeight;
-
-    sctx.clearRect(
-        0,
-        0,
-        w,
-        h
-    );
-
-    for(const star of stars){
-
-        star.a +=
-            Math.sin(
-                t * star.s
-            ) * .0005;
-
-        sctx.globalAlpha =
-            Math.max(
-                .05,
-                Math.min(
-                    .65,
-                    star.a
-                )
-            );
-
-        sctx.beginPath();
-
-        sctx.arc(
-            star.x,
-            star.y,
-            star.r,
-            0,
-            Math.PI*2
-        );
-
-        sctx.fillStyle =
-            "#ffffff";
-
-        sctx.fill();
-    }
-
-    requestAnimationFrame(
-        animateSpace
-    );
-}
-
-window.addEventListener(
-    "resize",
-    resizeSpace
-);
-
-resizeSpace();
-
-requestAnimationFrame(
-    animateSpace
-);
-
-
-/* ==========================================================
-   SATURN
-========================================================== */
-
-const saturnCanvas =
+const canvas =
     $("saturnCanvas");
 
-const saturnCtx =
-    saturnCanvas.getContext("2d");
+const ctx =
+    canvas.getContext("2d");
 
 let saturnParticles = [];
+
+let saturnAngle = 0;
+
 
 function resizeSaturn(){
 
     const rect =
-        $("saturn").getBoundingClientRect();
+        canvas.getBoundingClientRect();
 
     const dpr =
-        devicePixelRatio;
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
 
-    saturnCanvas.width =
-        rect.width*dpr;
+    canvas.width =
+        rect.width * dpr;
 
-    saturnCanvas.height =
-        rect.height*dpr;
+    canvas.height =
+        rect.height * dpr;
 
-    saturnCtx.setTransform(
+    ctx.setTransform(
         dpr,
         0,
         0,
@@ -3565,195 +3587,348 @@ function resizeSaturn(){
         0
     );
 
+    createSaturn();
+
+}
+
+
+function createSaturn(){
+
+    const rect =
+        canvas.getBoundingClientRect();
+
+    const cx =
+        rect.width/2;
+
+    const cy =
+        rect.height/2;
+
+    const radius =
+        Math.min(
+            rect.width,
+            rect.height
+        ) * .25;
+
     saturnParticles = [];
 
-    const count = 1150;
-
-    for(let i=0;i<count;i++){
-
-        const u =
-            Math.random();
-
-        const v =
-            Math.random();
+    // Planet
+    for(
+        let i=0;
+        i<1900;
+        i++
+    ){
 
         const theta =
-            2*Math.PI*u;
+            Math.random() *
+            Math.PI *
+            2;
 
         const phi =
             Math.acos(
-                2*v-1
+                2*Math.random()-1
             );
 
-        const radius =
-            205 +
-            (Math.random()-.5)*4;
+        const r =
+            radius *
+            Math.pow(
+                Math.random(),
+                .28
+            );
 
         saturnParticles.push({
-
+            type:"planet",
             theta,
-
             phi,
-
-            r:radius,
-
-            size:
-                .45 +
-                Math.random()*.9
+            r,
+            size:.5+Math.random()*1.5,
+            alpha:.2+Math.random()*.65
         });
+
     }
+
+    // Rings
+    for(
+        let i=0;
+        i<1200;
+        i++
+    ){
+
+        const angle =
+            Math.random() *
+            Math.PI *
+            2;
+
+        const ringR =
+            radius *
+            (
+                1.35 +
+                Math.random()*.85
+            );
+
+        saturnParticles.push({
+            type:"ring",
+            angle,
+            ringR,
+            offset:
+                (Math.random()-.5)*8,
+            size:
+                .4+
+                Math.random()*1.1,
+            alpha:
+                .12+
+                Math.random()*.5
+        });
+
+    }
+
 }
 
-function animateSaturn(t){
+
+function drawSaturn(){
 
     const rect =
-        $("saturn").getBoundingClientRect();
+        canvas.getBoundingClientRect();
 
-    const w =
+    const width =
         rect.width;
 
-    const h =
+    const height =
         rect.height;
 
-    saturnCtx.clearRect(
+    ctx.clearRect(
         0,
         0,
-        w,
-        h
+        width,
+        height
     );
 
     const cx =
-        w/2;
+        width/2;
 
     const cy =
-        h/2;
+        height/2;
 
-    const rotation =
-        t * .000045;
+    const radius =
+        Math.min(width,height)*.25;
 
-    for(const p of saturnParticles){
+    saturnAngle += .0007;
 
-        const theta =
-            p.theta +
-            rotation;
+    // Planet atmosphere glow
+    const glow =
+        ctx.createRadialGradient(
+            cx,
+            cy,
+            radius*.4,
+            cx,
+            cy,
+            radius*1.35
+        );
 
-        const sinPhi =
-            Math.sin(p.phi);
+    glow.addColorStop(
+        0,
+        "rgba(160,140,255,.13)"
+    );
+
+    glow.addColorStop(
+        .6,
+        "rgba(120,90,255,.045)"
+    );
+
+    glow.addColorStop(
+        1,
+        "rgba(0,0,0,0)"
+    );
+
+    ctx.fillStyle = glow;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        cx,
+        cy,
+        radius*1.4,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+    // Rings behind planet
+    ctx.save();
+
+    ctx.translate(
+        cx,
+        cy
+    );
+
+    ctx.rotate(
+        -.27 +
+        Math.sin(saturnAngle)*.02
+    );
+
+    for(
+        let r=radius*1.25;
+        r<radius*2.15;
+        r+=4
+    ){
+
+        ctx.beginPath();
+
+        ctx.ellipse(
+            0,
+            0,
+            r,
+            r*.29,
+            0,
+            0,
+            Math.PI*2
+        );
+
+        ctx.strokeStyle =
+            `rgba(160,150,210,${
+                .018 +
+                (
+                    1-
+                    (r-radius*1.25)/
+                    (radius*.9)
+                )*.055
+            })`;
+
+        ctx.lineWidth = 1;
+
+        ctx.stroke();
+
+    }
+
+    ctx.restore();
+
+    // Particle planet
+    for(
+        const p of saturnParticles
+    ){
+
+        if(p.type !== "planet"){
+            continue;
+        }
 
         const x =
             p.r *
-            sinPhi *
-            Math.cos(theta);
+            Math.sin(p.phi) *
+            Math.cos(
+                p.theta +
+                saturnAngle
+            );
+
+        const z =
+            p.r *
+            Math.sin(p.phi) *
+            Math.sin(
+                p.theta +
+                saturnAngle
+            );
 
         const y =
             p.r *
             Math.cos(p.phi);
 
-        const z =
-            p.r *
-            sinPhi *
-            Math.sin(theta);
-
         const perspective =
             1 +
-            z/850;
+            z/(radius*3);
 
-        const sx =
+        const px =
             cx +
-            x*perspective;
+            x *
+            perspective;
 
-        const sy =
+        const py =
             cy +
-            y*perspective;
+            y *
+            perspective;
 
-        const alpha =
-            .15 +
-            .75 *
-            ((z+p.r)/(2*p.r));
-
-        saturnCtx.globalAlpha =
-            Math.max(
-                .05,
-                Math.min(
-                    .95,
-                    alpha
+        ctx.fillStyle =
+            `rgba(185,175,220,${
+                p.alpha *
+                (
+                    .55 +
+                    .45 *
+                    (z/radius+1)/2
                 )
-            );
+            })`;
 
-        saturnCtx.beginPath();
+        ctx.beginPath();
 
-        saturnCtx.arc(
-            sx,
-            sy,
+        ctx.arc(
+            px,
+            py,
             p.size*perspective,
             0,
             Math.PI*2
         );
 
-        saturnCtx.fillStyle =
-            "#a98cff";
+        ctx.fill();
 
-        saturnCtx.fill();
     }
 
-    /*
-       Particle rings.
-       These are also generated on canvas,
-       not a static image.
-    */
+    // Particle rings
+    ctx.save();
 
-    for(let ring=0;ring<3;ring++){
+    ctx.translate(
+        cx,
+        cy
+    );
 
-        const radius =
-            235 +
-            ring*27;
+    ctx.rotate(
+        -.27 +
+        Math.sin(saturnAngle)*.02
+    );
 
-        saturnCtx.save();
+    for(
+        const p of saturnParticles
+    ){
 
-        saturnCtx.translate(
-            cx,
-            cy
-        );
+        if(p.type !== "ring"){
+            continue;
+        }
 
-        saturnCtx.rotate(
-            -0.35 +
-            Math.sin(t*.00003)*.08
-        );
+        const a =
+            p.angle +
+            saturnAngle;
 
-        saturnCtx.scale(
-            1,
-            .28
-        );
+        const x =
+            Math.cos(a) *
+            p.ringR;
 
-        saturnCtx.globalAlpha =
-            .22 -
-            ring*.04;
+        const y =
+            Math.sin(a) *
+            p.ringR *
+            .29;
 
-        saturnCtx.beginPath();
+        ctx.fillStyle =
+            `rgba(185,175,220,${
+                p.alpha
+            })`;
 
-        saturnCtx.arc(
-            0,
-            0,
-            radius,
+        ctx.beginPath();
+
+        ctx.arc(
+            x,
+            y,
+            p.size,
             0,
             Math.PI*2
         );
 
-        saturnCtx.strokeStyle =
-            "#9276df";
+        ctx.fill();
 
-        saturnCtx.lineWidth =
-            1.3;
-
-        saturnCtx.stroke();
-
-        saturnCtx.restore();
     }
 
+    ctx.restore();
+
     requestAnimationFrame(
-        animateSaturn
+        drawSaturn
     );
 }
+
 
 window.addEventListener(
     "resize",
@@ -3762,48 +3937,12 @@ window.addEventListener(
 
 resizeSaturn();
 
-requestAnimationFrame(
-    animateSaturn
-);
+drawSaturn();
 
 
-/* ==========================================================
-   HELPERS
-========================================================== */
-
-function sleep(ms){
-    return new Promise(
-        resolve=>setTimeout(
-            resolve,
-            ms
-        )
-    );
-}
-
-
-function escapeHtml(value){
-
-    return String(value)
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-}
-
-
-function escapeAttr(value){
-
-    return escapeHtml(value)
-        .replaceAll("`","&#096;");
-}
-
-
-/* ==========================================================
-   INIT
-========================================================== */
-
-loadGraph();
+/* ============================================================
+   START
+============================================================ */
 
 loadMe();
 
@@ -3812,4 +3951,4 @@ updateStats();
 </script>
 
 </body>
-  </html>
+    </html>
