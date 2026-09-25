@@ -1,25 +1,47 @@
 import os
 import re
 import json
-import sqlite3
+import time
 import hashlib
 import secrets
+import sqlite3
+import socket
 import asyncio
 from datetime import datetime, timezone
 from urllib.parse import quote
 
 import httpx
-from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 
 # ============================================================
 # NZX OSINT TOOL
-# Backend — single-file FastAPI server
+# Backend: FastAPI
+# Files required:
+#   main.py
+#   index.html
 # ============================================================
 
-app = FastAPI(title="NZX OSINT TOOL")
+APP_NAME = "NZX OSINT TOOL"
+
+PORT = int(os.getenv("PORT", "10000"))
+DB_PATH = os.getenv("DB_PATH", "nzx.db")
+
+GRAVATAR_API_KEY = os.getenv("GRAVATAR_API_KEY", "").strip()
+
+# Optional external APIs.
+# Leave empty if you don't have them.
+ABSTRACT_PHONE_API_KEY = os.getenv("ABSTRACT_PHONE_API_KEY", "").strip()
+ABSTRACT_EMAIL_API_KEY = os.getenv("ABSTRACT_EMAIL_API_KEY", "").strip()
+
+NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
+GRAVATAR_URL = "https://api.gravatar.com/v3/profiles"
+
+USER_AGENT = "NZX-OSINT-TOOL/1.0"
+
+app = FastAPI(title=APP_NAME)
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,23 +51,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DB = "nzx.db"
-
 
 # ============================================================
 # DATABASE
 # ============================================================
 
+db_lock = asyncio.Lock()
+
+
 def db():
-    con = sqlite3.connect(DB)
-    con.row_factory = sqlite3.Row
-    return con
+    conn = sqlite3.connect(DB_PATH, timeout=20)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
 def init_db():
-    con = db()
+    conn = db()
 
-    con.execute("""
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
@@ -56,10 +79,10 @@ def init_db():
         )
     """)
 
-    con.execute("""
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS chains (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
+            user_id INTEGER NOT NULL,
             name TEXT NOT NULL,
             data TEXT NOT NULL,
             created_at TEXT NOT NULL,
@@ -67,75 +90,100 @@ def init_db():
         )
     """)
 
-    con.commit()
-    con.close()
+    conn.commit()
+    conn.close()
 
 
 init_db()
 
 
 # ============================================================
-# HELPERS
+# SESSION
 # ============================================================
+
+SESSIONS = {}
+
+
+def hash_password(password: str):
+    return hashlib.sha256(password.encode("utf-8")).hexdigest()
+
 
 def now():
     return datetime.now(timezone.utc).isoformat()
 
 
-def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+def create_session(user_id: int):
+    token = secrets.token_urlsafe(40)
+    SESSIONS[token] = {
+        "user_id": user_id,
+        "created_at": time.time()
+    }
+    return token
 
 
-def valid_email(email):
-    return bool(
-        re.match(
-            r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$",
-            email.strip()
-        )
-    )
+def get_session(request: Request):
+    token = request.cookies.get("nzx_session")
 
-
-def clean_username(value):
-    return re.sub(r"[^a-zA-Z0-9_.-]", "", value.strip())[:32]
-
-
-def token():
-    return secrets.token_urlsafe(32)
-
-
-# Simple in-memory sessions.
-# Fine for a small demo / single Render instance.
-SESSIONS = {}
-
-
-def get_user(request: Request):
-    t = request.cookies.get("nzx_session")
-
-    if not t:
+    if not token:
         return None
 
-    uid = SESSIONS.get(t)
+    session = SESSIONS.get(token)
 
-    if not uid:
+    if not session:
         return None
 
-    con = db()
-    user = con.execute(
-        "SELECT id, username, email, avatar, created_at FROM users WHERE id=?",
-        (uid,)
+    # 30 days
+    if time.time() - session["created_at"] > 60 * 60 * 24 * 30:
+        SESSIONS.pop(token, None)
+        return None
+
+    return session
+
+
+def get_current_user(request: Request):
+    session = get_session(request)
+
+    if not session:
+        return None
+
+    conn = db()
+
+    user = conn.execute(
+        "SELECT * FROM users WHERE id = ?",
+        (session["user_id"],)
     ).fetchone()
-    con.close()
+
+    conn.close()
 
     return dict(user) if user else None
 
 
 # ============================================================
-# FRONTEND
+# BASIC
 # ============================================================
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 async def index():
-    return FileResponse("index.html")
+    try:
+        with open("index.html", "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        return HTMLResponse(
+            "<h1>NZX OSINT TOOL</h1><p>index.html not found</p>",
+            status_code=500
+        )
+
+
+@app.get("/api/health")
+async def health():
+    return {
+        "ok": True,
+        "app": APP_NAME,
+        "time": now(),
+        "gravatar": bool(GRAVATAR_API_KEY),
+        "phone_provider": bool(ABSTRACT_PHONE_API_KEY),
+        "email_provider": bool(ABSTRACT_EMAIL_API_KEY)
+    }
 
 
 # ============================================================
@@ -146,65 +194,58 @@ async def index():
 async def register(request: Request):
     data = await request.json()
 
-    username = clean_username(str(data.get("username", "")))
+    username = str(data.get("username", "")).strip()
     email = str(data.get("email", "")).strip().lower()
     password = str(data.get("password", ""))
 
     if len(username) < 3:
-        return JSONResponse(
-            {"ok": False, "error": "Username должен содержать минимум 3 символа"},
-            status_code=400
-        )
+        raise HTTPException(400, "Username must contain at least 3 characters")
 
-    if not valid_email(email):
-        return JSONResponse(
-            {"ok": False, "error": "Некорректный email"},
-            status_code=400
-        )
+    if not re.match(
+        r"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+        email
+    ):
+        raise HTTPException(400, "Invalid email")
 
     if len(password) < 6:
-        return JSONResponse(
-            {"ok": False, "error": "Пароль минимум 6 символов"},
-            status_code=400
+        raise HTTPException(400, "Password must contain at least 6 characters")
+
+    conn = db()
+
+    exists = conn.execute(
+        "SELECT id FROM users WHERE username = ? OR email = ?",
+        (username, email)
+    ).fetchone()
+
+    if exists:
+        conn.close()
+        raise HTTPException(409, "Username or email already exists")
+
+    cur = conn.execute(
+        """
+        INSERT INTO users
+        (username, email, password_hash, avatar, created_at)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (
+            username,
+            email,
+            hash_password(password),
+            "",
+            now()
         )
+    )
 
-    con = db()
+    conn.commit()
+    user_id = cur.lastrowid
+    conn.close()
 
-    try:
-        cur = con.execute(
-            """
-            INSERT INTO users
-            (username,email,password_hash,avatar,created_at)
-            VALUES (?,?,?,?,?)
-            """,
-            (
-                username,
-                email,
-                hash_password(password),
-                "",
-                now()
-            )
-        )
-
-        uid = cur.lastrowid
-        con.commit()
-
-    except sqlite3.IntegrityError:
-        con.close()
-        return JSONResponse(
-            {"ok": False, "error": "Username или email уже используется"},
-            status_code=409
-        )
-
-    con.close()
-
-    t = token()
-    SESSIONS[t] = uid
+    token = create_session(user_id)
 
     response = JSONResponse({
         "ok": True,
         "user": {
-            "id": uid,
+            "id": user_id,
             "username": username,
             "email": email,
             "avatar": ""
@@ -213,10 +254,9 @@ async def register(request: Request):
 
     response.set_cookie(
         "nzx_session",
-        t,
+        token,
         httponly=True,
         samesite="lax",
-        secure=False,
         max_age=60 * 60 * 24 * 30
     )
 
@@ -227,55 +267,44 @@ async def register(request: Request):
 async def login(request: Request):
     data = await request.json()
 
-    login_value = str(data.get("login", "")).strip().lower()
+    login_value = str(data.get("login", "")).strip()
     password = str(data.get("password", ""))
 
-    con = db()
+    conn = db()
 
-    user = con.execute(
+    user = conn.execute(
         """
-        SELECT id, username, email, avatar, created_at
-        FROM users
-        WHERE lower(username)=? OR lower(email)=?
+        SELECT * FROM users
+        WHERE username = ? OR email = ?
         """,
-        (login_value, login_value)
+        (login_value, login_value.lower())
     ).fetchone()
 
-    con.close()
+    conn.close()
 
     if not user:
-        return JSONResponse(
-            {"ok": False, "error": "Пользователь не найден"},
-            status_code=401
-        )
+        raise HTTPException(401, "Invalid login or password")
 
-    con = db()
-    check = con.execute(
-        "SELECT password_hash FROM users WHERE id=?",
-        (user["id"],)
-    ).fetchone()
-    con.close()
+    if user["password_hash"] != hash_password(password):
+        raise HTTPException(401, "Invalid login or password")
 
-    if not check or check["password_hash"] != hash_password(password):
-        return JSONResponse(
-            {"ok": False, "error": "Неверный пароль"},
-            status_code=401
-        )
-
-    t = token()
-    SESSIONS[t] = user["id"]
+    token = create_session(user["id"])
 
     response = JSONResponse({
         "ok": True,
-        "user": dict(user)
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "email": user["email"],
+            "avatar": user["avatar"] or ""
+        }
     })
 
     response.set_cookie(
         "nzx_session",
-        t,
+        token,
         httponly=True,
         samesite="lax",
-        secure=False,
         max_age=60 * 60 * 24 * 30
     )
 
@@ -284,10 +313,10 @@ async def login(request: Request):
 
 @app.post("/api/logout")
 async def logout(request: Request):
-    t = request.cookies.get("nzx_session")
+    token = request.cookies.get("nzx_session")
 
-    if t:
-        SESSIONS.pop(t, None)
+    if token:
+        SESSIONS.pop(token, None)
 
     response = JSONResponse({"ok": True})
     response.delete_cookie("nzx_session")
@@ -297,60 +326,67 @@ async def logout(request: Request):
 
 @app.get("/api/me")
 async def me(request: Request):
-    user = get_user(request)
+    user = get_current_user(request)
+
+    if not user:
+        return {
+            "authenticated": False,
+            "user": None
+        }
 
     return {
-        "ok": True,
-        "logged": bool(user),
-        "user": user
+        "authenticated": True,
+        "user": {
+            "id": user["id"],
+            "username": user["username"],
+            "email": user["email"],
+            "avatar": user["avatar"] or ""
+        }
     }
 
 
 @app.post("/api/profile")
 async def profile(request: Request):
-    user = get_user(request)
+    user = get_current_user(request)
 
     if not user:
-        return JSONResponse(
-            {"ok": False, "error": "Не авторизован"},
-            status_code=401
-        )
+        raise HTTPException(401, "Login required")
 
     data = await request.json()
 
-    username = clean_username(
-        str(data.get("username", user["username"]))
-    )
+    username = str(
+        data.get("username", user["username"])
+    ).strip()
 
-    avatar = str(data.get("avatar", ""))[:1000]
+    avatar = str(
+        data.get("avatar", user["avatar"] or "")
+    ).strip()
 
     if len(username) < 3:
-        return JSONResponse(
-            {"ok": False, "error": "Слишком короткий username"},
-            status_code=400
-        )
+        raise HTTPException(400, "Invalid username")
 
-    con = db()
+    conn = db()
 
-    try:
-        con.execute(
-            """
-            UPDATE users
-            SET username=?, avatar=?
-            WHERE id=?
-            """,
-            (username, avatar, user["id"])
-        )
-        con.commit()
+    duplicate = conn.execute(
+        "SELECT id FROM users WHERE username = ? AND id != ?",
+        (username, user["id"])
+    ).fetchone()
 
-    except sqlite3.IntegrityError:
-        con.close()
-        return JSONResponse(
-            {"ok": False, "error": "Этот username уже занят"},
-            status_code=409
-        )
+    if duplicate:
+        conn.close()
+        raise HTTPException(409, "Username already exists")
 
-    con.close()
+    conn.execute(
+        """
+        UPDATE users
+        SET username = ?, avatar = ?
+        WHERE id = ?
+        """,
+        (username, avatar, user["id"])
+    )
+
+    conn.commit()
+    conn.close()
 
     return {
         "ok": True,
@@ -360,19 +396,19 @@ async def profile(request: Request):
 
 
 # ============================================================
-# PUBLIC USER SEARCH
+# USER SEARCH
 # ============================================================
 
 @app.get("/api/users/search")
-async def search_users(request: Request):
-    q = request.query_params.get("q", "").strip()
+async def search_users(q: str = ""):
+    q = q.strip()
 
-    if len(q) < 2:
-        return {"ok": True, "users": []}
+    if not q:
+        return {"results": []}
 
-    con = db()
+    conn = db()
 
-    rows = con.execute(
+    rows = conn.execute(
         """
         SELECT id, username, avatar, created_at
         FROM users
@@ -383,11 +419,18 @@ async def search_users(request: Request):
         (f"%{q}%",)
     ).fetchall()
 
-    con.close()
+    conn.close()
 
     return {
-        "ok": True,
-        "users": [dict(x) for x in rows]
+        "results": [
+            {
+                "id": x["id"],
+                "username": x["username"],
+                "avatar": x["avatar"] or "",
+                "created_at": x["created_at"]
+            }
+            for x in rows
+        ]
     }
 
 
@@ -396,372 +439,625 @@ async def search_users(request: Request):
 # ============================================================
 
 @app.get("/api/chains")
-async def chains(request: Request):
-    user = get_user(request)
+async def get_chains(request: Request):
+    user = get_current_user(request)
 
     if not user:
-        return JSONResponse(
-            {"ok": False, "error": "Не авторизован"},
-            status_code=401
-        )
+        raise HTTPException(401, "Login required")
 
-    con = db()
+    conn = db()
 
-    rows = con.execute(
+    rows = conn.execute(
         """
-        SELECT id,name,data,created_at,updated_at
+        SELECT id, name, data, created_at, updated_at
         FROM chains
-        WHERE user_id=?
+        WHERE user_id = ?
         ORDER BY updated_at DESC
         """,
         (user["id"],)
     ).fetchall()
 
-    con.close()
+    conn.close()
 
     result = []
 
     for row in rows:
-        item = dict(row)
-
         try:
-            item["data"] = json.loads(item["data"])
+            parsed = json.loads(row["data"])
         except Exception:
-            item["data"] = {}
+            parsed = {}
 
-        result.append(item)
+        result.append({
+            "id": row["id"],
+            "name": row["name"],
+            "data": parsed,
+            "created_at": row["created_at"],
+            "updated_at": row["updated_at"]
+        })
 
-    return {
-        "ok": True,
-        "chains": result
-    }
+    return {"chains": result}
 
 
 @app.post("/api/chains")
-async def save_chain(request: Request):
-    user = get_user(request)
+async def create_chain(request: Request):
+    user = get_current_user(request)
 
     if not user:
-        return JSONResponse(
-            {"ok": False, "error": "Не авторизован"},
-            status_code=401
-        )
+        raise HTTPException(401, "Login required")
 
     data = await request.json()
 
-    name = str(data.get("name", "Untitled Chain")).strip()[:80]
-    graph = data.get("data", {})
+    name = str(data.get("name", "")).strip() or "Untitled Chain"
+    chain_data = data.get("data", {})
 
-    con = db()
+    conn = db()
 
-    cur = con.execute(
+    cur = conn.execute(
         """
         INSERT INTO chains
-        (user_id,name,data,created_at,updated_at)
-        VALUES (?,?,?,?,?)
+        (user_id, name, data, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
         """,
         (
             user["id"],
             name,
-            json.dumps(graph, ensure_ascii=False),
+            json.dumps(chain_data, ensure_ascii=False),
             now(),
             now()
         )
     )
 
-    cid = cur.lastrowid
-
-    con.commit()
-    con.close()
+    conn.commit()
+    chain_id = cur.lastrowid
+    conn.close()
 
     return {
         "ok": True,
-        "id": cid
+        "id": chain_id
     }
 
 
 @app.put("/api/chains/{chain_id}")
 async def update_chain(chain_id: int, request: Request):
-    user = get_user(request)
+    user = get_current_user(request)
 
     if not user:
-        return JSONResponse(
-            {"ok": False, "error": "Не авторизован"},
-            status_code=401
-        )
+        raise HTTPException(401, "Login required")
 
     data = await request.json()
 
-    name = str(data.get("name", "Untitled Chain")).strip()[:80]
-    graph = data.get("data", {})
+    name = str(data.get("name", "")).strip() or "Untitled Chain"
+    chain_data = data.get("data", {})
 
-    con = db()
+    conn = db()
 
-    cur = con.execute(
+    result = conn.execute(
         """
         UPDATE chains
-        SET name=?,data=?,updated_at=?
-        WHERE id=? AND user_id=?
+        SET name = ?, data = ?, updated_at = ?
+        WHERE id = ? AND user_id = ?
         """,
         (
             name,
-            json.dumps(graph, ensure_ascii=False),
+            json.dumps(chain_data, ensure_ascii=False),
             now(),
             chain_id,
             user["id"]
         )
     )
 
-    con.commit()
-    con.close()
+    conn.commit()
+    conn.close()
 
-    if cur.rowcount == 0:
-        return JSONResponse(
-            {"ok": False, "error": "Цепочка не найдена"},
-            status_code=404
-        )
+    if result.rowcount == 0:
+        raise HTTPException(404, "Chain not found")
 
     return {"ok": True}
 
 
 @app.delete("/api/chains/{chain_id}")
 async def delete_chain(chain_id: int, request: Request):
-    user = get_user(request)
+    user = get_current_user(request)
 
     if not user:
-        return JSONResponse(
-            {"ok": False, "error": "Не авторизован"},
-            status_code=401
-        )
+        raise HTTPException(401, "Login required")
 
-    con = db()
+    conn = db()
 
-    con.execute(
-        "DELETE FROM chains WHERE id=? AND user_id=?",
+    result = conn.execute(
+        """
+        DELETE FROM chains
+        WHERE id = ? AND user_id = ?
+        """,
         (chain_id, user["id"])
     )
 
-    con.commit()
-    con.close()
+    conn.commit()
+    conn.close()
+
+    if result.rowcount == 0:
+        raise HTTPException(404, "Chain not found")
 
     return {"ok": True}
 
 
 # ============================================================
-# EMAIL OSINT
+# EMAIL
 # ============================================================
 
-async def email_gravatar(email):
-    normalized = email.strip().lower()
+EMAIL_RE = re.compile(
+    r"^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+    r"[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$"
+)
 
-    h = hashlib.md5(
-        normalized.encode()
-    ).hexdigest()
 
-    url = f"https://www.gravatar.com/avatar/{h}?d=404"
+def email_parts(email):
+    email = email.strip().lower()
+
+    if "@" not in email:
+        return None, None
+
+    local, domain = email.rsplit("@", 1)
+
+    return local, domain
+
+
+async def dns_mx(domain):
+    """
+    Uses Google's DNS-over-HTTPS resolver.
+    This checks whether DNS has MX records.
+    It does NOT prove that an individual mailbox exists.
+    """
+
+    url = (
+        "https://dns.google/resolve"
+        f"?name={quote(domain)}&type=MX"
+    )
 
     try:
         async with httpx.AsyncClient(
             timeout=8,
-            follow_redirects=True
+            headers={"User-Agent": USER_AGENT}
         ) as client:
 
-            r = await client.get(url)
+            response = await client.get(url)
 
+        if response.status_code != 200:
             return {
-                "service": "GRAVATAR",
-                "status": "FOUND" if r.status_code == 200 else "NOT FOUND",
-                "url": f"https://www.gravatar.com/avatar/{h}"
+                "status": "UNKNOWN",
+                "reason": "DNS provider unavailable"
             }
 
-    except Exception:
+        payload = response.json()
+
+        answers = payload.get("Answer", [])
+
+        mx = []
+
+        for answer in answers:
+            value = str(answer.get("data", "")).strip()
+
+            if value:
+                mx.append(value)
+
+        if mx:
+            return {
+                "status": "FOUND",
+                "reason": "MX records exist",
+                "records": mx
+            }
+
         return {
-            "service": "GRAVATAR",
+            "status": "NOT_FOUND",
+            "reason": "No MX records found",
+            "records": []
+        }
+
+    except Exception as e:
+        return {
             "status": "UNKNOWN",
-            "url": ""
+            "reason": str(e),
+            "records": []
         }
 
 
-async def email_domain(email):
-    domain = email.split("@")[-1].lower()
+async def gravatar_lookup(email):
+    clean = email.strip().lower()
+
+    email_hash = hashlib.sha256(
+        clean.encode("utf-8")
+    ).hexdigest()
+
+    result = {
+        "service": "Gravatar",
+        "status": "UNKNOWN",
+        "url": f"https://gravatar.com/{email_hash}",
+        "avatar": (
+            f"https://0.gravatar.com/avatar/{email_hash}"
+        ),
+        "profile": None,
+        "hash": email_hash
+    }
 
     try:
-        async with httpx.AsyncClient(timeout=8) as client:
-            r = await client.get(
-                "https://dns.google/resolve",
-                params={
-                    "name": domain,
-                    "type": "MX"
-                },
-                headers={
-                    "Accept": "application/dns-json"
-                }
+        headers = {
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json"
+        }
+
+        if GRAVATAR_API_KEY:
+            headers["Authorization"] = (
+                f"Bearer {GRAVATAR_API_KEY}"
             )
 
-        data = r.json()
+        async with httpx.AsyncClient(
+            timeout=10,
+            follow_redirects=True,
+            headers=headers
+        ) as client:
 
-        answers = data.get("Answer", [])
+            response = await client.get(
+                f"{GRAVATAR_URL}/{email_hash}"
+            )
 
+        if response.status_code == 200:
+            payload = response.json()
+
+            result["status"] = "FOUND"
+            result["profile"] = payload
+
+            if payload.get("profile_url"):
+                result["url"] = payload["profile_url"]
+
+            if payload.get("avatar_url"):
+                result["avatar"] = payload["avatar_url"]
+
+        elif response.status_code == 404:
+            result["status"] = "NOT_FOUND"
+
+        elif response.status_code == 429:
+            result["status"] = "UNKNOWN"
+            result["reason"] = "Rate limit exceeded"
+
+        else:
+            result["status"] = "UNKNOWN"
+            result["reason"] = f"HTTP {response.status_code}"
+
+    except Exception as e:
+        result["status"] = "UNKNOWN"
+        result["reason"] = str(e)
+
+    return result
+
+
+async def abstract_email_check(email):
+    if not ABSTRACT_EMAIL_API_KEY:
         return {
-            "service": "DOMAIN / MX",
-            "status": "FOUND" if answers else "NOT FOUND",
-            "url": ""
-        }
-
-    except Exception:
-        return {
-            "service": "DOMAIN / MX",
+            "service": "Email Intelligence",
             "status": "UNKNOWN",
-            "url": ""
+            "reason": "API key not configured"
         }
 
-
-async def email_public_checks(email):
-    """
-    Only checks services that expose a public,
-    non-authenticated signal.
-
-    We deliberately don't attempt to bypass account
-    recovery pages, CAPTCHA, rate limits or privacy controls.
-    """
-
-    results = []
-
-    results.append({
-        "service": "EMAIL FORMAT",
-        "status": "FOUND" if valid_email(email) else "NOT FOUND",
-        "url": ""
-    })
-
-    if not valid_email(email):
-        return results
-
-    a, b = await asyncio.gather(
-        email_gravatar(email),
-        email_domain(email)
+    # Abstract Email Validation API.
+    url = (
+        "https://emailvalidation.abstractapi.com/v1/"
+        f"?api_key={quote(ABSTRACT_EMAIL_API_KEY)}"
+        f"&email={quote(email)}"
     )
 
-    results.extend([a, b])
+    try:
+        async with httpx.AsyncClient(
+            timeout=12,
+            headers={"User-Agent": USER_AGENT}
+        ) as client:
 
-    return results
+            response = await client.get(url)
+
+        if response.status_code != 200:
+            return {
+                "service": "Email Intelligence",
+                "status": "UNKNOWN",
+                "reason": f"HTTP {response.status_code}"
+            }
+
+        payload = response.json()
+
+        deliverability = (
+            payload.get("is_smtp_valid", {})
+            .get("value")
+        )
+
+        if deliverability is True:
+            status = "FOUND"
+            reason = "SMTP validation indicates the domain/mail system accepts validation"
+        elif deliverability is False:
+            status = "NOT_FOUND"
+            reason = "SMTP validation failed"
+        else:
+            status = "UNKNOWN"
+            reason = "Provider did not return a definitive result"
+
+        return {
+            "service": "Email Intelligence",
+            "status": status,
+            "reason": reason,
+            "raw": payload
+        }
+
+    except Exception as e:
+        return {
+            "service": "Email Intelligence",
+            "status": "UNKNOWN",
+            "reason": str(e)
+        }
 
 
 @app.post("/api/osint/email")
-async def email_osint(request: Request):
+async def osint_email(request: Request):
     data = await request.json()
 
     email = str(data.get("email", "")).strip().lower()
 
-    if not email:
-        return JSONResponse(
-            {"ok": False, "error": "Введите email"},
-            status_code=400
-        )
+    if not EMAIL_RE.match(email):
+        raise HTTPException(400, "Invalid email address")
 
-    if len(email) > 254:
-        return JSONResponse(
-            {"ok": False, "error": "Слишком длинный email"},
-            status_code=400
-        )
+    local, domain = email_parts(email)
 
-    results = await email_public_checks(email)
+    started = time.time()
+
+    results = []
+
+    # 1. Syntax
+    results.append({
+        "service": "Email Syntax",
+        "status": "FOUND",
+        "reason": "Email format is syntactically valid"
+    })
+
+    # 2. Domain
+    results.append({
+        "service": "Domain",
+        "status": "FOUND",
+        "value": domain,
+        "reason": "Domain extracted from email"
+    })
+
+    # 3. MX
+    mx = await dns_mx(domain)
+
+    results.append({
+        "service": "DNS / MX",
+        "status": mx["status"],
+        "reason": mx.get("reason", ""),
+        "records": mx.get("records", [])
+    })
+
+    # 4. Gravatar
+    gravatar = await gravatar_lookup(email)
+    results.append(gravatar)
+
+    # 5. Optional email intelligence provider
+    provider = await abstract_email_check(email)
+    results.append(provider)
 
     return {
         "ok": True,
         "query": email,
+        "local": local,
+        "domain": domain,
+        "elapsed_ms": round(
+            (time.time() - started) * 1000
+        ),
+        "results": results,
+        "summary": {
+            "found": sum(
+                1 for x in results
+                if x.get("status") == "FOUND"
+            ),
+            "not_found": sum(
+                1 for x in results
+                if x.get("status") == "NOT_FOUND"
+            ),
+            "unknown": sum(
+                1 for x in results
+                if x.get("status") == "UNKNOWN"
+            )
+        }
+    }
+
+
+# ============================================================
+# PHONE
+# ============================================================
+
+def normalize_phone(phone):
+    phone = phone.strip()
+
+    if phone.startswith("00"):
+        phone = "+" + phone[2:]
+
+    cleaned = re.sub(
+        r"[^\d+]",
+        "",
+        phone
+    )
+
+    if cleaned.startswith("+"):
+        cleaned = "+" + re.sub(
+            r"\D",
+            "",
+            cleaned[1:]
+        )
+    else:
+        cleaned = re.sub(r"\D", "", cleaned)
+
+    return cleaned
+
+
+async def abstract_phone_lookup(phone):
+    if not ABSTRACT_PHONE_API_KEY:
+        return {
+            "service": "Phone Intelligence",
+            "status": "UNKNOWN",
+            "reason": "API key not configured"
+        }
+
+    url = (
+        "https://phonevalidation.abstractapi.com/v1/"
+        f"?api_key={quote(ABSTRACT_PHONE_API_KEY)}"
+        f"&phone={quote(phone)}"
+    )
+
+    try:
+        async with httpx.AsyncClient(
+            timeout=12,
+            headers={"User-Agent": USER_AGENT}
+        ) as client:
+
+            response = await client.get(url)
+
+        if response.status_code != 200:
+            return {
+                "service": "Phone Intelligence",
+                "status": "UNKNOWN",
+                "reason": f"HTTP {response.status_code}"
+            }
+
+        payload = response.json()
+
+        valid = payload.get("valid")
+
+        if valid is True:
+            status = "FOUND"
+            reason = "Provider considers the number valid"
+        elif valid is False:
+            status = "NOT_FOUND"
+            reason = "Provider considers the number invalid"
+        else:
+            status = "UNKNOWN"
+            reason = "Provider returned no definitive validation"
+
+        return {
+            "service": "Phone Intelligence",
+            "status": status,
+            "reason": reason,
+            "country": payload.get("country"),
+            "country_code": payload.get("country_code"),
+            "type": payload.get("type"),
+            "carrier": payload.get("carrier"),
+            "raw": payload
+        }
+
+    except Exception as e:
+        return {
+            "service": "Phone Intelligence",
+            "status": "UNKNOWN",
+            "reason": str(e)
+        }
+
+
+@app.post("/api/osint/phone")
+async def osint_phone(request: Request):
+    data = await request.json()
+
+    original = str(data.get("phone", "")).strip()
+
+    if not original:
+        raise HTTPException(400, "Phone is required")
+
+    phone = normalize_phone(original)
+
+    digits = re.sub(r"\D", "", phone)
+
+    results = []
+
+    if 7 <= len(digits) <= 15:
+        results.append({
+            "service": "Phone Format",
+            "status": "FOUND",
+            "reason": "Number has a plausible international length",
+            "value": phone
+        })
+    else:
+        results.append({
+            "service": "Phone Format",
+            "status": "NOT_FOUND",
+            "reason": "Number length is outside the normal international range",
+            "value": phone
+        })
+
+    # Do NOT claim carrier/operator/etc. without a real provider.
+    provider = await abstract_phone_lookup(phone)
+    results.append(provider)
+
+    return {
+        "ok": True,
+        "query": original,
+        "normalized": phone,
         "results": results
     }
 
 
 # ============================================================
-# PHONE CHECK
-# ============================================================
-
-@app.post("/api/osint/phone")
-async def phone_check(request: Request):
-    data = await request.json()
-
-    phone = str(data.get("phone", "")).strip()
-
-    digits = re.sub(r"\D", "", phone)
-
-    if len(digits) < 7 or len(digits) > 15:
-        return {
-            "ok": True,
-            "phone": phone,
-            "valid": False,
-            "status": "INVALID",
-            "message": "Количество цифр не соответствует международному диапазону"
-        }
-
-    normalized = "+" + digits
-
-    return {
-        "ok": True,
-        "phone": phone,
-        "normalized": normalized,
-        "valid": True,
-        "status": "FORMAT OK",
-        "message": (
-            "Номер имеет допустимую международную длину. "
-            "Это не подтверждает, что номер реально активен."
-        )
-    }
-
-
-# ============================================================
-# MAP / ADDRESS SEARCH
+# MAP
 # ============================================================
 
 @app.get("/api/map/search")
-async def map_search(request: Request):
-    q = request.query_params.get("q", "").strip()
+async def map_search(q: str = ""):
+    q = q.strip()
 
-    if len(q) < 2:
-        return {
-            "ok": True,
-            "results": []
-        }
+    if not q:
+        raise HTTPException(400, "Search query required")
 
-    url = "https://nominatim.openstreetmap.org/search"
+    params = {
+        "q": q,
+        "format": "jsonv2",
+        "addressdetails": 1,
+        "limit": 8,
+        "accept-language": "en"
+    }
+
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "application/json"
+    }
 
     try:
-        async with httpx.AsyncClient(timeout=12) as client:
-            r = await client.get(
-                url,
-                params={
-                    "q": q,
-                    "format": "jsonv2",
-                    "addressdetails": 1,
-                    "limit": 10
-                },
-                headers={
-                    "User-Agent": "NZX-OSINT-TOOL/1.0"
-                }
+        async with httpx.AsyncClient(
+            timeout=12,
+            headers=headers
+        ) as client:
+
+            response = await client.get(
+                NOMINATIM_URL,
+                params=params
             )
 
-        if r.status_code != 200:
+        if response.status_code != 200:
             return {
                 "ok": False,
-                "error": "Map provider unavailable"
+                "error": f"Map provider HTTP {response.status_code}"
             }
 
-        raw = r.json()
+        payload = response.json()
 
         results = []
 
-        for item in raw:
+        for item in payload:
             results.append({
-                "display_name": item.get("display_name", ""),
-                "lat": float(item.get("lat", 0)),
-                "lon": float(item.get("lon", 0)),
-                "type": item.get("type", ""),
-                "category": item.get("category", ""),
+                "place_id": item.get("place_id"),
+                "display_name": item.get("display_name"),
+                "lat": float(item["lat"]),
+                "lon": float(item["lon"]),
+                "type": item.get("type"),
+                "class": item.get("class"),
+                "importance": item.get("importance"),
                 "address": item.get("address", {})
             })
 
         return {
             "ok": True,
+            "query": q,
             "results": results
         }
 
@@ -773,29 +1069,15 @@ async def map_search(request: Request):
 
 
 # ============================================================
-# HEALTH
-# ============================================================
-
-@app.get("/api/health")
-async def health():
-    return {
-        "ok": True,
-        "service": "NZX OSINT TOOL",
-        "time": now()
-    }
-
-
-# ============================================================
-# RENDER
+# START
 # ============================================================
 
 if __name__ == "__main__":
     import uvicorn
 
-    port = int(os.environ.get("PORT", "10000"))
-
     uvicorn.run(
-        app,
+        "main:app",
         host="0.0.0.0",
-        port=port
+        port=PORT,
+        reload=False
     )
