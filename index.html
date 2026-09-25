@@ -2,341 +2,230 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>NZX OSINT TOOL</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+
+<title>nezzx|osint</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
-
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#050505;
-  color:#f5f5f5;
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-}
-
-button,input,textarea{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
-
 :root{
   --bg:#050505;
-  --panel:rgba(10,10,10,.92);
+  --panel:rgba(10,10,10,.94);
   --card:#111;
   --text:#f5f5f5;
   --muted:#777;
   --dim:#444;
   --line:rgba(255,255,255,.10);
   --line2:rgba(255,255,255,.22);
-  --good:#d9ffd9;
-  --warn:#ffe7a3;
-  --bad:#ff9b9b;
 }
 
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 
-/* ==========================================================
-   HACK INTRO
-========================================================== */
+html,
+body{
+  width:100%;
+  height:100%;
+  margin:0;
+  overflow:hidden;
+  background:#000;
+  color:#fff;
+  font-family:Inter,Arial,Helvetica,sans-serif;
+}
+
+button,
+input,
+textarea{
+  font:inherit;
+  outline:none;
+}
+
+button{
+  color:#fff;
+}
+
+/* =========================================================
+   INTRO
+========================================================= */
 
 #bootScreen{
   position:fixed;
   inset:0;
   z-index:999999;
+
   background:#000;
-  overflow:hidden;
+
   display:flex;
   align-items:center;
   justify-content:center;
-  color:#fff;
-}
-
-#asciiContainer{
-  position:absolute;
-  inset:0;
-
-  width:100%;
-  height:100%;
-
-  padding:18px;
 
   overflow:hidden;
 
+  animation:bootHide .01s steps(1,end) forwards;
+  animation-delay:3s;
+}
+
+.intro-wrap{
+  width:min(950px,92vw);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  gap:38px;
+}
+
+.intro-image{
+  width:330px;
+  max-width:42vw;
+
+  height:auto;
+
+  display:block;
+
+  opacity:0;
+  visibility:hidden;
+
+  animation:introAppear .01s steps(1,end) forwards;
+  animation-delay:.15s;
+}
+
+@keyframes introAppear{
+  from{
+    opacity:0;
+    visibility:hidden;
+  }
+  to{
+    opacity:1;
+    visibility:visible;
+  }
+}
+
+.intro-text{
+  min-width:330px;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:10px;
+}
+
+.intro-line{
   color:#fff;
 
   font-family:
     "Courier New",
-    Courier,
     monospace;
 
-  font-size:
-    clamp(3px,.47vw,7px);
+  font-size:11px;
+  font-weight:700;
 
-  line-height:.94;
+  letter-spacing:.16em;
 
-  white-space:pre;
-
-  text-shadow:
-    0 0 4px rgba(255,255,255,.65);
-
-  transform:
-    scale(1.02);
-
-  transform-origin:center;
-}
-
-.hack-line{
-  position:absolute;
-  left:0;
-
-  width:100%;
-
-  white-space:pre;
+  white-space:nowrap;
 
   opacity:0;
-
-  transform:
-    translateY(-100vh)
-    translateX(var(--hack-x))
-    skewX(var(--hack-skew));
-
-  animation:
-    hackDrop
-    .105s
-    cubic-bezier(.02,.9,.08,1)
-    forwards;
-
-  animation-delay:
-    var(--hack-delay);
+  visibility:hidden;
 }
 
-@keyframes hackDrop{
+.intro-line:nth-child(1){
+  animation:introLine .01s steps(1,end) forwards;
+  animation-delay:.55s;
+}
 
-  0%{
+.intro-line:nth-child(2){
+  animation:introLine .01s steps(1,end) forwards;
+  animation-delay:.85s;
+}
+
+.intro-line:nth-child(3){
+  animation:introLine .01s steps(1,end) forwards;
+  animation-delay:1.15s;
+}
+
+.intro-line:nth-child(4){
+  animation:introLine .01s steps(1,end) forwards;
+  animation-delay:1.45s;
+}
+
+.intro-line:nth-child(5){
+  animation:introLine .01s steps(1,end) forwards;
+  animation-delay:1.75s;
+}
+
+.intro-line:nth-child(6){
+  animation:introLine .01s steps(1,end) forwards;
+  animation-delay:2.05s;
+}
+
+@keyframes introLine{
+  from{
     opacity:0;
-
-    transform:
-      translateY(-100vh)
-      translateX(var(--hack-x))
-      skewX(var(--hack-skew));
+    visibility:hidden;
   }
-
-  25%{
+  to{
     opacity:1;
+    visibility:visible;
   }
+}
 
-  55%{
-    transform:
-      translateY(8px)
-      translateX(0)
-      skewX(0);
-  }
-
-  72%{
-    transform:
-      translateY(-3px)
-      translateX(0)
-      skewX(0);
-  }
-
-  100%{
+@keyframes bootHide{
+  from{
     opacity:1;
-
-    transform:
-      translateY(0)
-      translateX(0)
-      skewX(0);
+    visibility:visible;
   }
-}
-
-#bootScreen.hack{
-  animation:
-    screenGlitch
-    .075s
-    infinite;
-}
-
-@keyframes screenGlitch{
-
-  0%{
-    transform:translate(0,0);
-    filter:none;
-  }
-
-  18%{
-    transform:translate(-4px,1px);
-    filter:contrast(1.9) brightness(1.15);
-  }
-
-  31%{
-    transform:translate(5px,-2px);
-    filter:contrast(2);
-  }
-
-  48%{
-    transform:translate(-2px,3px);
-    filter:brightness(1.5);
-  }
-
-  67%{
-    transform:translate(3px,-1px);
-    filter:contrast(1.6);
-  }
-
-  83%{
-    transform:translate(-1px,0);
-  }
-
-  100%{
-    transform:translate(0,0);
-    filter:none;
-  }
-}
-
-#bootScreen::before{
-  content:"";
-
-  position:absolute;
-  inset:0;
-
-  pointer-events:none;
-
-  z-index:10;
-
-  background:
-    repeating-linear-gradient(
-      0deg,
-      transparent 0,
-      transparent 2px,
-      rgba(255,255,255,.025) 3px
-    );
-}
-
-#bootScreen::after{
-  content:"";
-
-  position:absolute;
-  inset:0;
-
-  pointer-events:none;
-
-  z-index:11;
-
-  background:
-    radial-gradient(
-      ellipse at center,
-      transparent 15%,
-      rgba(0,0,0,.8) 100%
-    );
-}
-
-.boot-flash{
-  position:absolute;
-  inset:0;
-
-  z-index:20;
-
-  pointer-events:none;
-
-  background:#fff;
-
-  opacity:0;
-}
-
-#bootScreen.flash .boot-flash{
-  animation:
-    flash .12s linear;
-}
-
-@keyframes flash{
-
-  0%{
-    opacity:.8;
-  }
-
-  100%{
+  to{
     opacity:0;
+    visibility:hidden;
+    pointer-events:none;
   }
 }
 
-#bootScreen.hack-end{
-  animation:none;
-
-  opacity:0;
-
-  transform:
-    scale(1.12);
-
-  filter:
-    blur(14px)
-    brightness(2.2);
-
-  transition:
-    opacity .15s linear,
-    transform .15s linear,
-    filter .15s linear;
-
-  pointer-events:none;
-}
-
-
-/* ==========================================================
+/* =========================================================
    APP
-========================================================== */
+========================================================= */
 
-.app{
+#app{
   width:100%;
   height:100%;
+
   position:relative;
 
   background:
     radial-gradient(
-      circle at 50% 40%,
+      circle at 50% 50%,
       rgba(255,255,255,.025),
-      transparent 45%
+      transparent 35%
     ),
     #050505;
 }
 
-
-/* ==========================================================
+/* =========================================================
    TOPBAR
-========================================================== */
+========================================================= */
 
 .topbar{
-  position:fixed;
-  z-index:100;
+  position:absolute;
 
-  top:0;
   left:0;
   right:0;
+  top:0;
 
-  height:72px;
+  height:68px;
+
+  z-index:100;
 
   display:flex;
   align-items:center;
 
   padding:0 18px;
 
-  background:
-    linear-gradient(
-      180deg,
-      rgba(8,8,8,.98),
-      rgba(8,8,8,.88)
-    );
+  background:rgba(5,5,5,.84);
+
+  backdrop-filter:blur(14px);
 
   border-bottom:1px solid var(--line);
-
-  backdrop-filter:blur(18px);
 }
 
 .logo{
@@ -347,264 +236,170 @@ button{
   align-items:center;
   justify-content:center;
 
-  border:1px solid #fff;
-  border-radius:11px;
+  border:1px solid rgba(255,255,255,.3);
 
-  font-size:19px;
+  background:#0b0b0b;
+
   font-weight:900;
+  font-size:19px;
 
-  margin-right:12px;
-
-  box-shadow:
-    0 0 25px rgba(255,255,255,.08);
+  margin-right:11px;
 }
 
 .brand{
   display:flex;
   flex-direction:column;
-  gap:2px;
 
-  min-width:210px;
+  gap:2px;
 }
 
 .brand b{
-  font-size:14px;
-  letter-spacing:.15em;
+  font-size:12px;
+  letter-spacing:.12em;
 }
 
 .brand small{
-  color:#666;
+  color:#555;
   font-size:8px;
-  letter-spacing:.24em;
+  letter-spacing:.2em;
 }
 
 .top-tools{
+  margin-left:auto;
+
   display:flex;
   align-items:center;
-  gap:7px;
 
-  margin-left:auto;
+  gap:8px;
 }
 
-.top-btn{
+.top-btn,
+.btn{
   height:34px;
 
   padding:0 13px;
 
-  color:#bbb;
-  background:#0c0c0c;
+  background:#090909;
 
   border:1px solid var(--line2);
-  border-radius:8px;
+
+  color:#ddd;
+
+  cursor:pointer;
 
   font-size:9px;
-  font-weight:800;
-  letter-spacing:.1em;
 
-  transition:.2s ease;
+  letter-spacing:.12em;
+
+  transition:.15s;
 }
 
-.top-btn:hover{
+.top-btn:hover,
+.btn:hover{
+  background:#171717;
+  border-color:#555;
   color:#fff;
-  background:#161616;
-  border-color:#666;
-  transform:translateY(-1px);
 }
 
 .profile-mini{
-  width:38px;
-  height:38px;
+  width:34px;
+  height:34px;
 
-  border-radius:50%;
-  border:1px solid #333;
+  margin-left:8px;
 
-  background:#111;
+  padding:0;
 
   overflow:hidden;
 
-  margin-left:10px;
-  padding:0;
+  cursor:pointer;
+
+  background:#0b0b0b;
+
+  border:1px solid var(--line2);
 }
 
 .profile-mini img{
   width:100%;
   height:100%;
+
   object-fit:cover;
-  display:block;
 }
 
-
-/* ==========================================================
+/* =========================================================
    SIDEBAR
-========================================================== */
+========================================================= */
 
 .sidebar{
-  position:fixed;
-
-  left:0;
-  top:72px;
-  bottom:0;
-
-  width:66px;
+  position:absolute;
 
   z-index:90;
 
-  display:flex;
-  align-items:center;
-  flex-direction:column;
+  left:0;
+  top:68px;
+  bottom:0;
 
-  padding-top:18px;
-
-  background:rgba(6,6,6,.94);
+  width:58px;
 
   border-right:1px solid var(--line);
 
-  backdrop-filter:blur(18px);
+  background:rgba(6,6,6,.9);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  padding-top:14px;
+
+  gap:8px;
 }
 
 .side-btn{
-  width:42px;
-  height:42px;
+  width:38px;
+  height:38px;
 
-  margin-bottom:8px;
+  background:#090909;
 
-  border:1px solid transparent;
-  border-radius:10px;
+  border:1px solid var(--line);
 
-  color:#555;
-  background:transparent;
+  color:#777;
 
-  font-size:19px;
+  cursor:pointer;
 
-  transition:.2s ease;
+  font-size:18px;
 }
 
 .side-btn:hover,
 .side-btn.active{
   color:#fff;
-  background:#111;
-  border-color:#292929;
+  border-color:#555;
+  background:#151515;
 }
 
-
-/* ==========================================================
+/* =========================================================
    PAGES
-========================================================== */
+========================================================= */
 
 .page{
-  display:none;
-
   position:absolute;
 
-  top:72px;
-  left:66px;
+  left:58px;
   right:0;
+  top:68px;
   bottom:0;
+
+  display:none;
 }
 
 .page.active{
   display:block;
 }
 
-
-/* ==========================================================
-   CHAIN
-========================================================== */
+/* =========================================================
+   GRAPH PAGE
+========================================================= */
 
 .chain-page{
-  width:100%;
-  height:100%;
-  position:relative;
-}
-
-.chain-toolbar{
-  position:absolute;
-
-  top:17px;
-  left:18px;
-  right:18px;
-
-  z-index:30;
-
-  display:flex;
-  gap:8px;
-  align-items:center;
-
-  flex-wrap:wrap;
-}
-
-.chain-search{
-  width:240px;
-  height:37px;
-
-  padding:0 12px;
-
-  border-radius:9px;
-  border:1px solid var(--line2);
-
-  background:rgba(10,10,10,.86);
-  color:#fff;
-
-  outline:none;
-  font-size:11px;
-}
-
-.chain-search:focus{
-  border-color:#666;
-}
-
-.chain-search::placeholder{
-  color:#555;
-}
-
-.btn{
-  height:37px;
-
-  padding:0 13px;
-
-  border-radius:9px;
-  border:1px solid var(--line2);
-
-  color:#aaa;
-  background:#0c0c0c;
-
-  font-size:9px;
-  font-weight:800;
-
-  transition:.2s ease;
-}
-
-.btn:hover{
-  color:#fff;
-  background:#151515;
-  border-color:#777;
-}
-
-.btn.primary{
-  color:#050505;
-  background:#fff;
-  border-color:#fff;
-}
-
-.btn.primary:hover{
-  background:#ddd;
-}
-
-
-/* ==========================================================
-   GRAPH
-========================================================== */
-
-.graph{
-  width:100%;
-  height:100%;
-
-  position:relative;
-  overflow:hidden;
-
-  background-color:#050505;
-
-  background-image:
+  background:
     linear-gradient(
       rgba(255,255,255,.025) 1px,
       transparent 1px
@@ -613,11 +408,81 @@ button{
       90deg,
       rgba(255,255,255,.025) 1px,
       transparent 1px
-    );
+    ),
+    #050505;
 
-  background-size:40px 40px;
+  background-size:50px 50px;
 }
 
+.chain-toolbar{
+  position:absolute;
+
+  z-index:80;
+
+  top:15px;
+  left:15px;
+  right:15px;
+
+  display:flex;
+  align-items:center;
+
+  gap:7px;
+
+  pointer-events:none;
+}
+
+.chain-toolbar>*{
+  pointer-events:auto;
+}
+
+.chain-search{
+  width:230px;
+  height:34px;
+
+  padding:0 11px;
+
+  background:rgba(7,7,7,.92);
+
+  border:1px solid var(--line2);
+
+  color:#fff;
+
+  font-size:10px;
+}
+
+.chain-search::placeholder{
+  color:#555;
+}
+
+/* =========================================================
+   GRAPH
+========================================================= */
+
+.graph{
+  position:absolute;
+
+  inset:0;
+
+  overflow:hidden;
+
+  cursor:grab;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255,255,255,.025),
+      transparent 28%
+    );
+}
+
+.graph.dragging{
+  cursor:grabbing;
+}
+
+/*
+  IMPORTANT:
+  World and SVG use exactly the same coordinate system.
+*/
 .world{
   position:absolute;
 
@@ -632,8 +497,6 @@ button{
     scale(1);
 
   transform-origin:center;
-
-  pointer-events:none;
 }
 
 .lines{
@@ -652,188 +515,132 @@ button{
   z-index:1;
 }
 
+/*
+  Nodes are above SVG.
+*/
 .node{
   position:absolute;
 
-  width:170px;
-  min-height:72px;
+  z-index:5;
 
-  transform:
-    translate(-50%,-50%);
+  width:190px;
+  min-height:74px;
 
-  padding:12px 13px;
+  transform:translate(-50%,-50%);
 
-  border:1px solid rgba(255,255,255,.13);
+  background:rgba(9,9,9,.96);
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(20,20,20,.97),
-      rgba(9,9,9,.97)
-    );
+  border:1px solid rgba(255,255,255,.18);
 
-  border-radius:12px;
+  padding:11px 12px;
 
-  box-shadow:
-    0 20px 60px rgba(0,0,0,.45);
+  cursor:pointer;
 
   user-select:none;
 
-  cursor:grab;
-
-  z-index:5;
-
-  pointer-events:auto;
+  box-shadow:
+    0 10px 35px rgba(0,0,0,.45);
 
   transition:
-    border-color .2s,
-    box-shadow .2s;
+    border-color .15s,
+    background .15s,
+    box-shadow .15s;
 }
 
 .node:hover{
-  border-color:#555;
+  border-color:rgba(255,255,255,.5);
 
-  box-shadow:
-    0 25px 70px rgba(0,0,0,.6);
+  background:#111;
 }
 
-.node.dragging{
-  cursor:grabbing;
-
-  border-color:#888;
-
-  box-shadow:
-    0 30px 90px rgba(0,0,0,.8);
-}
-
-.node.highlight{
+.node.selected{
   border-color:#fff;
 
   box-shadow:
-    0 0 0 1px rgba(255,255,255,.2),
-    0 0 40px rgba(255,255,255,.1);
+    0 0 0 1px rgba(255,255,255,.15),
+    0 0 35px rgba(255,255,255,.08);
+}
+
+.node-title{
+  font-size:10px;
+  font-weight:800;
+
+  letter-spacing:.1em;
+
+  margin-bottom:7px;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.node-value{
+  color:#999;
+
+  font-size:10px;
+
+  line-height:1.45;
+
+  word-break:break-word;
 }
 
 .node-type{
   color:#555;
 
-  font-size:8px;
-  font-weight:900;
+  font-size:7px;
+
+  margin-top:7px;
+
+  text-transform:uppercase;
 
   letter-spacing:.15em;
-
-  margin-bottom:6px;
 }
 
-.node-title{
-  color:#eee;
+/* =========================================================
+   FIXED SVG CONNECTIONS
+========================================================= */
 
-  font-size:11px;
-  font-weight:800;
+.edge{
+  fill:none;
 
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
+  stroke:rgba(255,255,255,.48);
 
-.node-content{
-  margin-top:5px;
+  stroke-width:2;
 
-  color:#777;
+  stroke-linecap:round;
 
-  font-size:9px;
-  line-height:1.4;
+  stroke-dasharray:8 8;
 
-  max-height:28px;
-  overflow:hidden;
-
-  word-break:break-word;
-}
-
-.node-delete{
-  position:absolute;
-
-  right:7px;
-  top:6px;
-
-  width:20px;
-  height:20px;
-
-  border:0;
-  border-radius:5px;
-
-  color:#555;
-  background:transparent;
-
-  font-size:12px;
-}
-
-.node-delete:hover{
-  color:#fff;
-  background:#222;
-}
-
-.node-dot{
-  position:absolute;
-
-  width:10px;
-  height:10px;
-
-  right:-5px;
-  top:50%;
-
-  transform:translateY(-50%);
-
-  border-radius:50%;
-
-  background:#fff;
-
-  box-shadow:
-    0 0 14px rgba(255,255,255,.45);
-
-  cursor:crosshair;
-}
-
-
-/* ==========================================================
-   LINES
-========================================================== */
-
-.graph-line{
-  opacity:0;
+  vector-effect:non-scaling-stroke;
 
   animation:
-    lineAppear .45s ease forwards;
+    edgeMove 1.4s linear infinite;
 }
 
-.graph-line-flow{
-  animation:
-    dash 5s linear infinite;
+.edge.active{
+  stroke:#fff;
+
+  stroke-width:2.5;
 }
 
-@keyframes lineAppear{
+@keyframes edgeMove{
   from{
-    opacity:0;
+    stroke-dashoffset:0;
   }
 
   to{
-    opacity:1;
+    stroke-dashoffset:-32;
   }
 }
 
-@keyframes dash{
-  to{
-    stroke-dashoffset:-60;
-  }
-}
-
-
-/* ==========================================================
+/* =========================================================
    SATURN
-========================================================== */
+========================================================= */
 
 .saturn{
   position:absolute;
+
+  z-index:0;
 
   left:50%;
   top:50%;
@@ -850,7 +657,8 @@ button{
 
   filter:
     drop-shadow(
-      0 0 35px rgba(255,255,255,.08)
+      0 0 35px
+      rgba(255,255,255,.08)
     );
 }
 
@@ -871,10 +679,12 @@ button{
   border-radius:50%;
 
   border:
-    1px solid rgba(255,255,255,.14);
+    1px solid
+    rgba(255,255,255,.14);
 
   box-shadow:
-    0 0 20px rgba(255,255,255,.05);
+    0 0 20px
+    rgba(255,255,255,.05);
 
   transform:
     translate(-50%,-50%)
@@ -885,117 +695,113 @@ button{
   opacity:.65;
 }
 
-
-/* ==========================================================
+/* =========================================================
    PROFILE
-========================================================== */
+========================================================= */
 
-.profile{
-  width:100%;
-  height:100%;
+.profile-page{
+  padding:25px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  overflow:auto;
 
-  padding:30px;
+  background:
+    radial-gradient(
+      circle at 50% 0,
+      rgba(255,255,255,.04),
+      transparent 35%
+    ),
+    #050505;
 }
 
 .profile-card{
-  width:min(600px,100%);
+  max-width:650px;
+
+  background:#090909;
 
   border:1px solid var(--line);
-  border-radius:18px;
 
-  background:
-    linear-gradient(
-      145deg,
-      rgba(20,20,20,.95),
-      rgba(7,7,7,.96)
-    );
-
-  box-shadow:
-    0 30px 100px rgba(0,0,0,.5);
-
-  padding:28px;
-}
-
-.profile-head{
-  display:flex;
-  align-items:center;
-  gap:18px;
+  padding:25px;
 }
 
 .profile-avatar{
-  width:84px;
-  height:84px;
+  width:80px;
+  height:80px;
 
-  border-radius:50%;
+  border:1px solid var(--line2);
+
   object-fit:cover;
 
   background:#111;
-  border:1px solid #333;
+
+  margin-bottom:17px;
 }
 
-.profile-info h1{
-  font-size:24px;
+.profile-name{
+  font-size:20px;
+  font-weight:800;
+
+  letter-spacing:.05em;
 }
 
-.profile-info p{
+.profile-sub{
   color:#666;
 
-  margin-top:5px;
+  font-size:9px;
 
-  font-size:12px;
+  letter-spacing:.15em;
+
+  margin-top:5px;
 }
 
-.profile-actions{
-  display:flex;
-  gap:8px;
+.profile-info{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:10px;
 
   margin-top:25px;
-
-  flex-wrap:wrap;
 }
 
-.profile-button{
-  height:38px;
+.info-box{
+  padding:13px;
 
-  padding:0 14px;
+  background:#0d0d0d;
 
-  border-radius:8px;
-  border:1px solid #333;
+  border:1px solid var(--line);
+}
 
-  background:#111;
-  color:#aaa;
+.info-box small{
+  display:block;
 
+  color:#555;
+
+  font-size:7px;
+
+  letter-spacing:.15em;
+
+  margin-bottom:6px;
+}
+
+.info-box b{
   font-size:10px;
-  font-weight:800;
+
+  word-break:break-word;
 }
 
-.profile-button:hover{
-  color:#fff;
-  border-color:#666;
-}
-
-.profile-button.primary{
-  color:#000;
-  background:#fff;
-  border-color:#fff;
-}
-
-
-/* ==========================================================
+/* =========================================================
    MODALS
-========================================================== */
+========================================================= */
 
-.tool-modal,
-#nodeModal{
+.modal-backdrop{
   position:fixed;
+
+  z-index:500;
 
   inset:0;
 
-  z-index:500;
+  background:rgba(0,0,0,.72);
 
   display:none;
 
@@ -1003,363 +809,279 @@ button{
   justify-content:center;
 
   padding:20px;
-
-  background:
-    rgba(0,0,0,.72);
-
-  backdrop-filter:blur(12px);
 }
 
-.tool-modal.open,
-#nodeModal.open{
+.modal-backdrop.open{
   display:flex;
 }
 
-.modal-box,
-.node-modal-box{
-  width:min(520px,100%);
+.modal{
+  width:min(560px,95vw);
 
-  max-height:calc(100vh - 40px);
+  max-height:90vh;
 
   overflow:auto;
 
-  border:1px solid rgba(255,255,255,.14);
-  border-radius:16px;
+  background:#090909;
 
-  background:
-    linear-gradient(
-      145deg,
-      #151515,
-      #090909
-    );
+  border:1px solid var(--line2);
 
   box-shadow:
-    0 40px 120px rgba(0,0,0,.75);
-
-  padding:22px;
+    0 30px 100px
+    rgba(0,0,0,.7);
 }
 
-.modal-top{
+.modal-head{
+  min-height:55px;
+
   display:flex;
   align-items:center;
   justify-content:space-between;
 
-  margin-bottom:10px;
+  padding:0 17px;
+
+  border-bottom:1px solid var(--line);
 }
 
-.modal-top h2{
-  font-size:17px;
-  letter-spacing:.04em;
+.modal-head b{
+  font-size:11px;
+
+  letter-spacing:.13em;
 }
 
-.close{
-  width:32px;
-  height:32px;
-
-  border:0;
-  border-radius:8px;
+.close-btn{
+  width:30px;
+  height:30px;
 
   background:#111;
+
+  border:1px solid var(--line);
+
+  color:#888;
+
+  cursor:pointer;
+}
+
+.close-btn:hover{
+  color:#fff;
+
+  border-color:#555;
+}
+
+.modal-body{
+  padding:17px;
+}
+
+.form-group{
+  margin-bottom:13px;
+}
+
+.form-group label{
+  display:block;
+
+  margin-bottom:6px;
+
   color:#777;
 
-  font-size:20px;
+  font-size:8px;
+
+  letter-spacing:.15em;
+
+  text-transform:uppercase;
 }
 
-.close:hover{
+.form-input,
+.form-textarea{
+  width:100%;
+
+  background:#050505;
+
+  border:1px solid var(--line2);
+
   color:#fff;
-}
 
-.modal-description{
-  color:#666;
+  padding:10px;
 
   font-size:10px;
-  line-height:1.5;
-
-  margin-bottom:16px;
 }
 
-.modal-input{
-  width:100%;
-  height:45px;
+.form-textarea{
+  min-height:100px;
 
-  padding:0 13px;
-
-  color:#fff;
-  background:#080808;
-
-  border:1px solid #2b2b2b;
-  border-radius:9px;
-
-  outline:none;
-}
-
-.modal-input:focus{
-  border-color:#777;
+  resize:vertical;
 }
 
 .modal-actions{
   display:flex;
+
   justify-content:flex-end;
-  gap:8px;
-
-  margin-top:12px;
-}
-
-.modal-actions button{
-  height:36px;
-
-  padding:0 14px;
-
-  border-radius:8px;
-  border:1px solid #333;
-
-  color:#aaa;
-  background:#111;
-
-  font-size:9px;
-  font-weight:900;
-}
-
-.modal-actions button:hover{
-  color:#fff;
-  border-color:#777;
-}
-
-.modal-actions button.primary{
-  background:#fff;
-  color:#000;
-  border-color:#fff;
-}
-
-.results{
-  display:flex;
-  flex-direction:column;
 
   gap:7px;
 
-  margin-top:18px;
+  margin-top:15px;
 }
 
-.result{
-  padding:11px 12px;
-
-  border-radius:9px;
-  border:1px solid #202020;
-
-  background:#0c0c0c;
-}
-
-.result-head{
-  display:flex;
-  align-items:center;
-  gap:7px;
-
-  color:#777;
-
-  font-size:8px;
-  font-weight:900;
-
-  letter-spacing:.12em;
-}
-
-.result-value{
-  margin-top:5px;
-
-  color:#ddd;
-
-  font-size:11px;
-  line-height:1.45;
-
-  white-space:pre-wrap;
-  word-break:break-word;
-}
-
-.result.good{
-  border-color:rgba(170,255,170,.18);
-}
-
-.result.warn{
-  border-color:rgba(255,220,100,.18);
-}
-
-.result.bad{
-  border-color:rgba(255,100,100,.18);
-}
-
-.field{
-  margin-bottom:13px;
-}
-
-.field label{
-  display:block;
-
-  color:#555;
-
-  font-size:8px;
-  font-weight:900;
-
-  letter-spacing:.13em;
-
-  margin-bottom:6px;
-}
-
-.field input,
-.field textarea{
-  width:100%;
-
-  color:#fff;
-  background:#080808;
-
-  border:1px solid #292929;
-  border-radius:8px;
-
-  outline:none;
-
-  padding:10px;
-
-  font-size:11px;
-}
-
-.field input{
-  height:40px;
-}
-
-.field textarea{
-  min-height:100px;
-  resize:vertical;
-}
-
-.field input:focus,
-.field textarea:focus{
-  border-color:#666;
-}
-
-
-/* ==========================================================
+/* =========================================================
    TOAST
-========================================================== */
+========================================================= */
 
-.toast{
+#toast{
   position:fixed;
 
-  z-index:900;
+  z-index:1000;
 
-  left:50%;
-  bottom:22px;
+  right:18px;
+  bottom:18px;
 
-  transform:
-    translate(-50%,20px);
+  max-width:330px;
 
-  opacity:0;
+  background:#101010;
 
-  pointer-events:none;
+  border:1px solid var(--line2);
 
-  padding:10px 15px;
+  color:#fff;
 
-  border:1px solid #333;
-  border-radius:9px;
+  padding:12px 15px;
 
-  background:#111;
-  color:#ddd;
+  font-size:9px;
 
-  font-size:10px;
+  letter-spacing:.05em;
 
-  transition:.25s ease;
+  display:none;
 }
 
-.toast.show{
-  opacity:1;
-
-  transform:
-    translate(-50%,0);
+#toast.show{
+  display:block;
 }
 
-
-/* ==========================================================
+/* =========================================================
    MOBILE
-========================================================== */
+========================================================= */
 
-@media(max-width:760px){
+@media(max-width:900px){
 
-  .topbar{
-    height:62px;
-    padding:0 10px;
-  }
-
-  .brand{
-    min-width:0;
-  }
-
-  .brand b{
-    font-size:11px;
+  .top-tools .top-btn{
+    display:none;
   }
 
   .brand small{
     display:none;
   }
 
-  .top-tools{
-    margin-left:auto;
-  }
-
-  .top-btn{
-    width:35px;
-    padding:0;
-    overflow:hidden;
-    font-size:0;
-  }
-
-  .top-btn:first-child::after{
-    content:"☎";
-    font-size:14px;
-  }
-
-  .top-btn:nth-child(2)::after{
-    content:"⌖";
-    font-size:14px;
-  }
-
-  .sidebar{
-    top:62px;
-    width:54px;
-  }
-
-  .page{
-    top:62px;
-    left:54px;
-  }
-
   .chain-toolbar{
-    left:8px;
-    right:8px;
-
-    gap:5px;
+    flex-wrap:wrap;
   }
 
   .chain-search{
-    width:100%;
-  }
-
-  .btn{
-    font-size:7px;
-    padding:0 8px;
-  }
-
-  .node{
-    width:150px;
+    width:170px;
   }
 
   .saturn{
-    width:330px;
-    height:330px;
+    width:390px;
+    height:390px;
   }
 
   .saturn-ring{
-    width:270px;
+    width:300px;
+  }
+}
+
+@media(max-width:700px){
+
+  .topbar{
+    height:58px;
+
+    padding:0 10px;
   }
 
-  #asciiContainer{
-    font-size:clamp(2px,.42vw,5px);
+  .logo{
+    width:32px;
+    height:32px;
+  }
+
+  .brand b{
+    font-size:10px;
+  }
+
+  .sidebar{
+    top:58px;
+
+    width:48px;
+  }
+
+  .page{
+    left:48px;
+    top:58px;
+  }
+
+  .chain-toolbar{
+    top:10px;
+    left:10px;
+    right:10px;
+  }
+
+  .chain-search{
+    width:150px;
+  }
+
+  .btn{
+    height:31px;
+
+    padding:0 8px;
+
+    font-size:8px;
+  }
+
+  .node{
+    width:165px;
+  }
+
+  .profile-info{
+    grid-template-columns:1fr;
+  }
+
+  .intro-wrap{
+    gap:18px;
+    width:94vw;
+  }
+
+  .intro-image{
+    width:220px;
+    max-width:45vw;
+  }
+
+  .intro-text{
+    min-width:0;
+    gap:7px;
+  }
+
+  .intro-line{
+    font-size:7px;
+    letter-spacing:.09em;
+  }
+}
+
+@media(max-width:480px){
+
+  .intro-wrap{
+    gap:12px;
+  }
+
+  .intro-image{
+    width:170px;
+  }
+
+  .intro-line{
+    font-size:6px;
+    letter-spacing:.07em;
+  }
+
+  .intro-text{
+    gap:6px;
+  }
+
+  .chain-search{
+    width:125px;
   }
 }
 </style>
@@ -1367,43 +1089,66 @@ button{
 
 <body>
 
-
-<!-- ==========================================================
-     HACK INTRO
-========================================================== -->
+<!-- =========================================================
+     INTRO
+========================================================= -->
 
 <div id="bootScreen">
 
-  <div id="asciiContainer"></div>
+  <div class="intro-wrap">
 
-  <div class="boot-flash"></div>
+    <img
+      class="intro-image"
+      src="https://i.ibb.co/mCnvdM5C/16450-removebg-preview-1.png"
+      alt=""
+    >
+
+    <div class="intro-text">
+
+      <div class="intro-line">
+        CONNECTION ESTABLISHED
+      </div>
+
+      <div class="intro-line">
+        SYSTEM INITIALIZED
+      </div>
+
+      <div class="intro-line">
+        SCANNING NETWORK
+      </div>
+
+      <div class="intro-line">
+        ANALYZING DATA
+      </div>
+
+      <div class="intro-line">
+        ACCESSING NZX OSINT
+      </div>
+
+      <div class="intro-line">
+        YOU HAVE BEEN NOTICED
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
 
 
-<!-- ==========================================================
-     MAIN APP
-========================================================== -->
+<!-- =========================================================
+     APP
+========================================================= -->
 
-<div class="app">
-
+<div id="app">
 
 <header class="topbar">
 
-  <div class="logo">
-    N
-  </div>
+  <div class="logo">N</div>
 
   <div class="brand">
-
-    <b>
-      NZX OSINT TOOL
-    </b>
-
-    <small>
-      INTELLIGENCE WORKSPACE
-    </small>
-
+    <b>NZX OSINT TOOL</b>
+    <small>INTELLIGENCE WORKSPACE</small>
   </div>
 
   <div class="top-tools">
@@ -1437,6 +1182,10 @@ button{
 </header>
 
 
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
 <aside class="sidebar">
 
   <button
@@ -1458,97 +1207,102 @@ button{
 </aside>
 
 
+<!-- =========================================================
+     CHAIN
+========================================================= -->
+
 <section
-  class="page active"
-  id="page-chain"
+  class="page chain-page active"
+  id="chainPage"
 >
 
-  <div class="chain-page">
+  <div class="chain-toolbar">
 
-    <div class="chain-toolbar">
+    <input
+      class="chain-search"
+      id="chainSearch"
+      placeholder="Search chain or node..."
+      autocomplete="off"
+    >
 
-      <input
-        class="chain-search"
-        id="chainSearch"
-        placeholder="Search chain or node..."
-      >
+    <button
+      class="btn"
+      onclick="openNodeModal()"
+    >
+      ＋ NODE
+    </button>
 
-      <button
-        class="btn"
-        onclick="openNodeModal()"
-      >
-        ＋ Node
-      </button>
+    <button
+      class="btn"
+      onclick="centerGraph()"
+    >
+      ⌂
+    </button>
 
-      <button
-        class="btn"
-        onclick="centerGraph()"
-      >
-        ⌂
-      </button>
+    <button
+      class="btn"
+      onclick="createProject()"
+    >
+      CREATE PROJECT
+    </button>
 
-      <button
-        class="btn"
-        onclick="createProject()"
-      >
-        CREATE PROJECT
-      </button>
+    <button
+      class="btn"
+      onclick="showProjects()"
+    >
+      MY PROJECTS
+    </button>
 
-      <button
-        class="btn"
-        onclick="showProjects()"
-      >
-        MY PROJECTS
-      </button>
+    <button
+      class="btn"
+      onclick="deleteProject()"
+    >
+      DELETE PROJECT
+    </button>
 
-      <button
-        class="btn"
-        onclick="deleteProject()"
-      >
-        DELETE PROJECT
-      </button>
+    <button
+      class="btn"
+      onclick="deleteAllNodes()"
+    >
+      DELETE ALL NODES
+    </button>
 
-      <button
-        class="btn"
-        onclick="deleteAllNodes()"
-      >
-        DELETE ALL NODES
-      </button>
+  </div>
+
+
+  <div
+    class="graph"
+    id="graph"
+  >
+
+    <div class="saturn">
+
+      <canvas
+        id="saturn"
+      ></canvas>
+
+      <div
+        class="saturn-ring"
+        id="saturnRing"
+      ></div>
 
     </div>
 
 
     <div
-      class="graph"
-      id="graph"
+      class="world"
+      id="world"
     >
 
-      <div class="saturn">
-
-        <canvas
-          id="saturn"
-        ></canvas>
-
-        <div
-          class="saturn-ring"
-          id="saturnRing"
-        ></div>
-
-      </div>
-
-
-      <div
-        class="world"
-        id="world"
-      >
-
-        <svg
-          class="lines"
-          id="lines"
-          viewBox="0 0 10000 10000"
-        ></svg>
-
-      </div>
+      <!-- SVG IS FIRST SO NODES ARE ALWAYS ABOVE IT -->
+      <svg
+        class="lines"
+        id="lines"
+        width="10000"
+        height="10000"
+        viewBox="0 0 10000 10000"
+        preserveAspectRatio="none"
+      ></svg>
 
     </div>
 
@@ -1556,71 +1310,88 @@ button{
 
 </section>
 
+
+<!-- =========================================================
+     PROFILE
+========================================================= -->
 
 <section
-  class="page"
-  id="page-profile"
+  class="page profile-page"
+  id="profilePage"
 >
 
-  <div class="profile">
+  <div class="profile-card">
 
-    <div class="profile-card">
+    <img
+      id="profileAvatar"
+      class="profile-avatar"
+      alt=""
+    >
 
-      <div class="profile-head">
+    <div
+      class="profile-name"
+      id="profileName"
+    >
+      NZX USER
+    </div>
 
-        <img
-          class="profile-avatar"
-          id="profileAvatar"
-          alt=""
-        >
-
-        <div class="profile-info">
-
-          <h1 id="profileName">
-            NZX User
-          </h1>
-
-          <p id="profileUsername">
-            @nzx_user
-          </p>
-
-        </div>
-
-      </div>
+    <div class="profile-sub">
+      OSINT WORKSPACE PROFILE
+    </div>
 
 
-      <div class="profile-actions">
+    <div class="profile-info">
 
-        <button
-          class="profile-button primary"
-          onclick="chooseAvatar()"
-        >
-          Choose avatar
-        </button>
+      <div class="info-box">
 
-        <button
-          class="profile-button"
-          onclick="editProfileName()"
-        >
-          Edit name
-        </button>
+        <small>
+          USER ID
+        </small>
 
-        <button
-          class="profile-button"
-          onclick="showPage('chain')"
-        >
-          Back to Chain
-        </button>
+        <b id="profileId">
+          —
+        </b>
 
       </div>
 
 
-      <input
-        id="avatarFile"
-        type="file"
-        accept="image/*"
-        style="display:none"
-      >
+      <div class="info-box">
+
+        <small>
+          PROJECT
+        </small>
+
+        <b id="profileProject">
+          Default Project
+        </b>
+
+      </div>
+
+
+      <div class="info-box">
+
+        <small>
+          NODES
+        </small>
+
+        <b id="profileNodes">
+          0
+        </b>
+
+      </div>
+
+
+      <div class="info-box">
+
+        <small>
+          STATUS
+        </small>
+
+        <b>
+          ONLINE
+        </b>
+
+      </div>
 
     </div>
 
@@ -1628,148 +1399,100 @@ button{
 
 </section>
 
+</div>
 
-<!-- ==========================================================
-     TOOL MODAL
-========================================================== -->
+
+<!-- =========================================================
+     NODE MODAL
+========================================================= -->
 
 <div
-  class="tool-modal"
-  id="toolModal"
-  onclick="outsideToolModal(event)"
+  class="modal-backdrop"
+  id="nodeModal"
 >
 
-  <div
-    class="modal-box"
-    onclick="event.stopPropagation()"
-  >
+  <div class="modal">
 
-    <div class="modal-top">
+    <div class="modal-head">
 
-      <h2 id="toolTitle">
-        Check
-      </h2>
+      <b>
+        CREATE NODE
+      </b>
 
       <button
-        class="close"
-        onclick="closeTool()"
+        class="close-btn"
+        onclick="closeModal('nodeModal')"
       >
         ×
       </button>
 
     </div>
 
-    <div
-      class="modal-description"
-      id="toolDescription"
-    ></div>
 
-    <input
-      class="modal-input"
-      id="toolInput"
-      autocomplete="off"
-    >
+    <div class="modal-body">
 
-    <div class="modal-actions">
+      <div class="form-group">
 
-      <button onclick="closeTool()">
-        CLOSE
-      </button>
+        <label>
+          NODE TYPE
+        </label>
 
-      <button
-        class="primary"
-        id="toolRun"
-        onclick="runTool()"
-      >
-        CHECK
-      </button>
+        <input
+          class="form-input"
+          id="nodeType"
+          placeholder="PERSON / PHONE / EMAIL / ADDRESS"
+        >
 
-    </div>
-
-    <div
-      class="results"
-      id="toolResults"
-    ></div>
-
-  </div>
-
-</div>
+      </div>
 
 
-<!-- ==========================================================
-     NODE MODAL
-========================================================== -->
+      <div class="form-group">
 
-<div id="nodeModal">
+        <label>
+          VALUE
+        </label>
 
-  <div class="node-modal-box">
+        <input
+          class="form-input"
+          id="nodeValue"
+          placeholder="Enter value..."
+        >
 
-    <h2
-      id="nodeModalTitle"
-      style="margin:0 0 18px"
-    >
-      New Node
-    </h2>
-
-
-    <div class="field">
-
-      <label>NAME</label>
-
-      <input
-        id="nodeTitle"
-        placeholder="Username"
-      >
-
-    </div>
+      </div>
 
 
-    <div class="field">
+      <div class="form-group">
 
-      <label>TYPE</label>
+        <label>
+          NOTE
+        </label>
 
-      <input
-        id="nodeType"
-        placeholder="PHONE / USERNAME / LOCATION"
-      >
+        <textarea
+          class="form-textarea"
+          id="nodeNote"
+          placeholder="Optional note..."
+        ></textarea>
 
-    </div>
-
-
-    <div class="field">
-
-      <label>CONTENT</label>
-
-      <textarea
-        id="nodeContent"
-        placeholder="Information..."
-      ></textarea>
-
-    </div>
+      </div>
 
 
-    <div
-      style="
-        display:flex;
-        gap:8px;
-        margin-top:17px;
-      "
-    >
+      <div class="modal-actions">
 
-      <button
-        class="btn"
-        style="margin-left:auto"
-        onclick="closeNodeModal()"
-      >
-        Cancel
-      </button>
+        <button
+          class="btn"
+          onclick="closeModal('nodeModal')"
+        >
+          CANCEL
+        </button>
 
-      <button
-        class="btn primary"
-        onclick="saveNode()"
-      >
-        Save
-      </button>
+        <button
+          class="btn"
+          onclick="createNode()"
+        >
+          CREATE
+        </button>
+
+      </div>
 
     </div>
 
@@ -1777,315 +1500,257 @@ button{
 
 </div>
 
+
+<!-- =========================================================
+     TOOL MODAL
+========================================================= -->
 
 <div
-  class="toast"
-  id="toast"
-></div>
+  class="modal-backdrop"
+  id="toolModal"
+>
 
+  <div class="modal">
+
+    <div class="modal-head">
+
+      <b id="toolTitle">
+        OSINT TOOL
+      </b>
+
+      <button
+        class="close-btn"
+        onclick="closeModal('toolModal')"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div class="modal-body">
+
+      <div class="form-group">
+
+        <label id="toolLabel">
+          VALUE
+        </label>
+
+        <input
+          class="form-input"
+          id="toolInput"
+          autocomplete="off"
+        >
+
+      </div>
+
+
+      <div
+        id="toolResult"
+        style="
+          display:none;
+          border:1px solid rgba(255,255,255,.1);
+          background:#050505;
+          padding:13px;
+          font-size:10px;
+          line-height:1.6;
+          color:#aaa;
+          white-space:pre-wrap;
+          word-break:break-word;
+        "
+      ></div>
+
+
+      <div class="modal-actions">
+
+        <button
+          class="btn"
+          onclick="closeModal('toolModal')"
+        >
+          CLOSE
+        </button>
+
+        <button
+          class="btn"
+          onclick="runTool()"
+        >
+          RUN CHECK
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
+
+
+<div id="toast"></div>
 
 
 <script>
 
+/* =========================================================
+   STATE
+========================================================= */
 
-/* ==========================================================
-   ASCII HACK ART
-========================================================== */
-
-const ASCII_ART = String.raw`
-          *#++++*++***********++**#######*+++++++**********#*+++**********+++++++=****++++==++=-+******#**+==++++++=+++*++=+++++*+=--:..
-  .-=+++***++++*+*+*******##*++*#####**++++++++*****+**#**+****+=+******++++==++==**==+=*=-***********+**++++++=+++++**+++***+=++*=:                           
-:-+.  =*++**++***###**#####**+*####*****+****+***+#*#****===********+*+++++=-+*+=+*=--:+*-***##****+**++*+****++*****+*#**********#******++==-::
-:-:-++++**###*#*##*#####*##**+#######**+**++*+++*****+#*++===**####**+=++-==-=+*==*+-::-=+******#************#*#####**#*****#*#**+++++++++=+=.
-.:-+****#####*##++****##**#*++*###*******+**+=++****++#*+++=****#*#**=--+=-=+*+*=***+++***+****+++*******#####*#****+-. .:----:.    .::-:.
- .=*#######*##*++******#**#*+****##*#*##+*#**+#******+*****+*******+=-:-+*******#*#**+*****##***++*+****#***#*##****+*+++++===-:.
- .=########***++==++*####**#**##****###***##+*#***++*************##+-=+**#********#*#*##**#*******+***+*#*****##***************+=+=-:
- .=*###****#++++**#*######**#**#######*********##**+************####+***********#******#**###*******+++*******##*#********#**##*****+--            
- .-+*+****#+++++*****##################**+**##**##***+****###*###*#****#**###******#######********++++******###########*********###***+====-=====++++++++++++=---:.
-=+**++*++*###****######################***#####**+*****##************************#*####*#####**+++=++****#######################**#**= :---:-=-.  .-=-==++++**+*++:
-***+++*##**+++**###+***+***#####***###########*#***+++******#***#****####****#######*#*****#*#**++++++####*###############*######*****#*=-:.     ..   ..::=+*******
-***###*#####**#%##**##*******###*++**#########***++==-...:-=+*****+*##*#*****########***#*=*#**#**#***#**#######*##*##******#######*=-+*+**+=:      .....:--==+****
-*####*#####*+########***+**##*##****########**++-::....        .-=+*******#*************************##########%%#######***##########*++++*****+-.        ..:-==++*#
-**##########*#######****########*##########**+=-......            .=+***##***#*#***********#####*#*#####%###%############**########**#**+**+-. .:...   .....:-=+=++
-=+**#############%#######################***+=-...                  .=+************+********########**###%#%%##########*##**##**###*++*#**+=:.    .    :..:::-==+++
-   :***####*############################**+++-....                   .:-===+++++++++++++******####*##########%###+######*###########**#*****+=---:. ::..:::--==-=++
-    .=***#*#######################*******++-.......                    ::-==+=+++++++++******###*##########*##%#*#########****#######**#***##****+-.::::::---=-=---
-         :-=*###*#########*+=+***+++++++--...   ......:-:.              ..:-====+=+++++*+*****#################%%%###########*=-.:---:       .::...::-------------=
-           .- :**#########+-::--------=-:..      .......:====..         ....:-==-===++++*****#*#****##########%%%%%%########+=-:.........:::::::-----=-----========
-             .*###########*+::-=:....::...        .:---:::=++++=..       .....-=-==+++++****##*****####%########%%%%%%%#******+=::::::::::---===+ =+++++***+++
-             :+####*######+=-==-.........          ..-+***+++*+++++=   ......:--===++++++**##*****%#############%#####%####%#*++==--=-=+=++++*******####%%#####*###
-             .-*#*###*+-   ::........                ...=*##********+=......::====+++++++***####%#%##############%%##%%%%###*******+****#########*#*##########%###%
-              .:*++-+      .:.....                      -+-.=*##%###*#*+-:---=====++++++**####%#%#*%%%#%%*++=+#******+**#*###%#%#%#%%%%@%%#####***###*##******#*###
-               :-.         .::....                      ..:   =**+**####**++++++++*******##%#%#*%%%#%%#%%*++=+#******+**#*###%#%#%#%%%%###****###*##*******++***#* 
-                           ::...:..                      .:+:  :.==+#####*****+=+**#*###%#%**#*%%%%##*#%##+=----:::=+****###%%#%#%#%%%%###****###*##*******++***#* 
-                          .::........                     ..-++-:-=*###+*+-:::-=+*#*###%#**++**%%#%######%#=-:-:-=++*##*###########*##*****#*###******++**+++++=+: 
-.:-==+++++++++==--:.     .:.:....:....                     ..:+*****#+.. -. ..-=+*####*++****++#####--++++=::-==++++***#**####*#**+++++-++======-==--==-=---=======
-===============+==+=+==-=====-:..::....                   ....:-+**+.       ..-++###*+*##****====*##+.:.: :::=+*++***+*#*+========+========---==---==============++
-=========--------:------==-=--------....                  .......            .:+*#*=******++==---=--=+::-=+=+***+*==-:....:::::::------=-=====================+++++
-=-------::-:::::::::::..:.:::::-:::--:-:..             . .........           .-*#******+***==----===-:-===++++=-............::..::::::::::-=---====-===========++=+
-------::::...........................:::::-..          ............. .... ...:::-======+*+=---::-=====++++==:...  ....:..:..:.....:.:::::::-:---=---==-=-=====+++**
---:::::::...................................:::.. .........           .... ..........::::-=====-===+===++..   ......::............:-----:------:---===========+****
-::::::................................................                    ............................::............................:::-------:-:---====+++++******
-:........................... .....................                             .......................                   ............::-----=---=---==++++******++*
-................ ......       . .............                                                . .....                             ....:-===+==========++++**********
-...............  ...              .......                                                                                         ...:--===+++++++=+++++***********
-................ ..             .......                                                                                         ..:--==+++++++++++**************
-.......................      ....                                                                                            ....::-====++++++****####*********
-:...................................                                                                                             ....:--==+++++****######*******###
-:::::::............................                                                                                        ....  ....::-=+=+****######**####*######
---:::.::.........................                                                                                     ..............::-==++**######################
-----:.::..........................                                                                                  ................:-=+++*########################
--::::::......................                                                                               ......................::-==+**#####%%%%%%%####%%######%
--:::::::::...................                                                                             ......................:--==++**######%#%%%%%%%%#######%%%
---::::::.:....................                                                                       .......................::--==++*##########%%%%%%%#%#####%%%%%%
----::::.:.........................        .                                            ..    .............................:-===+++*######%#%%%###%%%%%#####%%%%##%%
----:::::...............................  .....                                        ... .... ........................::--=+++***#############%#%%%############%#%
-=---:--:::::...................................   .                         .     .  ................................:--===+++****#%%%%%%%#########################
-===-----:::::::.............................................................................::::::::-----====+++++***%%%%%%#%###########****#******#***+-
-`;
-
-
-/* ==========================================================
-   BOOT
-========================================================== */
-
-function initBoot(){
-
-  const screen =
-    document.getElementById(
-      "bootScreen"
-    );
-
-  const container =
-    document.getElementById(
-      "asciiContainer"
-    );
-
-  if(!screen || !container)
-    return;
-
-
-  container.innerHTML="";
-
-
-  const lines =
-    ASCII_ART
-      .replace(/\r/g,"")
-      .split("\n")
-      .filter(
-        line =>
-          line.length > 0
-      );
-
-
-  lines.forEach(
-    (line,index)=>{
-
-      const el =
-        document.createElement(
-          "div"
-        );
-
-      el.className =
-        "hack-line";
-
-      el.textContent =
-        line;
-
-
-      const x =
-        (
-          Math.random()*90-45
-        ).toFixed(1);
-
-      const skew =
-        (
-          Math.random()*16-8
-        ).toFixed(1);
-
-
-      const delay =
-        (
-          index*.003 +
-          Math.random()*.055
-        ).toFixed(3);
-
-
-      el.style.top =
-        (
-          index /
-          Math.max(
-            lines.length-1,
-            1
-          ) *
-          100
-        ) + "%";
-
-
-      el.style.setProperty(
-        "--hack-x",
-        x+"px"
-      );
-
-      el.style.setProperty(
-        "--hack-skew",
-        skew+"deg"
-      );
-
-      el.style.setProperty(
-        "--hack-delay",
-        delay+"s"
-      );
-
-
-      container.appendChild(
-        el
-      );
-    }
-  );
-
-
-  /*
-    Очень короткий резкий
-    glitch/freeze.
-  */
-
-  screen.classList.add(
-    "hack"
-  );
-
-
-  setTimeout(
-    ()=>{
-      screen.classList.add(
-        "flash"
-      );
-    },
-    500
-  );
-
-
-  setTimeout(
-    ()=>{
-      screen.classList.remove(
-        "hack"
-      );
-    },
-    720
-  );
-
-
-  /*
-    Резкий выход.
-  */
-
-  const duration =
-    Math.min(
-      2100,
-      1050 +
-      lines.length*4
-    );
-
-
-  setTimeout(
-    ()=>{
-
-      screen.classList.add(
-        "hack-end"
-      );
-
-
-      setTimeout(
-        ()=>{
-          screen.remove();
-        },
-        200
-      );
-
-    },
-    duration
-  );
-}
-
-
-/* ==========================================================
-   STORAGE
-========================================================== */
-
-const STORAGE_KEY =
+const DB_KEY =
   "nzx-osint-real-v4";
 
-let db = {
+const PROJECTS_KEY =
+  "nzx-projects";
 
-  nodes:{},
+const CURRENT_PROJECT_KEY =
+  "nzx-current-project";
 
-  links:[],
-
-  profile:{
-    name:"NZX User",
-    username:"nzx_user",
-    avatar:""
-  },
-
-  searches:0
-};
-
-
-try{
-
-  const saved =
-    localStorage.getItem(
-      STORAGE_KEY
-    );
-
-  if(saved){
-
-    const parsed =
-      JSON.parse(saved);
-
-    db = {
-
-      ...db,
-      ...parsed,
-
-      nodes:
-        parsed.nodes || {},
-
-      links:
-        Array.isArray(
-          parsed.links
-        )
-          ? parsed.links
-          : [],
-
-      profile:{
-        ...db.profile,
-        ...(parsed.profile || {})
-      }
-    };
-  }
-
-}catch(error){
-
-  console.warn(
-    "Storage error",
-    error
-  );
-}
-
-
-/* ==========================================================
-   PROJECT SYSTEM
-========================================================== */
+let nodes = [];
+let links = [];
 
 let currentProject =
   localStorage.getItem(
-    "nzx-current-project"
+    CURRENT_PROJECT_KEY
   ) ||
   "Default Project";
 
+let selectedNode = null;
+
+let graphScale = 1;
+let graphX = 0;
+let graphY = 0;
+
+let draggingGraph = false;
+
+let dragStartX = 0;
+let dragStartY = 0;
+
+let dragOriginX = 0;
+let dragOriginY = 0;
+
+let activeTool = null;
+
+let saturnCanvas = null;
+let saturnCtx = null;
+
+let saturnParticles = [];
+
+let saturnRotation = 0;
+
+let ringRotation = 0;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function $(id){
+  return document.getElementById(id);
+}
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+function toast(message){
+
+  const el =
+    $("toast");
+
+  el.textContent =
+    message;
+
+  el.classList.add(
+    "show"
+  );
+
+  clearTimeout(
+    window.__toastTimer
+  );
+
+  window.__toastTimer =
+    setTimeout(
+      ()=>{
+        el.classList.remove(
+          "show"
+        );
+      },
+      2600
+    );
+
+}
+
+
+/* =========================================================
+   DATABASE
+========================================================= */
+
+function loadDB(){
+
+  try{
+
+    const raw =
+      localStorage.getItem(
+        DB_KEY
+      );
+
+    if(!raw){
+      return;
+    }
+
+    const data =
+      JSON.parse(raw);
+
+    nodes =
+      Array.isArray(data.nodes)
+        ? data.nodes
+        : [];
+
+    links =
+      Array.isArray(data.links)
+        ? data.links
+        : [];
+
+  }catch(error){
+
+    console.error(
+      "DB LOAD ERROR:",
+      error
+    );
+
+    nodes = [];
+    links = [];
+
+  }
+
+}
+
+
+function saveDB(){
+
+  localStorage.setItem(
+    DB_KEY,
+    JSON.stringify({
+      nodes,
+      links,
+      updatedAt:Date.now()
+    })
+  );
+
+  updateProfileUI();
+
+}
+
+
+/* =========================================================
+   PROJECTS
+========================================================= */
 
 function getProjects(){
 
@@ -2093,27 +1758,26 @@ function getProjects(){
 
     return JSON.parse(
       localStorage.getItem(
-        "nzx-projects"
+        PROJECTS_KEY
       ) || "{}"
     );
 
   }catch{
 
     return {};
+
   }
+
 }
 
 
-function saveProjects(
-  projects
-){
+function saveProjects(projects){
 
   localStorage.setItem(
-    "nzx-projects",
-    JSON.stringify(
-      projects
-    )
+    PROJECTS_KEY,
+    JSON.stringify(projects)
   );
+
 }
 
 
@@ -2122,25 +1786,38 @@ function saveCurrentProject(){
   const projects =
     getProjects();
 
-
   projects[currentProject] = {
 
     nodes:
-      db.nodes,
+      JSON.parse(
+        JSON.stringify(nodes)
+      ),
 
     links:
-      db.links,
+      JSON.parse(
+        JSON.stringify(links)
+      ),
 
     createdAt:
       projects[currentProject]?.createdAt ||
+      Date.now(),
+
+    updatedAt:
       Date.now()
 
   };
 
-
   saveProjects(
     projects
   );
+
+  localStorage.setItem(
+    CURRENT_PROJECT_KEY,
+    currentProject
+  );
+
+  saveDB();
+
 }
 
 
@@ -2148,114 +1825,100 @@ function createProject(){
 
   const name =
     prompt(
-      "PROJECT NAME:"
+      "Enter project name:",
+      "New Project"
     );
 
-  if(name === null)
+  if(name === null){
     return;
-
+  }
 
   const clean =
     name.trim();
 
-
   if(!clean){
-
-    toast(
-      "PROJECT NAME REQUIRED"
-    );
-
     return;
   }
 
+  saveCurrentProject();
 
   const projects =
     getProjects();
 
+  if(projects[clean]){
 
-  if(
-    projects[clean]
-  ){
+    if(
+      !confirm(
+        "Project already exists. Replace it?"
+      )
+    ){
+      return;
+    }
 
-    toast(
-      "PROJECT ALREADY EXISTS"
-    );
-
-    return;
   }
 
+  currentProject =
+    clean;
 
-  saveCurrentProject();
+  nodes = [];
+  links = [];
 
+  selectedNode = null;
 
-  projects[clean] = {
+  projects[currentProject] = {
 
-    nodes:{},
-
+    nodes:[],
     links:[],
 
-    createdAt:
-      Date.now()
+    createdAt:Date.now(),
+    updatedAt:Date.now()
 
   };
-
 
   saveProjects(
     projects
   );
 
-
-  currentProject =
-    clean;
-
-
   localStorage.setItem(
-    "nzx-current-project",
+    CURRENT_PROJECT_KEY,
     currentProject
   );
-
-
-  db.nodes={};
-
-  db.links=[];
-
 
   saveDB();
 
   renderNodes();
-
   renderLines();
 
-  centerGraph();
-
+  updateProfileUI();
 
   toast(
-    "PROJECT CREATED"
+    "Project created."
   );
+
 }
 
 
 function showProjects(){
 
+  saveCurrentProject();
+
   const projects =
     getProjects();
-
 
   const names =
     Object.keys(
       projects
     );
 
-
   if(!names.length){
 
     toast(
-      "NO PROJECTS"
+      "No projects."
     );
 
     return;
-  }
 
+  }
 
   const list =
     names
@@ -2265,71 +1928,66 @@ function showProjects(){
       )
       .join("\n");
 
-
-  const selected =
+  const choice =
     prompt(
-      "MY PROJECTS:\n\n" +
+      "MY PROJECTS\n\n" +
       list +
-      "\n\nENTER PROJECT NAME:"
+      "\n\nEnter project name:",
+      currentProject
     );
 
-
-  if(
-    selected === null
-  )
-    return;
-
-
-  const name =
-    selected.trim();
-
-
-  if(!projects[name]){
-
-    toast(
-      "PROJECT NOT FOUND"
-    );
-
+  if(choice === null){
     return;
   }
 
+  const selected =
+    choice.trim();
 
-  saveCurrentProject();
+  if(!projects[selected]){
 
+    toast(
+      "Project not found."
+    );
 
-  const project =
-    projects[name];
+    return;
 
-
-  db.nodes =
-    project.nodes || {};
-
-  db.links =
-    project.links || [];
-
+  }
 
   currentProject =
-    name;
+    selected;
 
+  nodes =
+    JSON.parse(
+      JSON.stringify(
+        projects[selected].nodes || []
+      )
+    );
+
+  links =
+    JSON.parse(
+      JSON.stringify(
+        projects[selected].links || []
+      )
+    );
+
+  selectedNode = null;
 
   localStorage.setItem(
-    "nzx-current-project",
+    CURRENT_PROJECT_KEY,
     currentProject
   );
-
 
   saveDB();
 
   renderNodes();
-
   renderLines();
 
-  centerGraph();
-
+  updateProfileUI();
 
   toast(
-    "PROJECT LOADED"
+    "Project loaded."
   );
+
 }
 
 
@@ -2338,22 +1996,20 @@ function deleteProject(){
   const projects =
     getProjects();
 
-
   const names =
     Object.keys(
       projects
     );
 
-
   if(!names.length){
 
     toast(
-      "NO PROJECTS"
+      "No projects."
     );
 
     return;
-  }
 
+  }
 
   const list =
     names
@@ -2363,298 +2019,154 @@ function deleteProject(){
       )
       .join("\n");
 
-
-  const selected =
+  const choice =
     prompt(
-      "DELETE PROJECT:\n\n" +
+      "DELETE PROJECT\n\n" +
       list +
-      "\n\nENTER PROJECT NAME:"
+      "\n\nEnter project name:",
+      currentProject
     );
 
-
-  if(
-    selected === null
-  )
-    return;
-
-
-  const name =
-    selected.trim();
-
-
-  if(!projects[name]){
-
-    toast(
-      "PROJECT NOT FOUND"
-    );
-
+  if(choice === null){
     return;
   }
 
+  const selected =
+    choice.trim();
+
+  if(!projects[selected]){
+
+    toast(
+      "Project not found."
+    );
+
+    return;
+
+  }
 
   if(
     !confirm(
-      `DELETE PROJECT "${name}"?`
+      `Delete "${selected}"?`
     )
-  )
+  ){
     return;
+  }
 
+  delete projects[selected];
 
-  delete projects[name];
-
-
-  saveProjects(
-    projects
-  );
-
+  const remaining =
+    Object.keys(
+      projects
+    );
 
   if(
-    currentProject ===
-    name
+    selected === currentProject
   ){
-
-    const remaining =
-      Object.keys(
-        projects
-      );
-
 
     if(remaining.length){
 
       currentProject =
         remaining[0];
 
-      const project =
-        projects[
-          currentProject
-        ];
+      nodes =
+        JSON.parse(
+          JSON.stringify(
+            projects[currentProject].nodes || []
+          )
+        );
 
-
-      db.nodes =
-        project.nodes || {};
-
-      db.links =
-        project.links || {};
-
-      if(
-        !Array.isArray(
-          db.links
-        )
-      ){
-        db.links=[];
-      }
+      links =
+        JSON.parse(
+          JSON.stringify(
+            projects[currentProject].links || []
+          )
+        );
 
     }else{
 
       currentProject =
         "Default Project";
 
-      db.nodes={};
+      nodes = [];
+      links = [];
 
-      db.links=[];
+      projects[currentProject] = {
+
+        nodes:[],
+        links:[],
+
+        createdAt:Date.now(),
+        updatedAt:Date.now()
+
+      };
+
     }
 
-
     localStorage.setItem(
-      "nzx-current-project",
+      CURRENT_PROJECT_KEY,
       currentProject
     );
 
-
-    saveDB();
-
-    renderNodes();
-
-    renderLines();
-
-    centerGraph();
   }
 
+  saveProjects(
+    projects
+  );
+
+  saveDB();
+
+  renderNodes();
+  renderLines();
+
+  updateProfileUI();
 
   toast(
-    "PROJECT DELETED"
+    "Project deleted."
   );
+
 }
 
 
 function deleteAllNodes(){
 
-  const count =
-    Object.keys(
-      db.nodes
-    ).length;
-
-
-  if(!count){
+  if(!nodes.length){
 
     toast(
-      "NO NODES"
+      "Graph is empty."
     );
 
     return;
-  }
 
+  }
 
   if(
     !confirm(
-      `DELETE ALL ${count} NODES?`
+      "Delete ALL nodes?"
     )
-  )
+  ){
     return;
+  }
 
+  nodes = [];
+  links = [];
 
-  db.nodes={};
-
-  db.links=[];
-
-
-  saveDB();
+  selectedNode = null;
 
   saveCurrentProject();
 
   renderNodes();
-
   renderLines();
 
-
   toast(
-    "ALL NODES DELETED"
-  );
-}
-
-
-setInterval(
-  ()=>{
-    saveCurrentProject();
-  },
-  3000
-);
-
-
-/* ==========================================================
-   HELPERS
-========================================================== */
-
-function saveDB(){
-
-  try{
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(db)
-    );
-
-  }catch(error){
-
-    console.warn(
-      "Could not save database",
-      error
-    );
-  }
-}
-
-
-function $(id){
-  return document.getElementById(id);
-}
-
-
-function escapeHTML(value){
-
-  return String(
-    value ?? ""
-  )
-  .replaceAll("&","&amp;")
-  .replaceAll("<","&lt;")
-  .replaceAll(">","&gt;")
-  .replaceAll('"',"&quot;")
-  .replaceAll("'","&#039;");
-}
-
-
-function objectToText(value){
-
-  if(
-    value === null ||
-    value === undefined
-  ){
-    return "UNKNOWN";
-  }
-
-  if(
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean"
-  ){
-    return String(value);
-  }
-
-  try{
-
-    return JSON.stringify(
-      value,
-      null,
-      2
-    );
-
-  }catch{
-
-    return String(value);
-  }
-}
-
-
-function uid(){
-
-  return (
-    "node_" +
-    Date.now() +
-    "_" +
-    Math.random()
-      .toString(36)
-      .slice(2,8)
-  );
-}
-
-
-let toastTimer=null;
-
-
-function toast(message){
-
-  const el =
-    $("toast");
-
-
-  el.textContent =
-    message;
-
-
-  el.classList.add(
-    "show"
+    "All nodes deleted."
   );
 
-
-  clearTimeout(
-    toastTimer
-  );
-
-
-  toastTimer =
-    setTimeout(
-      ()=>{
-        el.classList.remove(
-          "show"
-        );
-      },
-      2200
-    );
 }
 
 
-/* ==========================================================
+/* =========================================================
    PAGE
-========================================================== */
+========================================================= */
 
 function showPage(page){
 
@@ -2663,109 +2175,134 @@ function showPage(page){
       ".page"
     )
     .forEach(
-      el=>{
+      el =>
         el.classList.remove(
           "active"
-        );
-      }
+        )
     );
-
-
-  const target =
-    $("page-"+page);
-
-
-  if(target){
-
-    target.classList.add(
-      "active"
-    );
-  }
-
 
   document
     .querySelectorAll(
       ".side-btn"
     )
     .forEach(
-      button=>{
-
-        button.classList.toggle(
-          "active",
-          button.dataset.page ===
-            page
-        );
-
-      }
+      el =>
+        el.classList.remove(
+          "active"
+        )
     );
+
+  if(page === "chain"){
+
+    $("chainPage")
+      .classList
+      .add("active");
+
+    document
+      .querySelector(
+        '[data-page="chain"]'
+      )
+      ?.classList
+      .add("active");
+
+  }
+
+  if(page === "profile"){
+
+    $("profilePage")
+      .classList
+      .add("active");
+
+    document
+      .querySelector(
+        '[data-page="profile"]'
+      )
+      ?.classList
+      .add("active");
+
+  }
+
 }
 
 
-function openProfile(){
-
-  showPage(
-    "profile"
-  );
-
-  updateProfileUI();
-}
-
-
-/* ==========================================================
+/* =========================================================
    PROFILE
-========================================================== */
+========================================================= */
 
-function avatarFallback(){
+function getUser(){
+
+  try{
+
+    return JSON.parse(
+      localStorage.getItem(
+        "nzx-user"
+      ) || "{}"
+    );
+
+  }catch{
+
+    return {};
+
+  }
+
+}
+
+
+function createAvatar(name){
+
+  const letter =
+    String(name || "N")
+      .charAt(0)
+      .toUpperCase();
+
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg"
+       width="100"
+       height="100"
+       viewBox="0 0 100 100">
+
+    <rect
+      width="100"
+      height="100"
+      fill="#111"
+    />
+
+    <text
+      x="50"
+      y="60"
+      text-anchor="middle"
+      font-size="45"
+      fill="white"
+      font-family="Arial"
+      font-weight="bold">
+      ${escapeHtml(letter)}
+    </text>
+
+  </svg>
+  `;
 
   return (
-    "data:image/svg+xml," +
-    encodeURIComponent(`
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="200"
-        height="200"
-        viewBox="0 0 200 200"
-      >
-        <rect
-          width="200"
-          height="200"
-          fill="#111"
-        />
-
-        <circle
-          cx="100"
-          cy="78"
-          r="38"
-          fill="#333"
-        />
-
-        <path
-          d="M35 190c7-49 36-69 65-69s58 20 65 69"
-          fill="#333"
-        />
-
-        <text
-          x="100"
-          y="30"
-          fill="#777"
-          text-anchor="middle"
-          font-size="13"
-          font-family="Arial"
-        >
-          NZX
-        </text>
-      </svg>
-    `)
+    "data:image/svg+xml;charset=utf-8," +
+    encodeURIComponent(svg)
   );
+
 }
 
 
 function updateProfileUI(){
 
-  const avatar =
-    db.profile.avatar ||
-    avatarFallback();
+  const user =
+    getUser();
 
+  const name =
+    user.name ||
+    user.username ||
+    "NZX USER";
+
+  const avatar =
+    user.avatar ||
+    user.photo ||
+    createAvatar(name);
 
   $("miniAvatar").src =
     avatar;
@@ -2773,1771 +2310,368 @@ function updateProfileUI(){
   $("profileAvatar").src =
     avatar;
 
-
   $("profileName").textContent =
-    db.profile.name;
+    name;
 
+  $("profileId").textContent =
+    user.id ||
+    user.user_id ||
+    "LOCAL";
 
-  $("profileUsername").textContent =
-    "@" +
-    db.profile.username;
+  $("profileProject").textContent =
+    currentProject;
+
+  $("profileNodes").textContent =
+    nodes.length;
+
 }
 
 
-function chooseAvatar(){
-
-  $("avatarFile").click();
-}
-
-
-$("avatarFile")
-.addEventListener(
-  "change",
-  event=>{
-
-    const file =
-      event.target.files?.[0];
-
-
-    if(!file)
-      return;
-
-
-    const reader =
-      new FileReader();
-
-
-    reader.onload =
-      ()=>{
-
-        db.profile.avatar =
-          reader.result;
-
-
-        saveDB();
-
-        updateProfileUI();
-
-
-        toast(
-          "AVATAR UPDATED"
-        );
-      };
-
-
-    reader.readAsDataURL(
-      file
-    );
-  }
-);
-
-
-function editProfileName(){
-
-  const name =
-    prompt(
-      "ENTER PROFILE NAME:",
-      db.profile.name
-    );
-
-
-  if(name === null)
-    return;
-
-
-  const clean =
-    name.trim();
-
-
-  if(!clean)
-    return;
-
-
-  db.profile.name =
-    clean;
-
-
-  saveDB();
+function openProfile(){
 
   updateProfileUI();
 
-
-  toast(
-    "PROFILE UPDATED"
+  showPage(
+    "profile"
   );
+
 }
 
 
-/* ==========================================================
-   TOOLS
-========================================================== */
+/* =========================================================
+   MODALS
+========================================================= */
 
-const toolConfig = {
+function openModal(id){
 
-  phone:{
-    title:"CHECK NUMBER",
+  $(id)
+    .classList
+    .add("open");
 
-    placeholder:"+374 XX XXX XXX",
-
-    description:
-      "Проверка номера через PhoneValidation API. Показываются только данные, которые реально вернул провайдер."
-  },
-
-  address:{
-    title:"CHECK ADDRESS",
-
-    placeholder:"Yerevan, Armenia",
-
-    description:
-      "Поиск адреса через OpenStreetMap Nominatim."
-  }
-
-};
+}
 
 
-let currentTool=null;
+function closeModal(id){
+
+  $(id)
+    .classList
+    .remove("open");
+
+}
 
 
-function openTool(type){
+function openNodeModal(){
 
-  const config =
-    toolConfig[type];
+  $("nodeType").value = "";
+  $("nodeValue").value = "";
+  $("nodeNote").value = "";
 
-
-  if(!config)
-    return;
-
-
-  currentTool =
-    type;
-
-
-  $("toolTitle").textContent =
-    config.title;
-
-
-  $("toolDescription").textContent =
-    config.description;
-
-
-  $("toolInput").placeholder =
-    config.placeholder;
-
-
-  $("toolInput").value =
-    "";
-
-
-  $("toolResults").innerHTML =
-    "";
-
-
-  $("toolModal")
-    .classList.add(
-      "open"
-    );
-
+  openModal(
+    "nodeModal"
+  );
 
   setTimeout(
     ()=>{
-      $("toolInput").focus();
+      $("nodeType").focus();
     },
     50
   );
+
 }
 
 
-function closeTool(){
+/* =========================================================
+   NODE
+========================================================= */
 
-  $("toolModal")
-    .classList.remove(
-      "open"
-    );
+function makeId(){
 
+  return (
+    Date.now().toString(36) +
+    Math.random()
+      .toString(36)
+      .slice(2,9)
+  );
 
-  currentTool=null;
 }
 
 
-function outsideToolModal(event){
-
-  if(
-    event.target ===
-    $("toolModal")
-  ){
-    closeTool();
-  }
-}
-
-
-$("toolInput")
-.addEventListener(
-  "keydown",
-  event=>{
-
-    if(
-      event.key ===
-      "Enter"
-    ){
-
-      event.preventDefault();
-
-      runTool();
-    }
-  }
-);
-
-
-async function runTool(){
-
-  if(!currentTool)
-    return;
-
-
-  const value =
-    $("toolInput")
-      .value
-      .trim();
-
-
-  if(!value){
-
-    toast(
-      "ENTER A VALUE"
-    );
-
-    return;
-  }
-
-
-  $("toolRun").disabled =
-    true;
-
-
-  $("toolRun").textContent =
-    "CHECKING...";
-
-
-  $("toolResults").innerHTML =
-    "";
-
-
-  try{
-
-    if(
-      currentTool ===
-      "phone"
-    ){
-
-      await checkPhoneReal(
-        value
-      );
-
-    }else if(
-      currentTool ===
-      "address"
-    ){
-
-      await checkAddressReal(
-        value
-      );
-    }
-
-  }finally{
-
-    $("toolRun").disabled =
-      false;
-
-    $("toolRun").textContent =
-      "CHECK";
-  }
-}
-
-
-/* ==========================================================
-   RESULTS
-========================================================== */
-
-function addResult(
-  title,
-  value,
-  status="INFO",
-  icon="•"
-){
-
-  const box =
-    document.createElement(
-      "div"
-    );
-
-
-  let cls =
-    "result";
-
-
-  if(status === "OK")
-    cls += " good";
-
-
-  if(status === "WARNING")
-    cls += " warn";
-
-
-  if(status === "ERROR")
-    cls += " bad";
-
-
-  box.className =
-    cls;
-
-
-  box.innerHTML = `
-
-    <div class="result-head">
-
-      <span>
-        ${escapeHTML(icon)}
-      </span>
-
-      <span>
-        ${escapeHTML(title)}
-      </span>
-
-    </div>
-
-    <div class="result-value">
-      ${escapeHTML(
-        objectToText(value)
-      )}
-    </div>
-
-  `;
-
-
-  $("toolResults")
-    .appendChild(
-      box
-    );
-}
-
-
-/* ==========================================================
-   PHONE API
-========================================================== */
-
-async function checkPhoneReal(
-  value
-){
-
-  addResult(
-    "REQUEST",
-    "Checking number...",
-    "INFO",
-    "•"
-  );
-
-
-  try{
-
-    const form =
-      new URLSearchParams();
-
-
-    form.append(
-      "phone",
-      value
-    );
-
-
-    const response =
-      await fetch(
-        "/api/osint/phone",
-        {
-          method:"POST",
-
-          headers:{
-            "Accept":
-              "application/json"
-          },
-
-          body:form
-        }
-      );
-
-
-    let data=null;
-
-
-    try{
-
-      data =
-        await response.json();
-
-    }catch{
-
-      data=null;
-    }
-
-
-    $("toolResults")
-      .innerHTML =
-      "";
-
-
-    if(!response.ok){
-
-      addResult(
-        "BACKEND ERROR",
-        data ||
-          ("HTTP " +
-           response.status),
-        "ERROR",
-        "!"
-      );
-
-      return;
-    }
-
-
-    if(!data){
-
-      addResult(
-        "RESPONSE",
-        "Backend did not return JSON.",
-        "ERROR",
-        "!"
-      );
-
-      return;
-    }
-
-
-    renderPhoneResult(
-      data
-    );
-
-
-    createPhoneGraph(
-      data
-    );
-
-
-    db.searches++;
-
-
-    saveDB();
-
-  }catch(error){
-
-    $("toolResults")
-      .innerHTML =
-      "";
-
-
-    addResult(
-      "CONNECTION",
-      error?.message ||
-        "Could not connect to backend.",
-      "ERROR",
-      "!"
-    );
-  }
-}
-
-
-function renderPhoneResult(data){
-
-  addResult(
-    "PHONE",
-    data.phone ||
-      "UNKNOWN",
-    "OK",
-    "☎"
-  );
-
-
-  addResult(
-    "VALID",
-    data.valid === null ||
-    data.valid === undefined
-      ? "UNKNOWN"
-      : data.valid
-        ? "YES"
-        : "NO",
-    data.valid === true
-      ? "OK"
-      : data.valid === false
-        ? "ERROR"
-        : "WARNING",
-    "✓"
-  );
-
-
-  addResult(
-    "POSSIBLE",
-    data.possible === null ||
-    data.possible === undefined
-      ? "UNKNOWN"
-      : data.possible
-        ? "YES"
-        : "NO",
-    data.possible === true
-      ? "OK"
-      : "WARNING",
-    "?"
-  );
-
-
-  addResult(
-    "CONFIDENCE",
-    data.confidence ||
-      "UNKNOWN",
-    data.confidence ===
-      "verified"
-      ? "OK"
-      : "WARNING",
-    "◆"
-  );
-
-
-  if(
-    data.score !== null &&
-    data.score !== undefined
-  ){
-
-    addResult(
-      "SCORE",
-      data.score,
-      "INFO",
-      "◈"
-    );
-  }
-
-
-  addResult(
-    "COUNTRY",
-    data.country ||
-      "UNKNOWN",
-    "INFO",
-    "◎"
-  );
-
-
-  addResult(
-    "COUNTRY CODE",
-    data.country_code ||
-      "UNKNOWN",
-    "INFO",
-    "+"
-  );
-
-
-  addResult(
-    "REGION",
-    data.region ||
-      "UNKNOWN",
-    "INFO",
-    "⌖"
-  );
-
-
-  addResult(
-    "CARRIER",
-    data.carrier ||
-      "UNKNOWN",
-    "INFO",
-    "◉"
-  );
-
-
-  addResult(
-    "LINE TYPE",
-    data.line_type ||
-      "UNKNOWN",
-    "INFO",
-    "▣"
-  );
-
-
-  addResult(
-    "DISPOSABLE / VOIP",
-    data.disposable ||
-      "UNKNOWN",
-    data.disposable ===
-      "YES"
-      ? "WARNING"
-      : "INFO",
-    "!"
-  );
-
-
-  addResult(
-    "NATIONAL",
-    data.national ||
-      "UNKNOWN",
-    "INFO",
-    "N"
-  );
-
-
-  addResult(
-    "INTERNATIONAL",
-    data.international ||
-      "UNKNOWN",
-    "INFO",
-    "I"
-  );
-
-
-  addResult(
-    "E.164",
-    data.e164 ||
-      "UNKNOWN",
-    "INFO",
-    "E"
-  );
-
-
-  addResult(
-    "PROVIDER",
-    data.source ||
-      "UNKNOWN",
-    "INFO",
-    "S"
-  );
-
-
-  addResult(
-    "PROVIDER STATUS",
-    data.provider_status ||
-      "UNKNOWN",
-    data.provider_status ===
-      "OK"
-      ? "OK"
-      : "WARNING",
-    data.provider_status ===
-      "OK"
-      ? "✓"
-      : "!"
-  );
-
-
-  if(
-    data.credits_remaining !==
-      null &&
-    data.credits_remaining !==
-      undefined
-  ){
-
-    addResult(
-      "CREDITS REMAINING",
-      data.credits_remaining,
-      "INFO",
-      "C"
-    );
-  }
-
-
-  if(data.provider_error){
-
-    addResult(
-      "PROVIDER RESPONSE",
-      data.provider_error,
-      "WARNING",
-      "!"
-    );
-  }
-
-
-  if(
-    data.diagnostics &&
-    Object.keys(
-      data.diagnostics
-    ).length
-  ){
-
-    addResult(
-      "DIAGNOSTICS",
-      data.diagnostics,
-      "INFO",
-      "D"
-    );
-  }
-
-
-  if(
-    data.city &&
-    data.city !==
-      "UNKNOWN"
-  ){
-
-    addResult(
-      "CITY",
-      data.city,
-      "INFO",
-      "⌂"
-    );
-  }
-}
-
-
-/* ==========================================================
-   NODE CREATION
-========================================================== */
-
-function createNode(
-  title,
-  type,
-  content,
-  x,
-  y,
-  extra={}
-){
-
-  const id =
-    uid();
-
-
-  db.nodes[id] = {
-
-    id,
-
-    title,
-
-    type,
-
-    content,
-
-    x,
-
-    y,
-
-    ...extra
-  };
-
-
-  return id;
-}
-
-
-/* ==========================================================
-   PHONE GRAPH
-========================================================== */
-
-function createPhoneGraph(
-  data
-){
-
-  const phone =
-    data.e164 ||
-    data.phone;
-
-
-  if(!phone)
-    return;
-
-
-  const phoneKey =
-    "phone:" +
-    String(phone)
-      .trim()
-      .toLowerCase();
-
-
-  Object.keys(
-    db.nodes
-  )
-  .forEach(
-    id=>{
-
-      const node =
-        db.nodes[id];
-
-
-      if(
-        node.group ===
-        phoneKey
-      ){
-
-        delete db.nodes[id];
-
-
-        db.links =
-          db.links.filter(
-            link =>
-              link.a !== id &&
-              link.b !== id
-          );
-      }
-    }
-  );
-
-
-  const center =
-    getGraphCenter();
-
-
-  const phoneId =
-    createNode(
-      "Phone Number",
-      "PHONE",
-      phone,
-      center.x,
-      center.y,
-      {
-        group:phoneKey
-      }
-    );
-
-
-  const values = [
-
-    [
-      "Country",
-      "COUNTRY",
-      data.country
-    ],
-
-    [
-      "Country Code",
-      "COUNTRY CODE",
-      data.country_code
-    ],
-
-    [
-      "Region",
-      "REGION",
-      data.region
-    ],
-
-    [
-      "Carrier",
-      "CARRIER",
-      data.carrier
-    ],
-
-    [
-      "Line Type",
-      "LINE TYPE",
-      data.line_type
-    ],
-
-    [
-      "Confidence",
-      "CONFIDENCE",
-      data.confidence
-    ],
-
-    [
-      "Valid",
-      "VALID",
-      data.valid === true
-        ? "YES"
-        : data.valid === false
-          ? "NO"
-          : data.valid
-    ],
-
-    [
-      "Possible",
-      "POSSIBLE",
-      data.possible === true
-        ? "YES"
-        : data.possible === false
-          ? "NO"
-          : data.possible
-    ],
-
-    [
-      "Disposable",
-      "DISPOSABLE",
-      data.disposable
-    ],
-
-    [
-      "National",
-      "NATIONAL",
-      data.national
-    ],
-
-    [
-      "International",
-      "INTERNATIONAL",
-      data.international
-    ],
-
-    [
-      "E.164",
-      "E.164",
-      data.e164
-    ],
-
-    [
-      "Score",
-      "SCORE",
-      data.score
-    ]
-
-  ];
-
-
-  const cleanValues =
-    values.filter(
-      item=>{
-
-        const value =
-          item[2];
-
-
-        return !(
-          value === null ||
-          value === undefined ||
-          value === "" ||
-          value === "UNKNOWN"
-        );
-      }
-    );
-
-
-  const PER_COLUMN=5;
-
-  const COLUMN_GAP=400;
-
-  const ROW_GAP=125;
-
-  const columns=[];
-
-
-  for(
-    let i=0;
-    i<cleanValues.length;
-    i+=PER_COLUMN
-  ){
-
-    columns.push(
-      cleanValues.slice(
-        i,
-        i+PER_COLUMN
-      )
-    );
-  }
-
-
-  const createdColumns=[];
-
-
-  columns.forEach(
-    (
-      column,
-      columnIndex
-    )=>{
-
-      const columnNodes=[];
-
-
-      const total =
-        column.length;
-
-
-      const startY =
-        center.y -
-        (
-          (total-1) *
-          ROW_GAP /
-          2
-        );
-
-
-      column.forEach(
-        (
-          item,
-          rowIndex
-        )=>{
-
-          const x =
-            center.x +
-            COLUMN_GAP *
-            (
-              columnIndex+1
-            );
-
-
-          const y =
-            startY +
-            rowIndex*
-            ROW_GAP;
-
-
-          const id =
-            createNode(
-              item[0],
-              item[1],
-              typeof item[2] ===
-                "boolean"
-                  ? (
-                      item[2]
-                        ? "YES"
-                        : "NO"
-                    )
-                  : String(item[2]),
-              x,
-              y,
-              {
-                group:phoneKey,
-
-                column:
-                  columnIndex,
-
-                row:
-                  rowIndex
-              }
-            );
-
-
-          columnNodes.push(
-            db.nodes[id]
-          );
-
-
-          if(
-            columnIndex ===
-            0
-          ){
-
-            db.links.push({
-              a:phoneId,
-              b:id
-            });
-          }
-
-        }
-      );
-
-
-      createdColumns.push(
-        columnNodes
-      );
-    }
-  );
-
-
-  for(
-    let columnIndex=1;
-
-    columnIndex<
-      createdColumns.length;
-
-    columnIndex++
-  ){
-
-    const previous =
-      createdColumns[
-        columnIndex-1
-      ];
-
-
-    const current =
-      createdColumns[
-        columnIndex
-      ];
-
-
-    current.forEach(
-      node=>{
-
-        let nearest =
-          previous[0];
-
-        let best =
-          Infinity;
-
-
-        previous.forEach(
-          prev=>{
-
-            const distance =
-              Math.abs(
-                prev.y -
-                node.y
-              );
-
-
-            if(
-              distance < best
-            ){
-
-              best =
-                distance;
-
-              nearest =
-                prev;
-            }
-          }
-        );
-
-
-        if(nearest){
-
-          db.links.push({
-
-            a:
-              nearest.id,
-
-            b:
-              node.id
-
-          });
-        }
-      }
-    );
-  }
-
-
-  saveDB();
-
-  saveCurrentProject();
-
-  renderNodes();
-
-  renderLines();
-
-  animateNewGraph(
-    phoneId
-  );
-}
-
-
-/* ==========================================================
-   ADDRESS
-========================================================== */
-
-async function checkAddressReal(
-  value
-){
-
-  addResult(
-    "SEARCH",
-    "Searching address...",
-    "INFO",
-    "•"
-  );
-
-
-  try{
-
-    const response =
-      await fetch(
-        "/api/map/search?q="+
-        encodeURIComponent(
-          value
-        ),
-        {
-          headers:{
-            "Accept":
-              "application/json"
-          }
-        }
-      );
-
-
-    const data =
-      await response.json();
-
-
-    $("toolResults")
-      .innerHTML =
-      "";
-
-
-    if(
-      !response.ok ||
-      !data.success
-    ){
-
-      addResult(
-        "ADDRESS ERROR",
-        data.error ||
-          "Address not found.",
-        "ERROR",
-        "!"
-      );
-
-      return;
-    }
-
-
-    const results =
-      data.results || [];
-
-
-    if(!results.length){
-
-      addResult(
-        "RESULT",
-        "Nothing found.",
-        "WARNING",
-        "?"
-      );
-
-      return;
-    }
-
-
-    results
-      .slice(0,10)
-      .forEach(
-        (
-          item,
-          index
-        )=>{
-
-          addResult(
-            "RESULT "+
-              (index+1),
-            item.display_name,
-            "OK",
-            "⌖"
-          );
-
-          addResult(
-            "COORDINATES",
-            `${item.lat}, ${item.lon}`,
-            "INFO",
-            "◉"
-          );
-
-          addResult(
-            "CITY",
-            item.city ||
-              "UNKNOWN",
-            "INFO",
-            "⌂"
-          );
-
-          addResult(
-            "COUNTRY",
-            item.country ||
-              "UNKNOWN",
-            "INFO",
-            "◎"
-          );
-
-          addResult(
-            "ROAD",
-            item.road ||
-              "UNKNOWN",
-            "INFO",
-            "R"
-          );
-
-          addResult(
-            "HOUSE",
-            item.house_number ||
-              "UNKNOWN",
-            "INFO",
-            "#"
-          );
-        }
-      );
-
-
-    createAddressGraph(
-      results[0]
-    );
-
-  }catch(error){
-
-    $("toolResults")
-      .innerHTML =
-      "";
-
-
-    addResult(
-      "CONNECTION",
-      error?.message ||
-        "Connection error.",
-      "ERROR",
-      "!"
-    );
-  }
-}
-
-
-function createAddressGraph(
-  data
-){
-
-  if(!data)
-    return;
-
-
-  const center =
-    getGraphCenter();
-
-
-  let addressNode =
-    Object.values(
-      db.nodes
-    ).find(
-      node =>
-        node.type ===
-          "ADDRESS" &&
-        node.content ===
-          data.display_name
-    );
-
-
-  if(!addressNode){
-
-    const id =
-      createNode(
-        "Address",
-        "ADDRESS",
-        data.display_name,
-        center.x,
-        center.y
-      );
-
-
-    addressNode =
-      db.nodes[id];
-  }
-
-
-  const values = [
-
-    [
-      "City",
-      "CITY",
-      data.city
-    ],
-
-    [
-      "Country",
-      "COUNTRY",
-      data.country
-    ],
-
-    [
-      "Coordinates",
-      "COORDINATES",
-      `${data.lat}, ${data.lon}`
-    ],
-
-    [
-      "Postcode",
-      "POSTCODE",
-      data.postcode
-    ],
-
-    [
-      "State",
-      "STATE",
-      data.state
-    ],
-
-    [
-      "Road",
-      "ROAD",
-      data.road
-    ],
-
-    [
-      "House",
-      "HOUSE",
-      data.house_number
-    ]
-
-  ].filter(
-    item =>
-      item[2] &&
-      item[2] !==
-        "UNKNOWN"
-  );
-
-
-  const ROW_GAP=125;
-
-  const COLUMN_GAP=400;
-
-
-  values.forEach(
-    (
-      item,
-      index
-    )=>{
-
-      const column =
-        Math.floor(
-          index/5
-        );
-
-
-      const row =
-        index%5;
-
-
-      const total =
-        Math.min(
-          5,
-          values.length -
-          column*5
-        );
-
-
-      const startY =
-        addressNode.y -
-        (
-          (total-1)*
-          ROW_GAP/
-          2
-        );
-
-
-      const id =
-        createNode(
-          item[0],
-          item[1],
-          item[2],
-          addressNode.x +
-            COLUMN_GAP*
-            (column+1),
-          startY +
-            row*
-            ROW_GAP
-        );
-
-
-      db.links.push({
-
-        a:
-          addressNode.id,
-
-        b:
-          id
-      });
-    }
-  );
-
-
-  saveDB();
-
-  saveCurrentProject();
-
-  renderNodes();
-
-  renderLines();
-}
-
-
-/* ==========================================================
-   NODE MODAL
-========================================================== */
-
-let editingNode=null;
-
-
-function openNodeModal(
-  nodeId=null
-){
-
-  editingNode =
-    nodeId;
-
-
-  $("nodeModalTitle")
-    .textContent =
-      nodeId
-        ? "Edit Node"
-        : "New Node";
-
-
-  if(nodeId){
-
-    const node =
-      db.nodes[nodeId];
-
-
-    if(!node)
-      return;
-
-
-    $("nodeTitle").value =
-      node.title || "";
-
-
-    $("nodeType").value =
-      node.type || "";
-
-
-    $("nodeContent").value =
-      node.content || "";
-
-  }else{
-
-    $("nodeTitle").value =
-      "";
-
-    $("nodeType").value =
-      "";
-
-    $("nodeContent").value =
-      "";
-  }
-
-
-  $("nodeModal")
-    .classList.add(
-      "open"
-    );
-}
-
-
-function closeNodeModal(){
-
-  $("nodeModal")
-    .classList.remove(
-      "open"
-    );
-
-
-  editingNode=null;
-}
-
-
-function saveNode(){
-
-  const title =
-    $("nodeTitle")
-      .value
-      .trim();
-
+function createNode(){
 
   const type =
     $("nodeType")
       .value
-      .trim()
-      .toUpperCase();
+      .trim() ||
+    "CUSTOM";
 
-
-  const content =
-    $("nodeContent")
+  const value =
+    $("nodeValue")
       .value
       .trim();
 
+  const note =
+    $("nodeNote")
+      .value
+      .trim();
 
-  if(!title){
+  if(!value){
 
     toast(
-      "ENTER NAME"
+      "Enter node value."
     );
 
     return;
+
   }
 
+  let x = 0;
+  let y = 0;
 
-  if(editingNode){
+  if(nodes.length){
 
-    const node =
-      db.nodes[
-        editingNode
+    const last =
+      nodes[
+        nodes.length - 1
       ];
 
+    x =
+      Number(last.x || 0) +
+      330;
 
-    if(node){
+    y =
+      Number(last.y || 0);
 
-      node.title =
-        title;
-
-      node.type =
-        type ||
-        "UNKNOWN";
-
-      node.content =
-        content;
-    }
-
-  }else{
-
-    const center =
-      getGraphCenter();
-
-
-    const existing =
-      Object.values(
-        db.nodes
-      );
-
-
-    const newId =
-      createNode(
-        title,
-        type ||
-          "UNKNOWN",
-        content,
-        center.x +
-          (
-            Math.random()-.5
-          )*260,
-        center.y +
-          (
-            Math.random()-.5
-          )*180
-      );
-
-
-    const candidates =
-      existing.filter(
-        node =>
-          node.id !==
-          newId
-      );
-
-
-    if(candidates.length){
-
-      const newNode =
-        db.nodes[
-          newId
-        ];
-
-
-      let nearest =
-        candidates[0];
-
-
-      let best =
-        Infinity;
-
-
-      candidates.forEach(
-        node=>{
-
-          const dx =
-            node.x -
-            newNode.x;
-
-
-          const dy =
-            node.y -
-            newNode.y;
-
-
-          const distance =
-            Math.sqrt(
-              dx*dx +
-              dy*dy
-            );
-
-
-          if(
-            distance < best
-          ){
-
-            best =
-              distance;
-
-            nearest =
-              node;
-          }
-        }
-      );
-
-
-      db.links.push({
-
-        a:
-          nearest.id,
-
-        b:
-          newId
-      });
-    }
   }
 
+  const node = {
 
-  saveDB();
+    id:makeId(),
+
+    type,
+    value,
+    note,
+
+    x,
+    y,
+
+    createdAt:Date.now()
+
+  };
+
+  nodes.push(
+    node
+  );
+
+  /*
+    Every new node after the first one
+    automatically connects to the closest
+    existing node.
+  */
+  if(nodes.length > 1){
+
+    const candidates =
+      nodes.filter(
+        n =>
+          n.id !== node.id
+      );
+
+    const nearest =
+      findNearestNode(
+        node,
+        candidates
+      );
+
+    if(nearest){
+
+      addLink(
+        nearest.id,
+        node.id
+      );
+
+    }
+
+  }
+
+  closeModal(
+    "nodeModal"
+  );
 
   saveCurrentProject();
 
   renderNodes();
-
   renderLines();
 
-  closeNodeModal();
-
-
   toast(
-    "NODE SAVED"
+    "Node created."
   );
+
 }
 
 
-/* ==========================================================
-   GRAPH
-========================================================== */
+function findNearestNode(
+  node,
+  candidates
+){
 
-const graph =
-  $("graph");
+  let nearest = null;
 
+  let shortest =
+    Infinity;
 
-const world =
-  $("world");
+  candidates.forEach(
+    other=>{
 
+      const dx =
+        Number(node.x) -
+        Number(other.x);
 
-let zoom=1;
+      const dy =
+        Number(node.y) -
+        Number(other.y);
 
-let panX=0;
+      const distance =
+        Math.sqrt(
+          dx * dx +
+          dy * dy
+        );
 
-let panY=0;
+      if(
+        distance < shortest
+      ){
 
-let draggingNode=null;
+        shortest =
+          distance;
 
-let dragOffsetX=0;
+        nearest =
+          other;
 
-let dragOffsetY=0;
+      }
 
-let panning=false;
+    }
+  );
 
-let panStartX=0;
+  return nearest;
 
-let panStartY=0;
-
-let linkSource=null;
-
-
-function applyWorld(){
-
-  world.style.transform =
-    `
-      translate(
-        calc(-50% + ${panX}px),
-        calc(-50% + ${panY}px)
-      )
-      scale(${zoom})
-    `;
 }
 
 
-function getGraphCenter(){
+function getNode(id){
 
-  return {
+  return nodes.find(
+    n =>
+      n.id === id
+  );
 
-    x:
-      -panX/zoom,
-
-    y:
-      -panY/zoom
-
-  };
 }
 
 
-/* ==========================================================
+function addLink(
+  source,
+  target
+){
+
+  if(
+    source === target
+  ){
+    return;
+  }
+
+  const exists =
+    links.some(
+      link =>
+        (
+          link.source === source &&
+          link.target === target
+        ) ||
+        (
+          link.source === target &&
+          link.target === source
+        )
+    );
+
+  if(exists){
+    return;
+  }
+
+  links.push({
+
+    id:makeId(),
+
+    source,
+    target
+
+  });
+
+}
+
+
+function removeNode(id){
+
+  nodes =
+    nodes.filter(
+      node =>
+        node.id !== id
+    );
+
+  links =
+    links.filter(
+      link =>
+        link.source !== id &&
+        link.target !== id
+    );
+
+  if(
+    selectedNode === id
+  ){
+    selectedNode = null;
+  }
+
+  saveCurrentProject();
+
+  renderNodes();
+  renderLines();
+
+}
+
+
+function editNode(node){
+
+  const value =
+    prompt(
+      "Edit node value:",
+      node.value
+    );
+
+  if(value === null){
+    return;
+  }
+
+  const clean =
+    value.trim();
+
+  if(!clean){
+    return;
+  }
+
+  node.value =
+    clean;
+
+  saveCurrentProject();
+
+  renderNodes();
+  renderLines();
+
+}
+
+
+/* =========================================================
    RENDER NODES
-========================================================== */
+========================================================= */
 
 function renderNodes(){
+
+  const world =
+    $("world");
 
   world
     .querySelectorAll(
@@ -4548,11 +2682,7 @@ function renderNodes(){
         el.remove()
     );
 
-
-  Object.values(
-    db.nodes
-  )
-  .forEach(
+  nodes.forEach(
     node=>{
 
       const el =
@@ -4560,624 +2690,297 @@ function renderNodes(){
           "div"
         );
 
-
       el.className =
-        "node";
-
+        "node" +
+        (
+          selectedNode === node.id
+            ? " selected"
+            : ""
+        );
 
       el.dataset.id =
         node.id;
 
-
+      /*
+        IMPORTANT:
+        Node coordinates are in exactly
+        the same 10000x10000 world as SVG.
+      */
       el.style.left =
-        (
-          node.x+5000
-        )+"px";
-
+        `${node.x + 5000}px`;
 
       el.style.top =
-        (
-          node.y+5000
-        )+"px";
-
+        `${node.y + 5000}px`;
 
       el.innerHTML = `
 
-        <button
-          class="node-delete"
-          title="Delete"
-        >
-          ×
-        </button>
+        <div class="node-title">
+          ${escapeHtml(node.type)}
+        </div>
+
+        <div class="node-value">
+          ${escapeHtml(node.value)}
+        </div>
+
+        ${
+          node.note
+            ? `
+              <div
+                class="node-value"
+                style="
+                  margin-top:5px;
+                  color:#666;
+                "
+              >
+                ${escapeHtml(node.note)}
+              </div>
+            `
+            : ""
+        }
 
         <div class="node-type">
-          ${escapeHTML(
-            node.type ||
-            "UNKNOWN"
-          )}
+          NODE
         </div>
-
-        <div class="node-title">
-          ${escapeHTML(
-            node.title
-          )}
-        </div>
-
-        <div class="node-content">
-          ${escapeHTML(
-            node.content
-          )}
-        </div>
-
-        <div
-          class="node-dot"
-          title="Link"
-        ></div>
 
       `;
 
+      el.addEventListener(
+        "click",
+        event=>{
 
-      world.appendChild(
-        el
+          event.stopPropagation();
+
+          selectedNode =
+            node.id;
+
+          renderNodes();
+          renderLines();
+
+        }
       );
-
-
-      const deleteBtn =
-        el.querySelector(
-          ".node-delete"
-        );
-
-
-      deleteBtn.onclick =
-        event=>{
-
-          event.stopPropagation();
-
-          deleteNode(
-            node.id
-          );
-        };
-
-
-      const dot =
-        el.querySelector(
-          ".node-dot"
-        );
-
-
-      dot.onclick =
-        event=>{
-
-          event.stopPropagation();
-
-          handleLinkDot(
-            node.id
-          );
-        };
-
 
       el.addEventListener(
         "dblclick",
         event=>{
 
-          if(
-            event.target.closest(
-              ".node-delete"
-            ) ||
-            event.target.closest(
-              ".node-dot"
-            )
-          )
-            return;
+          event.stopPropagation();
 
+          editNode(node);
 
-          openNodeModal(
-            node.id
-          );
         }
       );
-
 
       el.addEventListener(
-        "pointerdown",
+        "contextmenu",
         event=>{
 
+          event.preventDefault();
+          event.stopPropagation();
+
           if(
-            event.target.closest(
-              ".node-delete"
-            ) ||
-            event.target.closest(
-              ".node-dot"
+            confirm(
+              "Delete this node?"
             )
-          )
-            return;
+          ){
 
+            removeNode(
+              node.id
+            );
 
-          startNodeDrag(
-            event,
-            node
-          );
+          }
+
         }
+      );
+
+      world.appendChild(
+        el
       );
 
     }
   );
 
+  updateProfileUI();
 
-  renderLines();
 }
 
 
-/* ==========================================================
-   DRAG
-========================================================== */
+/* =========================================================
+   FIXED LINE ENGINE
+========================================================= */
 
-function startNodeDrag(
-  event,
-  node
+function getCenterPoint(node){
+
+  return {
+
+    x:
+      Number(node.x) +
+      5000,
+
+    y:
+      Number(node.y) +
+      5000
+
+  };
+
+}
+
+
+function buildCurvePath(
+  a,
+  b
 ){
 
-  event.preventDefault();
+  const p1 =
+    getCenterPoint(a);
 
+  const p2 =
+    getCenterPoint(b);
 
-  draggingNode =
-    node;
+  const dx =
+    p2.x - p1.x;
 
+  const dy =
+    p2.y - p1.y;
 
-  node._dragging =
-    true;
-
-
-  const rect =
-    graph.getBoundingClientRect();
-
-
-  const graphX =
-    (
-      event.clientX -
-      rect.left -
-      rect.width/2 -
-      panX
-    )/zoom;
-
-
-  const graphY =
-    (
-      event.clientY -
-      rect.top -
-      rect.height/2 -
-      panY
-    )/zoom;
-
-
-  dragOffsetX =
-    node.x -
-    graphX;
-
-
-  dragOffsetY =
-    node.y -
-    graphY;
-
-
-  const el =
-    world.querySelector(
-      `[data-id="${node.id}"]`
+  /*
+    Curvature is based on horizontal
+    distance, but also works for
+    vertical / diagonal nodes.
+  */
+  const distance =
+    Math.sqrt(
+      dx * dx +
+      dy * dy
     );
 
-
-  if(el){
-
-    el.classList.add(
-      "dragging"
-    );
-  }
-
-
-  window.addEventListener(
-    "pointermove",
-    moveNode
-  );
-
-
-  window.addEventListener(
-    "pointerup",
-    stopNodeDrag,
-    {
-      once:true
-    }
-  );
-}
-
-
-function moveNode(event){
-
-  if(!draggingNode)
-    return;
-
-
-  const rect =
-    graph.getBoundingClientRect();
-
-
-  const graphX =
-    (
-      event.clientX -
-      rect.left -
-      rect.width/2 -
-      panX
-    )/zoom;
-
-
-  const graphY =
-    (
-      event.clientY -
-      rect.top -
-      rect.height/2 -
-      panY
-    )/zoom;
-
-
-  draggingNode.x =
-    graphX +
-    dragOffsetX;
-
-
-  draggingNode.y =
-    graphY +
-    dragOffsetY;
-
-
-  const el =
-    world.querySelector(
-      `[data-id="${draggingNode.id}"]`
+  const curve =
+    Math.max(
+      70,
+      Math.min(
+        260,
+        distance * .35
+      )
     );
 
-
-  if(el){
-
-    el.style.left =
-      (
-        draggingNode.x+
-        5000
-      )+"px";
-
-
-    el.style.top =
-      (
-        draggingNode.y+
-        5000
-      )+"px";
-  }
-
-
-  renderLines();
-}
-
-
-function stopNodeDrag(){
-
-  if(!draggingNode)
-    return;
-
-
-  const el =
-    world.querySelector(
-      `[data-id="${draggingNode.id}"]`
-    );
-
-
-  if(el){
-
-    el.classList.remove(
-      "dragging"
-    );
-  }
-
-
-  draggingNode._dragging =
-    false;
-
-
-  draggingNode=null;
-
-
-  window.removeEventListener(
-    "pointermove",
-    moveNode
-  );
-
-
-  saveDB();
-
-  saveCurrentProject();
-
-  renderLines();
-}
-
-
-/* ==========================================================
-   DELETE NODE
-========================================================== */
-
-function deleteNode(id){
-
-  const node =
-    db.nodes[id];
-
-
-  if(!node)
-    return;
-
+  let c1x;
+  let c1y;
+  let c2x;
+  let c2y;
 
   if(
-    !confirm(
-      `DELETE NODE "${node.title}"?`
-    )
-  )
-    return;
-
-
-  delete db.nodes[id];
-
-
-  db.links =
-    db.links.filter(
-      link =>
-        link.a !== id &&
-        link.b !== id
-    );
-
-
-  saveDB();
-
-  saveCurrentProject();
-
-  renderNodes();
-
-  renderLines();
-
-
-  toast(
-    "NODE DELETED"
-  );
-}
-
-
-/* ==========================================================
-   LINK
-========================================================== */
-
-function handleLinkDot(id){
-
-  if(!linkSource){
-
-    linkSource =
-      id;
-
-
-    highlightNode(
-      id
-    );
-
-
-    toast(
-      "SELECT ANOTHER NODE"
-    );
-
-
-    return;
-  }
-
-
-  if(
-    linkSource ===
-    id
+    Math.abs(dx) >=
+    Math.abs(dy)
   ){
 
-    linkSource=null;
+    const direction =
+      dx >= 0
+        ? 1
+        : -1;
 
-    clearHighlights();
+    c1x =
+      p1.x +
+      curve *
+      direction;
 
-    return;
+    c1y =
+      p1.y;
+
+    c2x =
+      p2.x -
+      curve *
+      direction;
+
+    c2y =
+      p2.y;
+
+  }else{
+
+    const direction =
+      dy >= 0
+        ? 1
+        : -1;
+
+    c1x =
+      p1.x;
+
+    c1y =
+      p1.y +
+      curve *
+      direction;
+
+    c2x =
+      p2.x;
+
+    c2y =
+      p2.y -
+      curve *
+      direction;
+
   }
 
+  return `
+    M ${p1.x} ${p1.y}
+    C
+      ${c1x} ${c1y},
+      ${c2x} ${c2y},
+      ${p2.x} ${p2.y}
+  `;
 
-  const exists =
-    db.links.some(
-      link =>
-        (
-          link.a ===
-            linkSource &&
-          link.b ===
-            id
-        ) ||
-        (
-          link.a ===
-            id &&
-          link.b ===
-            linkSource
-        )
-    );
-
-
-  if(!exists){
-
-    db.links.push({
-
-      a:
-        linkSource,
-
-      b:
-        id
-
-    });
-
-
-    saveDB();
-
-    saveCurrentProject();
-
-    renderLines();
-
-
-    toast(
-      "NODES LINKED"
-    );
-  }
-
-
-  linkSource=null;
-
-  clearHighlights();
 }
 
-
-function highlightNode(id){
-
-  clearHighlights();
-
-
-  const el =
-    world.querySelector(
-      `[data-id="${id}"]`
-    );
-
-
-  if(el){
-
-    el.classList.add(
-      "highlight"
-    );
-  }
-}
-
-
-function clearHighlights(){
-
-  world
-    .querySelectorAll(
-      ".node.highlight"
-    )
-    .forEach(
-      el =>
-        el.classList.remove(
-          "highlight"
-        )
-    );
-}
-
-
-/* ==========================================================
-   LINES
-========================================================== */
 
 function renderLines(){
 
   const svg =
     $("lines");
 
-
-  if(!svg)
+  if(!svg){
     return;
+  }
 
+  /*
+    Completely rebuild SVG every time.
+    This prevents stale paths.
+  */
+  svg.innerHTML = "";
 
-  svg.innerHTML =
-    "";
+  /*
+    Force the exact coordinate system.
+  */
+  svg.setAttribute(
+    "viewBox",
+    "0 0 10000 10000"
+  );
 
+  svg.setAttribute(
+    "width",
+    "10000"
+  );
 
-  db.links.forEach(
-    (
-      link,
-      index
-    )=>{
+  svg.setAttribute(
+    "height",
+    "10000"
+  );
 
-      const a =
-        db.nodes[
-          link.a
-        ];
+  links.forEach(
+    link=>{
 
-
-      const b =
-        db.nodes[
-          link.b
-        ];
-
-
-      if(!a || !b)
-        return;
-
-
-      const ax =
-        a.x+5000;
-
-
-      const ay =
-        a.y+5000;
-
-
-      const bx =
-        b.x+5000;
-
-
-      const by =
-        b.y+5000;
-
-
-      const dx =
-        bx-ax;
-
-
-      const dy =
-        by-ay;
-
-
-      const length =
-        Math.sqrt(
-          dx*dx+
-          dy*dy
+      const source =
+        getNode(
+          link.source
         );
 
-
-      if(!length)
-        return;
-
-
-      const nx =
-        -dy/length;
-
-
-      const ny =
-        dx/length;
-
-
-      const bend =
-        Math.min(
-          55,
-          Math.max(
-            20,
-            length*.1
-          )
+      const target =
+        getNode(
+          link.target
         );
 
-
-      const mx =
-        (ax+bx)/2;
-
-
-      const my =
-        (ay+by)/2;
-
-
-      const cx =
-        mx+
-        nx*bend;
-
-
-      const cy =
-        my+
-        ny*bend;
-
+      if(
+        !source ||
+        !target
+      ){
+        return;
+      }
 
       const path =
         document.createElementNS(
@@ -5185,357 +2988,1063 @@ function renderLines(){
           "path"
         );
 
-
       path.setAttribute(
         "d",
-        `
-          M ${ax} ${ay}
-          Q ${cx} ${cy}
-            ${bx} ${by}
-        `
+        buildCurvePath(
+          source,
+          target
+        )
       );
-
 
       path.setAttribute(
         "fill",
         "none"
       );
 
-
       path.setAttribute(
-        "stroke",
-        "rgba(255,255,255,.30)"
-      );
-
-
-      path.setAttribute(
-        "stroke-width",
-        "1.5"
-      );
-
-
-      path.setAttribute(
-        "stroke-dasharray",
-        "5 7"
-      );
-
-
-      path.classList.add(
-        "graph-line",
-        "graph-line-flow"
-      );
-
-
-      path.style.animationDelay =
+        "class",
+        "edge" +
         (
-          index*.035
-        )+"s";
-
+          selectedNode &&
+          (
+            source.id === selectedNode ||
+            target.id === selectedNode
+          )
+            ? " active"
+            : ""
+        )
+      );
 
       svg.appendChild(
         path
       );
+
     }
   );
+
 }
 
 
-/* ==========================================================
-   GRAPH ANIMATION
-========================================================== */
+/* =========================================================
+   PHONE LAYOUT
+========================================================= */
 
-function animateNewGraph(
-  rootId
+function layoutPhoneData(
+  root,
+  metadata
 ){
 
-  const nodes =
-    Array.from(
-      world.querySelectorAll(
-        ".node"
-      )
+  const valid =
+    metadata.filter(
+      item =>
+        item &&
+        item.value !== undefined &&
+        item.value !== null &&
+        String(
+          item.value
+        ).trim() !== ""
     );
 
+  const perColumn = 5;
 
-  nodes.forEach(
-    (
-      el,
-      index
-    )=>{
+  const columnGap = 420;
 
-      el.style.opacity =
-        "0";
+  const rowGap = 125;
 
+  /*
+    Root stays in center.
+  */
+  root.x = 0;
+  root.y = 0;
 
-      el.style.transform =
-        "translate(-50%,-50%) scale(.82)";
+  valid.forEach(
+    (item,index)=>{
 
+      const column =
+        Math.floor(
+          index /
+          perColumn
+        );
 
-      el.style.transition =
-        `
-          opacity .45s ease,
-          transform .55s cubic-bezier(.2,.8,.2,1)
-        `;
+      const row =
+        index %
+        perColumn;
 
+      const columnItems =
+        Math.min(
+          perColumn,
+          valid.length -
+          column *
+          perColumn
+        );
 
-      setTimeout(
-        ()=>{
+      const y =
+        (
+          row -
+          (columnItems - 1) / 2
+        ) *
+        rowGap;
 
-          el.style.opacity =
-            "1";
+      let existing =
+        nodes.find(
+          n =>
+            n.type === item.type &&
+            n.value ===
+              String(item.value)
+        );
 
+      if(!existing){
 
-          el.style.transform =
-            "translate(-50%,-50%) scale(1)";
+        existing = {
 
-        },
-        80+
-        index*45
-      );
+          id:makeId(),
+
+          type:
+            item.type ||
+            "DATA",
+
+          value:
+            String(
+              item.value
+            ),
+
+          note:
+            item.note ||
+            "",
+
+          x:
+            (column + 1) *
+            columnGap,
+
+          y,
+
+          createdAt:
+            Date.now()
+
+        };
+
+        nodes.push(
+          existing
+        );
+
+      }else{
+
+        existing.x =
+          (column + 1) *
+          columnGap;
+
+        existing.y =
+          y;
+
+      }
+
+      /*
+        Root -> first column
+        Later columns -> nearest node
+        from previous column.
+      */
+      const previousCandidates =
+        nodes.filter(
+          n =>
+            n.id !== existing.id &&
+            Number(n.x) <
+              Number(existing.x)
+        );
+
+      if(
+        previousCandidates.length
+      ){
+
+        const nearest =
+          findNearestNode(
+            existing,
+            previousCandidates
+          );
+
+        if(nearest){
+
+          addLink(
+            nearest.id,
+            existing.id
+          );
+
+        }
+
+      }
+
     }
   );
 
-
-  setTimeout(
-    renderLines,
-    300
-  );
 }
 
 
-/* ==========================================================
-   PAN / ZOOM
-========================================================== */
+/* =========================================================
+   TOOL MODAL
+========================================================= */
 
-graph.addEventListener(
-  "pointerdown",
-  event=>{
+function openTool(type){
 
-    if(
-      event.target.closest(
-        ".node"
-      )
-    )
-      return;
+  activeTool =
+    type;
+
+  $("toolInput").value =
+    "";
+
+  $("toolResult").style.display =
+    "none";
+
+  $("toolResult").textContent =
+    "";
+
+  if(
+    type === "phone"
+  ){
+
+    $("toolTitle").textContent =
+      "CHECK NUMBER";
+
+    $("toolLabel").textContent =
+      "PHONE NUMBER";
+
+    $("toolInput").placeholder =
+      "+374...";
+
+  }
+
+  if(
+    type === "address"
+  ){
+
+    $("toolTitle").textContent =
+      "CHECK ADDRESS";
+
+    $("toolLabel").textContent =
+      "ADDRESS";
+
+    $("toolInput").placeholder =
+      "Yerevan, Armenia...";
+
+  }
+
+  openModal(
+    "toolModal"
+  );
+
+  setTimeout(
+    ()=>{
+      $("toolInput").focus();
+    },
+    50
+  );
+
+}
 
 
-    panning=true;
+/* =========================================================
+   RUN TOOL
+========================================================= */
 
+async function runTool(){
 
-    panStartX =
-      event.clientX-
-      panX;
+  const value =
+    $("toolInput")
+      .value
+      .trim();
 
+  if(!value){
 
-    panStartY =
-      event.clientY-
-      panY;
-
-
-    graph.setPointerCapture(
-      event.pointerId
+    toast(
+      "Enter a value."
     );
+
+    return;
+
   }
-);
 
+  const result =
+    $("toolResult");
 
-graph.addEventListener(
-  "pointermove",
-  event=>{
+  result.style.display =
+    "block";
 
-    if(!panning)
-      return;
+  result.textContent =
+    "PROCESSING...";
 
+  if(
+    activeTool === "phone"
+  ){
 
-    panX =
-      event.clientX-
-      panStartX;
+    try{
 
+      const body =
+        new URLSearchParams();
 
-    panY =
-      event.clientY-
-      panStartY;
-
-
-    applyWorld();
-
-    renderLines();
-  }
-);
-
-
-graph.addEventListener(
-  "pointerup",
-  ()=>{
-    panning=false;
-
-    saveDB();
-
-    saveCurrentProject();
-  }
-);
-
-
-graph.addEventListener(
-  "wheel",
-  event=>{
-
-    event.preventDefault();
-
-
-    const oldZoom =
-      zoom;
-
-
-    zoom +=
-      event.deltaY < 0
-        ? .08
-        : -.08;
-
-
-    zoom =
-      Math.max(
-        .35,
-        Math.min(
-          2.5,
-          zoom
-        )
+      body.append(
+        "phone",
+        value
       );
 
+      const response =
+        await fetch(
+          "/api/osint/phone",
+          {
+            method:"POST",
 
-    if(
-      oldZoom !==
-      zoom
-    ){
+            headers:{
+              "Content-Type":
+                "application/x-www-form-urlencoded"
+            },
 
-      applyWorld();
+            body
+          }
+        );
 
-      renderLines();
+      const data =
+        await response.json();
+
+      if(!response.ok){
+
+        result.textContent =
+          data.detail ||
+          "Phone lookup failed.";
+
+        return;
+
+      }
+
+      result.textContent =
+        JSON.stringify(
+          data,
+          null,
+          2
+        );
+
+      addPhoneResultToGraph(
+        value,
+        data
+      );
+
+    }catch(error){
+
+      console.error(error);
+
+      result.textContent =
+        "REQUEST ERROR\n\n" +
+        error.message;
+
     }
 
-  },
-  {
-    passive:false
+    return;
+
   }
-);
+
+
+  if(
+    activeTool === "address"
+  ){
+
+    try{
+
+      const response =
+        await fetch(
+          "/api/map/search?q=" +
+          encodeURIComponent(
+            value
+          )
+        );
+
+      const data =
+        await response.json();
+
+      if(!response.ok){
+
+        result.textContent =
+          data.detail ||
+          "Address lookup failed.";
+
+        return;
+
+      }
+
+      result.textContent =
+        JSON.stringify(
+          data,
+          null,
+          2
+        );
+
+      addAddressResultToGraph(
+        value,
+        data
+      );
+
+    }catch(error){
+
+      console.error(error);
+
+      result.textContent =
+        "REQUEST ERROR\n\n" +
+        error.message;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   PHONE -> GRAPH
+========================================================= */
+
+function addPhoneResultToGraph(
+  phone,
+  data
+){
+
+  let root =
+    nodes.find(
+      node =>
+        node.type === "PHONE" &&
+        node.value === phone
+    );
+
+  if(!root){
+
+    root = {
+
+      id:makeId(),
+
+      type:"PHONE",
+
+      value:phone,
+
+      note:"Phone lookup",
+
+      x:0,
+      y:0,
+
+      createdAt:
+        Date.now()
+
+    };
+
+    nodes.push(
+      root
+    );
+
+  }
+
+  const metadata = [];
+
+  function collect(
+    object,
+    prefix=""
+  ){
+
+    if(
+      object === null ||
+      object === undefined
+    ){
+      return;
+    }
+
+    if(
+      typeof object !== "object"
+    ){
+
+      metadata.push({
+
+        type:
+          prefix
+            .replaceAll(
+              "_",
+              " "
+            )
+            .toUpperCase(),
+
+        value:
+          String(
+            object
+          )
+
+      });
+
+      return;
+
+    }
+
+    if(
+      Array.isArray(object)
+    ){
+
+      object.forEach(
+        (item,index)=>{
+          collect(
+            item,
+            `${prefix}_${index}`
+          );
+        }
+      );
+
+      return;
+
+    }
+
+    Object.entries(
+      object
+    ).forEach(
+      ([key,value])=>{
+
+        collect(
+          value,
+          key
+        );
+
+      }
+    );
+
+  }
+
+  collect(
+    data
+  );
+
+  const unique = [];
+  const seen = new Set();
+
+  metadata.forEach(
+    item=>{
+
+      const key =
+        item.type +
+        "|" +
+        item.value;
+
+      if(
+        seen.has(key)
+      ){
+        return;
+      }
+
+      seen.add(key);
+
+      unique.push(
+        item
+      );
+
+    }
+  );
+
+  layoutPhoneData(
+    root,
+    unique.slice(
+      0,
+      30
+    )
+  );
+
+  saveCurrentProject();
+
+  renderNodes();
+  renderLines();
+
+  toast(
+    "Phone data added."
+  );
+
+}
+
+
+/* =========================================================
+   ADDRESS -> GRAPH
+========================================================= */
+
+function addAddressResultToGraph(
+  address,
+  data
+){
+
+  let root =
+    nodes.find(
+      node =>
+        node.type === "ADDRESS" &&
+        node.value === address
+    );
+
+  if(!root){
+
+    root = {
+
+      id:makeId(),
+
+      type:"ADDRESS",
+
+      value:address,
+
+      note:"Address lookup",
+
+      x:0,
+      y:0,
+
+      createdAt:
+        Date.now()
+
+    };
+
+    nodes.push(
+      root
+    );
+
+  }
+
+  const values = [];
+
+  function add(
+    type,
+    value
+  ){
+
+    if(
+      value === undefined ||
+      value === null
+    ){
+      return;
+    }
+
+    const clean =
+      String(
+        value
+      ).trim();
+
+    if(!clean){
+      return;
+    }
+
+    values.push({
+
+      type,
+      value:clean
+
+    });
+
+  }
+
+  if(
+    Array.isArray(data)
+  ){
+
+    data.forEach(
+      item=>{
+
+        if(
+          !item
+        ){
+          return;
+        }
+
+        add(
+          "RESULT",
+          item.display_name ||
+          item.name ||
+          item.address ||
+          JSON.stringify(item)
+        );
+
+      }
+    );
+
+  }else if(
+    data &&
+    typeof data === "object"
+  ){
+
+    Object.entries(
+      data
+    ).forEach(
+      ([key,value])=>{
+
+        if(
+          typeof value !==
+          "object"
+        ){
+
+          add(
+            key.toUpperCase(),
+            value
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+  values
+    .slice(0,30)
+    .forEach(
+      (item,index)=>{
+
+        const node = {
+
+          id:makeId(),
+
+          type:item.type,
+
+          value:item.value,
+
+          note:
+            "Address lookup result",
+
+          x:420,
+
+          y:
+            (
+              index -
+              (
+                Math.min(
+                  values.length,
+                  30
+                ) - 1
+              ) / 2
+            ) *
+            125,
+
+          createdAt:
+            Date.now()
+
+        };
+
+        nodes.push(
+          node
+        );
+
+        addLink(
+          root.id,
+          node.id
+        );
+
+      }
+    );
+
+  saveCurrentProject();
+
+  renderNodes();
+  renderLines();
+
+  toast(
+    "Address data added."
+  );
+
+}
+
+
+/* =========================================================
+   GRAPH ZOOM / PAN
+========================================================= */
+
+function applyWorld(){
+
+  $("world").style.transform =
+    `
+      translate(
+        calc(-50% + ${graphX}px),
+        calc(-50% + ${graphY}px)
+      )
+      scale(${graphScale})
+    `;
+
+}
 
 
 function centerGraph(){
 
-  zoom=1;
+  graphScale = 1;
 
-  panX=0;
-
-  panY=0;
-
+  graphX = 0;
+  graphY = 0;
 
   applyWorld();
 
-  renderLines();
 }
 
 
-/* ==========================================================
-   SEARCH
-========================================================== */
+function zoomGraph(
+  delta,
+  centerX,
+  centerY
+){
 
-$("chainSearch")
-.addEventListener(
-  "input",
+  const oldScale =
+    graphScale;
+
+  graphScale =
+    Math.max(
+      .35,
+      Math.min(
+        2.5,
+        graphScale +
+        delta
+      )
+    );
+
+  if(
+    centerX !== undefined &&
+    centerY !== undefined
+  ){
+
+    const factor =
+      graphScale /
+      oldScale;
+
+    graphX =
+      centerX -
+      (
+        centerX -
+        graphX
+      ) *
+      factor;
+
+    graphY =
+      centerY -
+      (
+        centerY -
+        graphY
+      ) *
+      factor;
+
+  }
+
+  applyWorld();
+
+}
+
+
+/* =========================================================
+   MOUSE GRAPH
+========================================================= */
+
+$("graph")
+  .addEventListener(
+    "mousedown",
+    event=>{
+
+      if(
+        event.target.closest(
+          ".node"
+        )
+      ){
+        return;
+      }
+
+      draggingGraph =
+        true;
+
+      $("graph")
+        .classList
+        .add("dragging");
+
+      dragStartX =
+        event.clientX;
+
+      dragStartY =
+        event.clientY;
+
+      dragOriginX =
+        graphX;
+
+      dragOriginY =
+        graphY;
+
+    }
+  );
+
+
+window.addEventListener(
+  "mousemove",
   event=>{
 
-    const query =
-      event.target.value
-        .trim()
-        .toLowerCase();
+    if(
+      !draggingGraph
+    ){
+      return;
+    }
 
-
-    world
-      .querySelectorAll(
-        ".node"
-      )
-      .forEach(
-        el=>{
-
-          const id =
-            el.dataset.id;
-
-
-          const node =
-            db.nodes[id];
-
-
-          if(!query){
-
-            el.classList.remove(
-              "highlight"
-            );
-
-            return;
-          }
-
-
-          const text =
-            (
-              node.title+
-              " "+
-              node.type+
-              " "+
-              node.content
-            )
-            .toLowerCase();
-
-
-          el.classList.toggle(
-            "highlight",
-            text.includes(
-              query
-            )
-          );
-        }
+    graphX =
+      dragOriginX +
+      (
+        event.clientX -
+        dragStartX
       );
+
+    graphY =
+      dragOriginY +
+      (
+        event.clientY -
+        dragStartY
+      );
+
+    applyWorld();
+
   }
 );
 
 
-/* ==========================================================
-   SATURN
-========================================================== */
+window.addEventListener(
+  "mouseup",
+  ()=>{
 
-const canvas =
-  $("saturn");
+    draggingGraph =
+      false;
+
+    $("graph")
+      .classList
+      .remove("dragging");
+
+  }
+);
 
 
-const ctx =
-  canvas.getContext(
-    "2d"
+$("graph")
+  .addEventListener(
+    "wheel",
+    event=>{
+
+      event.preventDefault();
+
+      const rect =
+        $("graph")
+          .getBoundingClientRect();
+
+      const cx =
+        event.clientX -
+        rect.left -
+        rect.width / 2;
+
+      const cy =
+        event.clientY -
+        rect.top -
+        rect.height / 2;
+
+      zoomGraph(
+        event.deltaY > 0
+          ? -.08
+          : .08,
+        cx,
+        cy
+      );
+
+    },
+    {
+      passive:false
+    }
   );
 
 
-let particles=[];
+/* =========================================================
+   SEARCH
+========================================================= */
 
-let rotation=0;
+$("chainSearch")
+  .addEventListener(
+    "input",
+    event=>{
 
+      const query =
+        event.target.value
+          .trim()
+          .toLowerCase();
+
+      if(!query){
+
+        selectedNode =
+          null;
+
+        renderNodes();
+        renderLines();
+
+        return;
+
+      }
+
+      const found =
+        nodes.find(
+          node =>
+            String(
+              node.value
+            )
+            .toLowerCase()
+            .includes(query) ||
+
+            String(
+              node.type
+            )
+            .toLowerCase()
+            .includes(query) ||
+
+            String(
+              node.note || ""
+            )
+            .toLowerCase()
+            .includes(query)
+        );
+
+      if(found){
+
+        selectedNode =
+          found.id;
+
+        graphX =
+          -Number(found.x) *
+          graphScale;
+
+        graphY =
+          -Number(found.y) *
+          graphScale;
+
+        applyWorld();
+
+      }
+
+      renderNodes();
+      renderLines();
+
+    }
+  );
+
+
+/* =========================================================
+   SATURN
+========================================================= */
 
 function resizeSaturn(){
 
-  const rect =
-    canvas.getBoundingClientRect();
+  saturnCanvas =
+    $("saturn");
 
+  saturnCtx =
+    saturnCanvas.getContext(
+      "2d"
+    );
+
+  const rect =
+    saturnCanvas
+      .getBoundingClientRect();
 
   const dpr =
     window.devicePixelRatio ||
     1;
 
+  saturnCanvas.width =
+    rect.width *
+    dpr;
 
-  canvas.width =
-    rect.width*dpr;
+  saturnCanvas.height =
+    rect.height *
+    dpr;
 
-
-  canvas.height =
-    rect.height*dpr;
-
-
-  ctx.setTransform(
+  saturnCtx.setTransform(
     dpr,
     0,
     0,
@@ -5544,31 +4053,16 @@ function resizeSaturn(){
     0
   );
 
+  createSaturnParticles();
 
-  createParticles(
-    rect.width,
-    rect.height
-  );
 }
 
 
-function createParticles(
-  width,
-  height
-){
+function createSaturnParticles(){
 
-  particles=[];
+  saturnParticles = [];
 
-
-  const count=1100;
-
-
-  const radius =
-    Math.min(
-      width,
-      height
-    )*.28;
-
+  const count = 1100;
 
   for(
     let i=0;
@@ -5576,219 +4070,331 @@ function createParticles(
     i++
   ){
 
-    const u =
-      Math.random()*2-1;
+    const theta =
+      Math.random() *
+      Math.PI *
+      2;
 
-
-    const angle =
-      Math.random()*
-      Math.PI*2;
-
-
-    const r =
-      Math.sqrt(
-        1-u*u
+    const phi =
+      Math.acos(
+        2 *
+        Math.random() -
+        1
       );
 
+    const radius =
+      150 +
+      (
+        Math.random() -
+        .5
+      ) *
+      14;
 
-    const x =
-      r*
-      Math.cos(angle);
+    saturnParticles.push({
 
-
-    const y=u;
-
-
-    const z =
-      r*
-      Math.sin(angle);
-
-
-    particles.push({
-
-      x,
-      y,
-      z,
+      theta,
+      phi,
+      radius,
 
       size:
-        .45+
-        Math.random()*1.15,
+        Math.random() *
+        1.4 +
+        .25,
 
       alpha:
-        .15+
-        Math.random()*.65
+        Math.random() *
+        .55 +
+        .18
+
     });
+
   }
+
 }
 
 
 function drawSaturn(){
 
-  const width =
-    canvas.clientWidth;
+  if(
+    !saturnCtx ||
+    !saturnCanvas
+  ){
+    return;
+  }
 
+  const rect =
+    saturnCanvas
+      .getBoundingClientRect();
+
+  const width =
+    rect.width;
 
   const height =
-    canvas.clientHeight;
+    rect.height;
 
-
-  ctx.clearRect(
+  saturnCtx.clearRect(
     0,
     0,
     width,
     height
   );
 
-
   const cx =
-    width/2;
-
+    width / 2;
 
   const cy =
-    height/2;
+    height / 2;
 
+  saturnParticles.forEach(
+    particle=>{
 
-  const radius =
-    Math.min(
-      width,
-      height
-    )*.28;
+      const x =
+        particle.radius *
+        Math.sin(
+          particle.phi
+        ) *
+        Math.cos(
+          particle.theta +
+          saturnRotation
+        );
 
+      const y =
+        particle.radius *
+        Math.sin(
+          particle.phi
+        ) *
+        Math.sin(
+          particle.theta +
+          saturnRotation
+        );
 
-  rotation +=
-    .00065;
+      const z =
+        particle.radius *
+        Math.cos(
+          particle.phi
+        );
 
+      const perspective =
+        1 +
+        z / 700;
 
-  for(
-    const p of particles
-  ){
+      const px =
+        cx +
+        x *
+        perspective;
 
-    const c =
-      Math.cos(
-        rotation
+      const py =
+        cy +
+        y *
+        perspective;
+
+      const size =
+        particle.size *
+        perspective;
+
+      const alpha =
+        Math.max(
+          .03,
+          particle.alpha *
+          (
+            .65 +
+            z / 400
+          )
+        );
+
+      saturnCtx.beginPath();
+
+      saturnCtx.arc(
+        px,
+        py,
+        size,
+        0,
+        Math.PI * 2
       );
 
+      saturnCtx.fillStyle =
+        `rgba(255,255,255,${alpha})`;
 
-    const s =
-      Math.sin(
-        rotation
-      );
+      saturnCtx.fill();
 
-
-    const x =
-      p.x*c-
-      p.z*s;
-
-
-    const z =
-      p.x*s+
-      p.z*c;
-
-
-    const scale =
-      .55+
-      (z+1)*.23;
-
-
-    const px =
-      cx+
-      x*
-      radius*
-      scale;
-
-
-    const py =
-      cy+
-      p.y*
-      radius*
-      scale;
-
-
-    const alpha =
-      Math.max(
-        .04,
-        p.alpha*
-        (
-          .45+
-          (z+1)*.28
-        )
-      );
-
-
-    ctx.beginPath();
-
-
-    ctx.arc(
-      px,
-      py,
-      p.size*
-      scale,
-      0,
-      Math.PI*2
-    );
-
-
-    ctx.fillStyle =
-      `rgba(255,255,255,${alpha})`;
-
-
-    ctx.fill();
-  }
-
-
-  requestAnimationFrame(
-    drawSaturn
+    }
   );
+
 }
 
 
-window.addEventListener(
-  "resize",
-  resizeSaturn
-);
+function animateSaturn(){
 
+  saturnRotation +=
+    .00065;
 
-/* ==========================================================
-   SATURN RING
-========================================================== */
+  drawSaturn();
 
-let ringTime=0;
+  requestAnimationFrame(
+    animateSaturn
+  );
+
+}
 
 
 function animateRing(){
 
-  ringTime +=
-    .016;
+  const ring =
+    $("saturnRing");
 
+  if(!ring){
+    return;
+  }
 
-  const degrees =
-    (
-      ringTime*.75
-    )%360;
+  ringRotation +=
+    .055;
 
-
-  $("saturnRing")
-    .style.transform =
-      `
-        translate(-50%,-50%)
-        rotateX(67deg)
-        rotateZ(
-          ${-15+degrees}deg
-        )
-      `;
-
+  ring.style.transform =
+    `
+      translate(-50%,-50%)
+      rotateX(67deg)
+      rotateZ(${ringRotation}deg)
+    `;
 
   requestAnimationFrame(
     animateRing
   );
+
 }
 
 
-/* ==========================================================
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+window.addEventListener(
+  "keydown",
+  event=>{
+
+    if(
+      event.key ===
+      "Escape"
+    ){
+
+      document
+        .querySelectorAll(
+          ".modal-backdrop"
+        )
+        .forEach(
+          modal =>
+            modal.classList.remove(
+              "open"
+            )
+        );
+
+    }
+
+    if(
+      event.key ===
+      "Delete" &&
+      selectedNode
+    ){
+
+      removeNode(
+        selectedNode
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   MODAL OUTSIDE CLICK
+========================================================= */
+
+document
+  .querySelectorAll(
+    ".modal-backdrop"
+  )
+  .forEach(
+    backdrop=>{
+
+      backdrop.addEventListener(
+        "click",
+        event=>{
+
+          if(
+            event.target ===
+            backdrop
+          ){
+
+            backdrop.classList.remove(
+              "open"
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   AUTOSAVE
+========================================================= */
+
+setInterval(
+  ()=>{
+    saveCurrentProject();
+  },
+  3000
+);
+
+
+/* =========================================================
    INIT
-========================================================== */
+========================================================= */
+
+function initBoot(){
+  /* CSS controls intro */
+}
+
 
 function init(){
+
+  loadDB();
+
+  const projects =
+    getProjects();
+
+  if(
+    !projects[currentProject]
+  ){
+
+    projects[currentProject] = {
+
+      nodes:
+        JSON.parse(
+          JSON.stringify(nodes)
+        ),
+
+      links:
+        JSON.parse(
+          JSON.stringify(links)
+        ),
+
+      createdAt:
+        Date.now(),
+
+      updatedAt:
+        Date.now()
+
+    };
+
+    saveProjects(
+      projects
+    );
+
+  }
 
   updateProfileUI();
 
@@ -5802,10 +4408,22 @@ function init(){
 
   drawSaturn();
 
+  animateSaturn();
+
   animateRing();
 
   initBoot();
+
 }
+
+
+window.addEventListener(
+  "resize",
+  ()=>{
+    resizeSaturn();
+    renderLines();
+  }
+);
 
 
 init();
