@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-
 <title>NZX OSINT TOOL</title>
 
 <style>
@@ -23,8 +22,7 @@
   -webkit-tap-highlight-color:transparent;
 }
 
-html,
-body{
+html,body{
   width:100%;
   height:100%;
   margin:0;
@@ -34,9 +32,7 @@ body{
   font-family:Inter,Arial,Helvetica,sans-serif;
 }
 
-button,
-input,
-textarea{
+button,input,textarea{
   font:inherit;
   outline:none;
 }
@@ -45,214 +41,136 @@ button{
   color:#fff;
 }
 
-/* =========================================================
-   INTRO
-========================================================= */
+/* ================= INTRO ================= */
 
 #bootScreen{
   position:fixed;
   inset:0;
   z-index:999999;
-
   background:#000;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   overflow:hidden;
 }
 
 .intro-wrap{
   width:min(950px,92vw);
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   gap:38px;
 }
 
 .intro-image{
   width:330px;
   max-width:42vw;
-
   height:auto;
-
   display:block;
-
   opacity:0;
   visibility:hidden;
-
   animation:introAppear .01s steps(1,end) forwards;
   animation-delay:.15s;
 }
 
 @keyframes introAppear{
-  from{
-    opacity:0;
-    visibility:hidden;
-  }
-  to{
-    opacity:1;
-    visibility:visible;
-  }
+  from{opacity:0;visibility:hidden}
+  to{opacity:1;visibility:visible}
 }
 
 .intro-text{
   min-width:330px;
-
   display:flex;
   flex-direction:column;
-
   gap:10px;
 }
 
 .intro-line{
   color:#fff;
-
-  font-family:
-    "Courier New",
-    monospace;
-
+  font-family:"Courier New",monospace;
   font-size:11px;
   font-weight:700;
-
   letter-spacing:.16em;
-
   white-space:nowrap;
-
   opacity:0;
   visibility:hidden;
 }
 
-.intro-line:nth-child(1){
-  animation:introLine .01s steps(1,end) forwards;
-  animation-delay:.55s;
-}
-
-.intro-line:nth-child(2){
-  animation:introLine .01s steps(1,end) forwards;
-  animation-delay:.85s;
-}
-
-.intro-line:nth-child(3){
-  animation:introLine .01s steps(1,end) forwards;
-  animation-delay:1.15s;
-}
-
-.intro-line:nth-child(4){
-  animation:introLine .01s steps(1,end) forwards;
-  animation-delay:1.45s;
-}
-
-.intro-line:nth-child(5){
-  animation:introLine .01s steps(1,end) forwards;
-  animation-delay:1.75s;
-}
-
-.intro-line:nth-child(6){
-  animation:introLine .01s steps(1,end) forwards;
-  animation-delay:2.05s;
-}
+.intro-line:nth-child(1){animation:introLine .01s steps(1,end) forwards;animation-delay:.55s}
+.intro-line:nth-child(2){animation:introLine .01s steps(1,end) forwards;animation-delay:.85s}
+.intro-line:nth-child(3){animation:introLine .01s steps(1,end) forwards;animation-delay:1.15s}
+.intro-line:nth-child(4){animation:introLine .01s steps(1,end) forwards;animation-delay:1.45s}
+.intro-line:nth-child(5){animation:introLine .01s steps(1,end) forwards;animation-delay:1.75s}
+.intro-line:nth-child(6){animation:introLine .01s steps(1,end) forwards;animation-delay:2.05s}
 
 @keyframes introLine{
-  from{
-    opacity:0;
-    visibility:hidden;
-  }
-  to{
-    opacity:1;
-    visibility:visible;
-  }
+  from{opacity:0;visibility:hidden}
+  to{opacity:1;visibility:visible}
 }
 
-/* =========================================================
-   APP INTRO ENTER ANIMATION
-========================================================= */
+/* ================= APP ================= */
 
 #app{
   width:100%;
   height:100%;
-
   position:relative;
-
   background:
-    radial-gradient(
-      circle at 50% 50%,
-      rgba(255,255,255,.025),
-      transparent 35%
-    ),
+    radial-gradient(circle at 50% 50%,rgba(255,255,255,.025),transparent 35%),
     #050505;
-
   opacity:0;
   visibility:hidden;
 }
 
 #app.app-ready{
   visibility:visible;
-  animation:appAppear .8s ease-out forwards;
+  animation:appAppear .8s cubic-bezier(.16,1,.3,1) forwards;
 }
 
 @keyframes appAppear{
   from{
     opacity:0;
+    transform:translateY(8px) scale(.992);
   }
-
   to{
     opacity:1;
+    transform:translateY(0) scale(1);
   }
 }
 
-/* =========================================================
-   TOPBAR
-========================================================= */
+/* ================= TOPBAR ================= */
 
 .topbar{
   position:absolute;
-
   left:0;
   right:0;
   top:0;
-
   height:68px;
-
   z-index:100;
-
   display:flex;
   align-items:center;
-
   padding:0 18px;
-
   background:rgba(5,5,5,.84);
-
   backdrop-filter:blur(14px);
-
   border-bottom:1px solid var(--line);
 }
 
 .logo{
   width:38px;
   height:38px;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   border:1px solid rgba(255,255,255,.3);
-
+  border-radius:10px;
   background:#0b0b0b;
-
   font-weight:900;
   font-size:19px;
-
   margin-right:11px;
 }
 
 .brand{
   display:flex;
   flex-direction:column;
-
   gap:2px;
 }
 
@@ -269,36 +187,25 @@ button{
 
 .top-tools{
   margin-left:auto;
-
   display:flex;
   align-items:center;
-
   gap:8px;
 }
 
-.top-btn,
-.btn{
+.top-btn,.btn{
   height:34px;
-
   padding:0 13px;
-
   background:#090909;
-
   border:1px solid var(--line2);
-
+  border-radius:9px;
   color:#ddd;
-
   cursor:pointer;
-
   font-size:9px;
-
   letter-spacing:.12em;
-
   transition:.15s;
 }
 
-.top-btn:hover,
-.btn:hover{
+.top-btn:hover,.btn:hover{
   background:#171717;
   border-color:#555;
   color:#fff;
@@ -307,89 +214,64 @@ button{
 .profile-mini{
   width:34px;
   height:34px;
-
   margin-left:8px;
-
   padding:0;
-
   overflow:hidden;
-
   cursor:pointer;
-
   background:#0b0b0b;
-
   border:1px solid var(--line2);
+  border-radius:10px;
 }
 
 .profile-mini img{
   width:100%;
   height:100%;
-
   object-fit:cover;
 }
 
-/* =========================================================
-   SIDEBAR
-========================================================= */
+/* ================= SIDEBAR ================= */
 
 .sidebar{
   position:absolute;
-
   z-index:90;
-
   left:0;
   top:68px;
   bottom:0;
-
   width:58px;
-
   border-right:1px solid var(--line);
-
   background:rgba(6,6,6,.9);
-
   display:flex;
   flex-direction:column;
   align-items:center;
-
   padding-top:14px;
-
   gap:8px;
 }
 
 .side-btn{
   width:38px;
   height:38px;
-
   background:#090909;
-
   border:1px solid var(--line);
-
+  border-radius:10px;
   color:#777;
-
   cursor:pointer;
-
   font-size:18px;
 }
 
-.side-btn:hover,
-.side-btn.active{
+.side-btn:hover,.side-btn.active{
   color:#fff;
   border-color:#555;
   background:#151515;
 }
 
-/* =========================================================
-   PAGES
-========================================================= */
+/* ================= PAGES ================= */
 
 .page{
   position:absolute;
-
   left:58px;
   right:0;
   top:68px;
   bottom:0;
-
   display:none;
 }
 
@@ -397,40 +279,25 @@ button{
   display:block;
 }
 
-/* =========================================================
-   GRAPH PAGE
-========================================================= */
+/* ================= GRAPH ================= */
 
 .chain-page{
   background:
-    linear-gradient(
-      rgba(255,255,255,.025) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255,255,255,.025) 1px,
-      transparent 1px
-    ),
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
     #050505;
-
   background-size:50px 50px;
 }
 
 .chain-toolbar{
   position:absolute;
-
   z-index:80;
-
   top:15px;
   left:15px;
   right:15px;
-
   display:flex;
   align-items:center;
-
   gap:7px;
-
   pointer-events:none;
 }
 
@@ -441,15 +308,11 @@ button{
 .chain-search{
   width:230px;
   height:34px;
-
   padding:0 11px;
-
   background:rgba(7,7,7,.92);
-
   border:1px solid var(--line2);
-
+  border-radius:9px;
   color:#fff;
-
   font-size:10px;
 }
 
@@ -457,25 +320,13 @@ button{
   color:#555;
 }
 
-/* =========================================================
-   GRAPH
-========================================================= */
-
 .graph{
   position:absolute;
-
   inset:0;
-
   overflow:hidden;
-
   cursor:grab;
-
   background:
-    radial-gradient(
-      circle at center,
-      rgba(255,255,255,.025),
-      transparent 28%
-    );
+    radial-gradient(circle at center,rgba(255,255,255,.025),transparent 28%);
 }
 
 .graph.dragging{
@@ -484,74 +335,48 @@ button{
 
 .world{
   position:absolute;
-
   left:50%;
   top:50%;
-
   width:10000px;
   height:10000px;
-
-  transform:
-    translate(-50%,-50%)
-    scale(1);
-
+  transform:translate(-50%,-50%) scale(1);
   transform-origin:center;
 }
 
 .lines{
   position:absolute;
-
   left:0;
   top:0;
-
   width:10000px;
   height:10000px;
-
   overflow:visible;
-
   pointer-events:none;
-
   z-index:1;
 }
 
 .node{
   position:absolute;
-
   z-index:5;
-
   width:190px;
   min-height:74px;
-
   transform:translate(-50%,-50%);
-
   background:rgba(9,9,9,.96);
-
   border:1px solid rgba(255,255,255,.18);
-
+  border-radius:14px;
   padding:11px 12px;
-
   cursor:pointer;
-
   user-select:none;
-
-  box-shadow:
-    0 10px 35px rgba(0,0,0,.45);
-
-  transition:
-    border-color .15s,
-    background .15s,
-    box-shadow .15s;
+  box-shadow:0 10px 35px rgba(0,0,0,.45);
+  transition:border-color .15s,background .15s,box-shadow .15s;
 }
 
 .node:hover{
   border-color:rgba(255,255,255,.5);
-
   background:#111;
 }
 
 .node.selected{
   border-color:#fff;
-
   box-shadow:
     0 0 0 1px rgba(255,255,255,.15),
     0 0 35px rgba(255,255,255,.08);
@@ -560,11 +385,8 @@ button{
 .node-title{
   font-size:10px;
   font-weight:800;
-
   letter-spacing:.1em;
-
   margin-bottom:7px;
-
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
@@ -572,90 +394,54 @@ button{
 
 .node-value{
   color:#999;
-
   font-size:10px;
-
   line-height:1.45;
-
   word-break:break-word;
 }
 
 .node-type{
   color:#555;
-
   font-size:7px;
-
   margin-top:7px;
-
   text-transform:uppercase;
-
   letter-spacing:.15em;
 }
 
-/* =========================================================
-   FIXED SVG CONNECTIONS
-========================================================= */
+/* ================= EDGES ================= */
 
 .edge{
   fill:none;
-
   stroke:rgba(255,255,255,.48);
-
   stroke-width:2;
-
   stroke-linecap:round;
-
   stroke-dasharray:8 8;
-
   vector-effect:non-scaling-stroke;
-
-  animation:
-    edgeMove 1.4s linear infinite;
+  animation:edgeMove 1.4s linear infinite;
 }
 
 .edge.active{
   stroke:#fff;
-
   stroke-width:2.5;
 }
 
 @keyframes edgeMove{
-  from{
-    stroke-dashoffset:0;
-  }
-
-  to{
-    stroke-dashoffset:-32;
-  }
+  from{stroke-dashoffset:0}
+  to{stroke-dashoffset:-32}
 }
 
-/* =========================================================
-   SATURN
-========================================================= */
+/* ================= SATURN ================= */
 
 .saturn{
   position:absolute;
-
   z-index:0;
-
   left:50%;
   top:50%;
-
   width:470px;
   height:470px;
-
-  transform:
-    translate(-50%,-50%);
-
+  transform:translate(-50%,-50%);
   opacity:.62;
-
   pointer-events:none;
-
-  filter:
-    drop-shadow(
-      0 0 35px
-      rgba(255,255,255,.08)
-    );
+  filter:drop-shadow(0 0 35px rgba(255,255,255,.08));
 }
 
 #saturn{
@@ -665,145 +451,96 @@ button{
 
 .saturn-ring{
   position:absolute;
-
   left:50%;
   top:50%;
-
   width:360px;
   height:105px;
-
   border-radius:50%;
-
-  border:
-    1px solid
-    rgba(255,255,255,.14);
-
-  box-shadow:
-    0 0 20px
-    rgba(255,255,255,.05);
-
-  transform:
-    translate(-50%,-50%)
-    rotateX(67deg);
-
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 0 20px rgba(255,255,255,.05);
+  transform:translate(-50%,-50%) rotateX(67deg);
   transform-style:preserve-3d;
-
   opacity:.65;
 }
 
-/* =========================================================
-   PROFILE
-========================================================= */
+/* ================= PROFILE ================= */
 
 .profile-page{
   padding:25px;
-
   overflow:auto;
-
   background:
-    radial-gradient(
-      circle at 50% 0,
-      rgba(255,255,255,.04),
-      transparent 35%
-    ),
+    radial-gradient(circle at 50% 0,rgba(255,255,255,.04),transparent 35%),
     #050505;
 }
 
 .profile-card{
   max-width:650px;
-
   background:#090909;
-
   border:1px solid var(--line);
-
+  border-radius:16px;
   padding:25px;
 }
 
 .profile-avatar{
   width:80px;
   height:80px;
-
   border:1px solid var(--line2);
-
+  border-radius:14px;
   object-fit:cover;
-
   background:#111;
-
   margin-bottom:17px;
 }
 
 .profile-name{
   font-size:20px;
   font-weight:800;
-
   letter-spacing:.05em;
 }
 
 .profile-sub{
   color:#666;
-
   font-size:9px;
-
   letter-spacing:.15em;
-
   margin-top:5px;
 }
 
 .profile-info{
   display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
+  grid-template-columns:1fr 1fr;
   gap:10px;
-
   margin-top:25px;
 }
 
 .info-box{
   padding:13px;
-
   background:#0d0d0d;
-
   border:1px solid var(--line);
+  border-radius:11px;
 }
 
 .info-box small{
   display:block;
-
   color:#555;
-
   font-size:7px;
-
   letter-spacing:.15em;
-
   margin-bottom:6px;
 }
 
 .info-box b{
   font-size:10px;
-
   word-break:break-word;
 }
 
-/* =========================================================
-   MODALS
-========================================================= */
+/* ================= MODALS ================= */
 
 .modal-backdrop{
   position:fixed;
-
   z-index:500;
-
   inset:0;
-
   background:rgba(0,0,0,.72);
-
   display:none;
-
   align-items:center;
   justify-content:center;
-
   padding:20px;
 }
 
@@ -813,54 +550,40 @@ button{
 
 .modal{
   width:min(560px,95vw);
-
   max-height:90vh;
-
   overflow:auto;
-
   background:#090909;
-
   border:1px solid var(--line2);
-
-  box-shadow:
-    0 30px 100px
-    rgba(0,0,0,.7);
+  border-radius:16px;
+  box-shadow:0 30px 100px rgba(0,0,0,.7);
 }
 
 .modal-head{
   min-height:55px;
-
   display:flex;
   align-items:center;
   justify-content:space-between;
-
   padding:0 17px;
-
   border-bottom:1px solid var(--line);
 }
 
 .modal-head b{
   font-size:11px;
-
   letter-spacing:.13em;
 }
 
 .close-btn{
   width:30px;
   height:30px;
-
   background:#111;
-
   border:1px solid var(--line);
-
+  border-radius:9px;
   color:#888;
-
   cursor:pointer;
 }
 
 .close-btn:hover{
   color:#fff;
-
   border-color:#555;
 }
 
@@ -874,75 +597,93 @@ button{
 
 .form-group label{
   display:block;
-
   margin-bottom:6px;
-
   color:#777;
-
   font-size:8px;
-
   letter-spacing:.15em;
-
   text-transform:uppercase;
 }
 
-.form-input,
-.form-textarea{
+.form-input,.form-textarea{
   width:100%;
-
   background:#050505;
-
   border:1px solid var(--line2);
-
+  border-radius:9px;
   color:#fff;
-
   padding:10px;
-
   font-size:10px;
 }
 
 .form-textarea{
   min-height:100px;
-
   resize:vertical;
 }
 
 .modal-actions{
   display:flex;
-
   justify-content:flex-end;
-
   gap:7px;
-
   margin-top:15px;
 }
 
-/* =========================================================
-   TOAST
-========================================================= */
+/* ================= PHONE RESULTS ================= */
+
+.osint-result{
+  display:none;
+  background:#050505;
+  border:1px solid var(--line);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.result-row{
+  min-height:43px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:9px 12px;
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+
+.result-row:last-child{
+  border-bottom:0;
+}
+
+.result-key{
+  color:#666;
+  font-size:8px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  flex-shrink:0;
+}
+
+.result-value{
+  color:#eee;
+  font-size:10px;
+  text-align:right;
+  word-break:break-word;
+}
+
+.result-value.empty{
+  color:#444;
+}
+
+/* ================= TOAST ================= */
 
 #toast{
   position:fixed;
-
   z-index:1000;
-
   right:18px;
   bottom:18px;
-
   max-width:330px;
-
   background:#101010;
-
   border:1px solid var(--line2);
-
+  border-radius:10px;
   color:#fff;
-
   padding:12px 15px;
-
   font-size:9px;
-
   letter-spacing:.05em;
-
   display:none;
 }
 
@@ -950,18 +691,22 @@ button{
   display:block;
 }
 
-@media(max-width:900px){
+/* ================= RESPONSIVE ================= */
 
+@media(max-width:1100px){
+  .chain-toolbar{
+    flex-wrap:wrap;
+    max-width:calc(100% - 20px);
+  }
+}
+
+@media(max-width:900px){
   .top-tools .top-btn{
     display:none;
   }
 
   .brand small{
     display:none;
-  }
-
-  .chain-toolbar{
-    flex-wrap:wrap;
   }
 
   .chain-search{
@@ -979,10 +724,8 @@ button{
 }
 
 @media(max-width:700px){
-
   .topbar{
     height:58px;
-
     padding:0 10px;
   }
 
@@ -997,7 +740,6 @@ button{
 
   .sidebar{
     top:58px;
-
     width:48px;
   }
 
@@ -1018,9 +760,7 @@ button{
 
   .btn{
     height:31px;
-
     padding:0 8px;
-
     font-size:8px;
   }
 
@@ -1054,7 +794,6 @@ button{
 }
 
 @media(max-width:480px){
-
   .intro-wrap{
     gap:12px;
   }
@@ -1075,18 +814,17 @@ button{
   .chain-search{
     width:125px;
   }
+
+  .result-row{
+    gap:10px;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<!-- =========================================================
-     INTRO
-========================================================= -->
-
 <div id="bootScreen">
-
   <div class="intro-wrap">
 
     <img
@@ -1096,41 +834,16 @@ button{
     >
 
     <div class="intro-text">
-
-      <div class="intro-line">
-        CONNECTION ESTABLISHED
-      </div>
-
-      <div class="intro-line">
-        SYSTEM INITIALIZED
-      </div>
-
-      <div class="intro-line">
-        SCANNING NETWORK
-      </div>
-
-      <div class="intro-line">
-        ANALYZING DATA
-      </div>
-
-      <div class="intro-line">
-        ACCESSING NZX OSINT
-      </div>
-
-      <div class="intro-line">
-        YOU HAVE BEEN NOTICED
-      </div>
-
+      <div class="intro-line">CONNECTION ESTABLISHED</div>
+      <div class="intro-line">SYSTEM INITIALIZED</div>
+      <div class="intro-line">SCANNING NETWORK</div>
+      <div class="intro-line">ANALYZING DATA</div>
+      <div class="intro-line">ACCESSING NZX OSINT</div>
+      <div class="intro-line">YOU HAVE BEEN NOTICED</div>
     </div>
 
   </div>
-
 </div>
-
-
-<!-- =========================================================
-     APP
-========================================================= -->
 
 <div id="app">
 
@@ -1145,60 +858,45 @@ button{
 
   <div class="top-tools">
 
-    <button
-      class="top-btn"
-      onclick="openTool('phone')"
-    >
+    <button class="top-btn" onclick="openTool('phone')">
       CHECK NUMBER
     </button>
 
-    <button
-      class="top-btn"
-      onclick="openTool('address')"
-    >
+    <button class="top-btn" onclick="openTool('address')">
       CHECK ADDRESS
+    </button>
+
+    <button class="top-btn" onclick="openTool('name')">
+      CHECK NAME
     </button>
 
   </div>
 
-  <button
-    class="profile-mini"
-    onclick="openProfile()"
-  >
-    <img
-      id="miniAvatar"
-      alt=""
-    >
+  <button class="profile-mini" onclick="openProfile()">
+    <img id="miniAvatar" alt="">
   </button>
 
 </header>
-
 
 <aside class="sidebar">
 
   <button
     class="side-btn active"
     data-page="chain"
-    onclick="showPage('chain')"
-  >
+    onclick="showPage('chain')">
     ⌘
   </button>
 
   <button
     class="side-btn"
     data-page="profile"
-    onclick="openProfile()"
-  >
+    onclick="openProfile()">
     ◎
   </button>
 
 </aside>
 
-
-<section
-  class="page chain-page active"
-  id="chainPage"
->
+<section class="page chain-page active" id="chainPage">
 
   <div class="chain-toolbar">
 
@@ -1209,74 +907,47 @@ button{
       autocomplete="off"
     >
 
-    <button
-      class="btn"
-      onclick="openNodeModal()"
-    >
+    <button class="btn" onclick="openNodeModal()">
       ＋ NODE
     </button>
 
-    <button
-      class="btn"
-      onclick="centerGraph()"
-    >
+    <button class="btn" onclick="deleteSelectedNode()">
+      DELETE NODE
+    </button>
+
+    <button class="btn" onclick="centerGraph()">
       ⌂
     </button>
 
-    <button
-      class="btn"
-      onclick="createProject()"
-    >
+    <button class="btn" onclick="createProject()">
       CREATE PROJECT
     </button>
 
-    <button
-      class="btn"
-      onclick="showProjects()"
-    >
+    <button class="btn" onclick="showProjects()">
       MY PROJECTS
     </button>
 
-    <button
-      class="btn"
-      onclick="deleteProject()"
-    >
+    <button class="btn" onclick="deleteProject()">
       DELETE PROJECT
     </button>
 
-    <button
-      class="btn"
-      onclick="deleteAllNodes()"
-    >
+    <button class="btn" onclick="deleteAllNodes()">
       DELETE ALL NODES
     </button>
 
   </div>
 
-
-  <div
-    class="graph"
-    id="graph"
-  >
+  <div class="graph" id="graph">
 
     <div class="saturn">
 
-      <canvas
-        id="saturn"
-      ></canvas>
+      <canvas id="saturn"></canvas>
 
-      <div
-        class="saturn-ring"
-        id="saturnRing"
-      ></div>
+      <div class="saturn-ring" id="saturnRing"></div>
 
     </div>
 
-
-    <div
-      class="world"
-      id="world"
-    >
+    <div class="world" id="world">
 
       <svg
         class="lines"
@@ -1284,8 +955,8 @@ button{
         width="10000"
         height="10000"
         viewBox="0 0 10000 10000"
-        preserveAspectRatio="none"
-      ></svg>
+        preserveAspectRatio="none">
+      </svg>
 
     </div>
 
@@ -1293,24 +964,13 @@ button{
 
 </section>
 
-
-<section
-  class="page profile-page"
-  id="profilePage"
->
+<section class="page profile-page" id="profilePage">
 
   <div class="profile-card">
 
-    <img
-      id="profileAvatar"
-      class="profile-avatar"
-      alt=""
-    >
+    <img id="profileAvatar" class="profile-avatar" alt="">
 
-    <div
-      class="profile-name"
-      id="profileName"
-    >
+    <div class="profile-name" id="profileName">
       NZX USER
     </div>
 
@@ -1318,58 +978,26 @@ button{
       OSINT WORKSPACE PROFILE
     </div>
 
-
     <div class="profile-info">
 
       <div class="info-box">
-
-        <small>
-          USER ID
-        </small>
-
-        <b id="profileId">
-          —
-        </b>
-
+        <small>USER ID</small>
+        <b id="profileId">—</b>
       </div>
 
-
       <div class="info-box">
-
-        <small>
-          PROJECT
-        </small>
-
-        <b id="profileProject">
-          Default Project
-        </b>
-
+        <small>PROJECT</small>
+        <b id="profileProject">Default Project</b>
       </div>
 
-
       <div class="info-box">
-
-        <small>
-          NODES
-        </small>
-
-        <b id="profileNodes">
-          0
-        </b>
-
+        <small>NODES</small>
+        <b id="profileNodes">0</b>
       </div>
 
-
       <div class="info-box">
-
-        <small>
-          STATUS
-        </small>
-
-        <b>
-          ONLINE
-        </b>
-
+        <small>STATUS</small>
+        <b>ONLINE</b>
       </div>
 
     </div>
@@ -1380,90 +1008,66 @@ button{
 
 </div>
 
+<!-- NODE MODAL -->
 
-<div
-  class="modal-backdrop"
-  id="nodeModal"
->
+<div class="modal-backdrop" id="nodeModal">
 
   <div class="modal">
 
     <div class="modal-head">
 
-      <b>
-        CREATE NODE
-      </b>
+      <b>CREATE NODE</b>
 
       <button
         class="close-btn"
-        onclick="closeModal('nodeModal')"
-      >
+        onclick="closeModal('nodeModal')">
         ×
       </button>
 
     </div>
 
-
     <div class="modal-body">
 
       <div class="form-group">
 
-        <label>
-          NODE TYPE
-        </label>
+        <label>NODE TYPE</label>
 
         <input
           class="form-input"
           id="nodeType"
-          placeholder="PERSON / PHONE / EMAIL / ADDRESS"
-        >
+          placeholder="PERSON / PHONE / EMAIL / ADDRESS">
 
       </div>
 
-
       <div class="form-group">
 
-        <label>
-          VALUE
-        </label>
+        <label>VALUE</label>
 
         <input
           class="form-input"
           id="nodeValue"
-          placeholder="Enter value..."
-        >
+          placeholder="Enter value...">
 
       </div>
 
-
       <div class="form-group">
 
-        <label>
-          NOTE
-        </label>
+        <label>NOTE</label>
 
         <textarea
           class="form-textarea"
           id="nodeNote"
-          placeholder="Optional note..."
-        ></textarea>
+          placeholder="Optional note..."></textarea>
 
       </div>
 
-
       <div class="modal-actions">
 
-        <button
-          class="btn"
-          onclick="closeModal('nodeModal')"
-        >
+        <button class="btn" onclick="closeModal('nodeModal')">
           CANCEL
         </button>
 
-        <button
-          class="btn"
-          onclick="createNode()"
-        >
+        <button class="btn" onclick="createNode()">
           CREATE
         </button>
 
@@ -1475,76 +1079,50 @@ button{
 
 </div>
 
+<!-- TOOL MODAL -->
 
-<div
-  class="modal-backdrop"
-  id="toolModal"
->
+<div class="modal-backdrop" id="toolModal">
 
   <div class="modal">
 
     <div class="modal-head">
 
-      <b id="toolTitle">
-        OSINT TOOL
-      </b>
+      <b id="toolTitle">OSINT TOOL</b>
 
       <button
         class="close-btn"
-        onclick="closeModal('toolModal')"
-      >
+        onclick="closeModal('toolModal')">
         ×
       </button>
 
     </div>
 
-
     <div class="modal-body">
 
       <div class="form-group">
 
-        <label id="toolLabel">
-          VALUE
-        </label>
+        <label id="toolLabel">VALUE</label>
 
         <input
           class="form-input"
           id="toolInput"
-          autocomplete="off"
-        >
+          autocomplete="off">
 
       </div>
 
-
-      <div
-        id="toolResult"
-        style="
-          display:none;
-          border:1px solid rgba(255,255,255,.1);
-          background:#050505;
-          padding:13px;
-          font-size:10px;
-          line-height:1.6;
-          color:#aaa;
-          white-space:pre-wrap;
-          word-break:break-word;
-        "
-      ></div>
-
+      <div id="toolResult" class="osint-result"></div>
 
       <div class="modal-actions">
 
         <button
           class="btn"
-          onclick="closeModal('toolModal')"
-        >
+          onclick="closeModal('toolModal')">
           CLOSE
         </button>
 
         <button
           class="btn"
-          onclick="runTool()"
-        >
+          onclick="runTool()">
           RUN CHECK
         </button>
 
@@ -1556,9 +1134,7 @@ button{
 
 </div>
 
-
 <div id="toast"></div>
-
 
 <script>
 
@@ -1566,48 +1142,40 @@ button{
    STATE
 ========================================================= */
 
-const DB_KEY =
-  "nzx-osint-real-v4";
+const DB_KEY="nzx-osint-real-v4";
+const PROJECTS_KEY="nzx-projects";
+const CURRENT_PROJECT_KEY="nzx-current-project";
 
-const PROJECTS_KEY =
-  "nzx-projects";
+let nodes=[];
+let links=[];
 
-const CURRENT_PROJECT_KEY =
-  "nzx-current-project";
-
-let nodes = [];
-let links = [];
-
-let currentProject =
-  localStorage.getItem(
-    CURRENT_PROJECT_KEY
-  ) ||
+let currentProject=
+  localStorage.getItem(CURRENT_PROJECT_KEY) ||
   "Default Project";
 
-let selectedNode = null;
+let selectedNode=null;
 
-let graphScale = 1;
-let graphX = 0;
-let graphY = 0;
+let graphScale=1;
+let graphX=0;
+let graphY=0;
 
-let draggingGraph = false;
+let draggingGraph=false;
 
-let dragStartX = 0;
-let dragStartY = 0;
+let dragStartX=0;
+let dragStartY=0;
 
-let dragOriginX = 0;
-let dragOriginY = 0;
+let dragOriginX=0;
+let dragOriginY=0;
 
-let activeTool = null;
+let activeTool=null;
 
-let saturnCanvas = null;
-let saturnCtx = null;
+let saturnCanvas=null;
+let saturnCtx=null;
 
-let saturnParticles = [];
+let saturnParticles=[];
 
-let saturnRotation = 0;
-
-let ringRotation = 0;
+let saturnRotation=0;
+let ringRotation=0;
 
 
 /* =========================================================
@@ -1619,41 +1187,27 @@ function $(id){
 }
 
 function escapeHtml(value){
-
-  return String(value ?? "")
+  return String(value??"")
     .replaceAll("&","&amp;")
     .replaceAll("<","&lt;")
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
-
 }
 
 function toast(message){
 
-  const el =
-    $("toast");
+  const el=$("toast");
 
-  el.textContent =
-    message;
+  el.textContent=message;
 
-  el.classList.add(
-    "show"
-  );
+  el.classList.add("show");
 
-  clearTimeout(
-    window.__toastTimer
-  );
+  clearTimeout(window.__toastTimer);
 
-  window.__toastTimer =
-    setTimeout(
-      ()=>{
-        el.classList.remove(
-          "show"
-        );
-      },
-      2600
-    );
+  window.__toastTimer=setTimeout(()=>{
+    el.classList.remove("show");
+  },2600);
 
 }
 
@@ -1666,42 +1220,25 @@ function loadDB(){
 
   try{
 
-    const raw =
-      localStorage.getItem(
-        DB_KEY
-      );
+    const raw=localStorage.getItem(DB_KEY);
 
-    if(!raw){
-      return;
-    }
+    if(!raw)return;
 
-    const data =
-      JSON.parse(raw);
+    const data=JSON.parse(raw);
 
-    nodes =
-      Array.isArray(data.nodes)
-        ? data.nodes
-        : [];
-
-    links =
-      Array.isArray(data.links)
-        ? data.links
-        : [];
+    nodes=Array.isArray(data.nodes)?data.nodes:[];
+    links=Array.isArray(data.links)?data.links:[];
 
   }catch(error){
 
-    console.error(
-      "DB LOAD ERROR:",
-      error
-    );
+    console.error(error);
 
-    nodes = [];
-    links = [];
+    nodes=[];
+    links=[];
 
   }
 
 }
-
 
 function saveDB(){
 
@@ -1728,9 +1265,7 @@ function getProjects(){
   try{
 
     return JSON.parse(
-      localStorage.getItem(
-        PROJECTS_KEY
-      ) || "{}"
+      localStorage.getItem(PROJECTS_KEY)||"{}"
     );
 
   }catch{
@@ -1741,7 +1276,6 @@ function getProjects(){
 
 }
 
-
 function saveProjects(projects){
 
   localStorage.setItem(
@@ -1751,36 +1285,24 @@ function saveProjects(projects){
 
 }
 
-
 function saveCurrentProject(){
 
-  const projects =
-    getProjects();
+  const projects=getProjects();
 
-  projects[currentProject] = {
+  projects[currentProject]={
 
-    nodes:
-      JSON.parse(
-        JSON.stringify(nodes)
-      ),
-
-    links:
-      JSON.parse(
-        JSON.stringify(links)
-      ),
+    nodes:JSON.parse(JSON.stringify(nodes)),
+    links:JSON.parse(JSON.stringify(links)),
 
     createdAt:
       projects[currentProject]?.createdAt ||
       Date.now(),
 
-    updatedAt:
-      Date.now()
+    updatedAt:Date.now()
 
   };
 
-  saveProjects(
-    projects
-  );
+  saveProjects(projects);
 
   localStorage.setItem(
     CURRENT_PROJECT_KEY,
@@ -1791,64 +1313,43 @@ function saveCurrentProject(){
 
 }
 
-
 function createProject(){
 
-  const name =
-    prompt(
-      "Enter project name:",
-      "New Project"
-    );
+  const name=prompt(
+    "Enter project name:",
+    "New Project"
+  );
 
-  if(name === null){
-    return;
-  }
+  if(name===null)return;
 
-  const clean =
-    name.trim();
+  const clean=name.trim();
 
-  if(!clean){
-    return;
-  }
+  if(!clean)return;
 
   saveCurrentProject();
 
-  const projects =
-    getProjects();
+  const projects=getProjects();
 
   if(projects[clean]){
 
-    if(
-      !confirm(
-        "Project already exists. Replace it?"
-      )
-    ){
+    if(!confirm("Project already exists. Replace it?"))
       return;
-    }
 
   }
 
-  currentProject =
-    clean;
+  currentProject=clean;
+  nodes=[];
+  links=[];
+  selectedNode=null;
 
-  nodes = [];
-  links = [];
-
-  selectedNode = null;
-
-  projects[currentProject] = {
-
+  projects[currentProject]={
     nodes:[],
     links:[],
-
     createdAt:Date.now(),
     updatedAt:Date.now()
-
   };
 
-  saveProjects(
-    projects
-  );
+  saveProjects(projects);
 
   localStorage.setItem(
     CURRENT_PROJECT_KEY,
@@ -1862,86 +1363,57 @@ function createProject(){
 
   updateProfileUI();
 
-  toast(
-    "Project created."
-  );
+  toast("Project created.");
 
 }
-
 
 function showProjects(){
 
   saveCurrentProject();
 
-  const projects =
-    getProjects();
-
-  const names =
-    Object.keys(
-      projects
-    );
+  const projects=getProjects();
+  const names=Object.keys(projects);
 
   if(!names.length){
 
-    toast(
-      "No projects."
-    );
-
+    toast("No projects.");
     return;
 
   }
 
-  const list =
-    names
-      .map(
-        (name,index)=>
-          `${index+1}. ${name}`
-      )
-      .join("\n");
+  const list=names
+    .map((name,index)=>`${index+1}. ${name}`)
+    .join("\n");
 
-  const choice =
-    prompt(
-      "MY PROJECTS\n\n" +
-      list +
-      "\n\nEnter project name:",
-      currentProject
-    );
+  const choice=prompt(
+    "MY PROJECTS\n\n"+
+    list+
+    "\n\nEnter project name:",
+    currentProject
+  );
 
-  if(choice === null){
-    return;
-  }
+  if(choice===null)return;
 
-  const selected =
-    choice.trim();
+  const selected=choice.trim();
 
   if(!projects[selected]){
 
-    toast(
-      "Project not found."
-    );
-
+    toast("Project not found.");
     return;
 
   }
 
-  currentProject =
-    selected;
+  currentProject=selected;
 
-  nodes =
-    JSON.parse(
-      JSON.stringify(
-        projects[selected].nodes || []
-      )
-    );
+  nodes=JSON.parse(
+    JSON.stringify(projects[selected].nodes||[])
+  );
 
-  links =
-    JSON.parse(
-      JSON.stringify(
-        projects[selected].links || []
-      )
-    );
+  links=JSON.parse(
+    JSON.stringify(projects[selected].links||[])
+  );
 
-  selectedNode = null;
+  selectedNode=null;
 
   localStorage.setItem(
     CURRENT_PROJECT_KEY,
@@ -1955,120 +1427,81 @@ function showProjects(){
 
   updateProfileUI();
 
-  toast(
-    "Project loaded."
-  );
+  toast("Project loaded.");
 
 }
 
-
 function deleteProject(){
 
-  const projects =
-    getProjects();
-
-  const names =
-    Object.keys(
-      projects
-    );
+  const projects=getProjects();
+  const names=Object.keys(projects);
 
   if(!names.length){
 
-    toast(
-      "No projects."
-    );
-
+    toast("No projects.");
     return;
 
   }
 
-  const list =
-    names
-      .map(
-        (name,index)=>
-          `${index+1}. ${name}`
-      )
-      .join("\n");
+  const list=names
+    .map((name,index)=>`${index+1}. ${name}`)
+    .join("\n");
 
-  const choice =
-    prompt(
-      "DELETE PROJECT\n\n" +
-      list +
-      "\n\nEnter project name:",
-      currentProject
-    );
+  const choice=prompt(
+    "DELETE PROJECT\n\n"+
+    list+
+    "\n\nEnter project name:",
+    currentProject
+  );
 
-  if(choice === null){
-    return;
-  }
+  if(choice===null)return;
 
-  const selected =
-    choice.trim();
+  const selected=choice.trim();
 
   if(!projects[selected]){
 
-    toast(
-      "Project not found."
-    );
-
+    toast("Project not found.");
     return;
 
   }
 
-  if(
-    !confirm(
-      `Delete "${selected}"?`
-    )
-  ){
+  if(!confirm(`Delete "${selected}"?`))
     return;
-  }
 
   delete projects[selected];
 
-  const remaining =
-    Object.keys(
-      projects
-    );
+  const remaining=Object.keys(projects);
 
-  if(
-    selected === currentProject
-  ){
+  if(selected===currentProject){
 
     if(remaining.length){
 
-      currentProject =
-        remaining[0];
+      currentProject=remaining[0];
 
-      nodes =
-        JSON.parse(
-          JSON.stringify(
-            projects[currentProject].nodes || []
-          )
-        );
+      nodes=JSON.parse(
+        JSON.stringify(
+          projects[currentProject].nodes||[]
+        )
+      );
 
-      links =
-        JSON.parse(
-          JSON.stringify(
-            projects[currentProject].links || []
-          )
-        );
+      links=JSON.parse(
+        JSON.stringify(
+          projects[currentProject].links||[]
+        )
+      );
 
     }else{
 
-      currentProject =
-        "Default Project";
+      currentProject="Default Project";
 
-      nodes = [];
-      links = [];
+      nodes=[];
+      links=[];
 
-      projects[currentProject] = {
-
+      projects[currentProject]={
         nodes:[],
         links:[],
-
         createdAt:Date.now(),
         updatedAt:Date.now()
-
       };
 
     }
@@ -2080,57 +1513,39 @@ function deleteProject(){
 
   }
 
-  saveProjects(
-    projects
-  );
-
+  saveProjects(projects);
   saveDB();
 
   renderNodes();
   renderLines();
-
   updateProfileUI();
 
-  toast(
-    "Project deleted."
-  );
+  toast("Project deleted.");
 
 }
-
 
 function deleteAllNodes(){
 
   if(!nodes.length){
 
-    toast(
-      "Graph is empty."
-    );
-
+    toast("Graph is empty.");
     return;
 
   }
 
-  if(
-    !confirm(
-      "Delete ALL nodes?"
-    )
-  ){
+  if(!confirm("Delete ALL nodes?"))
     return;
-  }
 
-  nodes = [];
-  links = [];
-
-  selectedNode = null;
+  nodes=[];
+  links=[];
+  selectedNode=null;
 
   saveCurrentProject();
 
   renderNodes();
   renderLines();
 
-  toast(
-    "All nodes deleted."
-  );
+  toast("All nodes deleted.");
 
 }
 
@@ -2141,55 +1556,29 @@ function deleteAllNodes(){
 
 function showPage(page){
 
-  document
-    .querySelectorAll(
-      ".page"
-    )
-    .forEach(
-      el =>
-        el.classList.remove(
-          "active"
-        )
-    );
+  document.querySelectorAll(".page")
+    .forEach(el=>el.classList.remove("active"));
 
-  document
-    .querySelectorAll(
-      ".side-btn"
-    )
-    .forEach(
-      el =>
-        el.classList.remove(
-          "active"
-        )
-    );
+  document.querySelectorAll(".side-btn")
+    .forEach(el=>el.classList.remove("active"));
 
-  if(page === "chain"){
+  if(page==="chain"){
 
-    $("chainPage")
-      .classList
-      .add("active");
+    $("chainPage").classList.add("active");
 
     document
-      .querySelector(
-        '[data-page="chain"]'
-      )
-      ?.classList
-      .add("active");
+      .querySelector('[data-page="chain"]')
+      ?.classList.add("active");
 
   }
 
-  if(page === "profile"){
+  if(page==="profile"){
 
-    $("profilePage")
-      .classList
-      .add("active");
+    $("profilePage").classList.add("active");
 
     document
-      .querySelector(
-        '[data-page="profile"]'
-      )
-      ?.classList
-      .add("active");
+      .querySelector('[data-page="profile"]')
+      ?.classList.add("active");
 
   }
 
@@ -2205,9 +1594,7 @@ function getUser(){
   try{
 
     return JSON.parse(
-      localStorage.getItem(
-        "nzx-user"
-      ) || "{}"
+      localStorage.getItem("nzx-user")||"{}"
     );
 
   }catch{
@@ -2218,29 +1605,19 @@ function getUser(){
 
 }
 
-
 function createAvatar(name){
 
-  const letter =
-    String(name || "N")
-      .charAt(0)
-      .toUpperCase();
+  const letter=String(name||"N")
+    .charAt(0)
+    .toUpperCase();
 
-  const svg = `
+  const svg=`
   <svg xmlns="http://www.w3.org/2000/svg"
        width="100"
        height="100"
        viewBox="0 0 100 100">
-
-    <rect
-      width="100"
-      height="100"
-      fill="#111"
-    />
-
-    <text
-      x="50"
-      y="60"
+    <rect width="100" height="100" fill="#111"/>
+    <text x="50" y="60"
       text-anchor="middle"
       font-size="45"
       fill="white"
@@ -2248,63 +1625,46 @@ function createAvatar(name){
       font-weight="bold">
       ${escapeHtml(letter)}
     </text>
+  </svg>`;
 
-  </svg>
-  `;
-
-  return (
-    "data:image/svg+xml;charset=utf-8," +
-    encodeURIComponent(svg)
-  );
+  return "data:image/svg+xml;charset=utf-8,"+
+    encodeURIComponent(svg);
 
 }
 
-
 function updateProfileUI(){
 
-  const user =
-    getUser();
+  const user=getUser();
 
-  const name =
+  const name=
     user.name ||
     user.username ||
     "NZX USER";
 
-  const avatar =
+  const avatar=
     user.avatar ||
     user.photo ||
     createAvatar(name);
 
-  $("miniAvatar").src =
-    avatar;
+  $("miniAvatar").src=avatar;
+  $("profileAvatar").src=avatar;
 
-  $("profileAvatar").src =
-    avatar;
+  $("profileName").textContent=name;
 
-  $("profileName").textContent =
-    name;
-
-  $("profileId").textContent =
+  $("profileId").textContent=
     user.id ||
     user.user_id ||
     "LOCAL";
 
-  $("profileProject").textContent =
-    currentProject;
-
-  $("profileNodes").textContent =
-    nodes.length;
+  $("profileProject").textContent=currentProject;
+  $("profileNodes").textContent=nodes.length;
 
 }
-
 
 function openProfile(){
 
   updateProfileUI();
-
-  showPage(
-    "profile"
-  );
+  showPage("profile");
 
 }
 
@@ -2314,39 +1674,24 @@ function openProfile(){
 ========================================================= */
 
 function openModal(id){
-
-  $(id)
-    .classList
-    .add("open");
-
+  $(id).classList.add("open");
 }
-
 
 function closeModal(id){
-
-  $(id)
-    .classList
-    .remove("open");
-
+  $(id).classList.remove("open");
 }
-
 
 function openNodeModal(){
 
-  $("nodeType").value = "";
-  $("nodeValue").value = "";
-  $("nodeNote").value = "";
+  $("nodeType").value="";
+  $("nodeValue").value="";
+  $("nodeNote").value="";
 
-  openModal(
-    "nodeModal"
-  );
+  openModal("nodeModal");
 
-  setTimeout(
-    ()=>{
-      $("nodeType").focus();
-    },
-    50
-  );
+  setTimeout(()=>{
+    $("nodeType").focus();
+  },50);
 
 }
 
@@ -2357,240 +1702,153 @@ function openNodeModal(){
 
 function makeId(){
 
-  return (
-    Date.now().toString(36) +
-    Math.random()
-      .toString(36)
-      .slice(2,9)
-  );
+  return Date.now().toString(36)+
+    Math.random().toString(36).slice(2,9);
 
 }
 
-
 function createNode(){
 
-  const type =
-    $("nodeType")
-      .value
-      .trim() ||
+  const type=
+    $("nodeType").value.trim()||
     "CUSTOM";
 
-  const value =
-    $("nodeValue")
-      .value
-      .trim();
+  const value=
+    $("nodeValue").value.trim();
 
-  const note =
-    $("nodeNote")
-      .value
-      .trim();
+  const note=
+    $("nodeNote").value.trim();
 
   if(!value){
 
-    toast(
-      "Enter node value."
-    );
-
+    toast("Enter node value.");
     return;
 
   }
 
-  let x = 0;
-  let y = 0;
+  let x=0;
+  let y=0;
 
   if(nodes.length){
 
-    const last =
-      nodes[
-        nodes.length - 1
-      ];
+    const last=nodes[nodes.length-1];
 
-    x =
-      Number(last.x || 0) +
-      330;
-
-    y =
-      Number(last.y || 0);
+    x=Number(last.x||0)+330;
+    y=Number(last.y||0);
 
   }
 
-  const node = {
-
+  const node={
     id:makeId(),
-
     type,
     value,
     note,
-
     x,
     y,
-
     createdAt:Date.now()
-
   };
 
-  nodes.push(
-    node
-  );
+  nodes.push(node);
 
-  if(nodes.length > 1){
+  if(nodes.length>1){
 
-    const candidates =
-      nodes.filter(
-        n =>
-          n.id !== node.id
-      );
+    const candidates=nodes.filter(
+      n=>n.id!==node.id
+    );
 
-    const nearest =
-      findNearestNode(
-        node,
-        candidates
-      );
+    const nearest=findNearestNode(
+      node,
+      candidates
+    );
 
-    if(nearest){
-
-      addLink(
-        nearest.id,
-        node.id
-      );
-
-    }
+    if(nearest)
+      addLink(nearest.id,node.id);
 
   }
 
-  closeModal(
-    "nodeModal"
-  );
+  closeModal("nodeModal");
 
   saveCurrentProject();
 
   renderNodes();
   renderLines();
 
-  toast(
-    "Node created."
-  );
+  toast("Node created.");
 
 }
 
+function findNearestNode(node,candidates){
 
-function findNearestNode(
-  node,
-  candidates
-){
+  let nearest=null;
+  let shortest=Infinity;
 
-  let nearest = null;
+  candidates.forEach(other=>{
 
-  let shortest =
-    Infinity;
+    const dx=
+      Number(node.x)-Number(other.x);
 
-  candidates.forEach(
-    other=>{
+    const dy=
+      Number(node.y)-Number(other.y);
 
-      const dx =
-        Number(node.x) -
-        Number(other.x);
+    const distance=Math.sqrt(
+      dx*dx+dy*dy
+    );
 
-      const dy =
-        Number(node.y) -
-        Number(other.y);
+    if(distance<shortest){
 
-      const distance =
-        Math.sqrt(
-          dx * dx +
-          dy * dy
-        );
-
-      if(
-        distance < shortest
-      ){
-
-        shortest =
-          distance;
-
-        nearest =
-          other;
-
-      }
+      shortest=distance;
+      nearest=other;
 
     }
-  );
+
+  });
 
   return nearest;
 
 }
 
-
 function getNode(id){
 
   return nodes.find(
-    n =>
-      n.id === id
+    n=>n.id===id
   );
 
 }
 
+function addLink(source,target){
 
-function addLink(
-  source,
-  target
-){
+  if(source===target)return;
 
-  if(
-    source === target
-  ){
-    return;
-  }
+  const exists=links.some(
+    link=>
+      (link.source===source&&link.target===target)||
+      (link.source===target&&link.target===source)
+  );
 
-  const exists =
-    links.some(
-      link =>
-        (
-          link.source === source &&
-          link.target === target
-        ) ||
-        (
-          link.source === target &&
-          link.target === source
-        )
-    );
-
-  if(exists){
-    return;
-  }
+  if(exists)return;
 
   links.push({
-
     id:makeId(),
-
     source,
     target
-
   });
 
 }
 
-
 function removeNode(id){
 
-  nodes =
-    nodes.filter(
-      node =>
-        node.id !== id
-    );
+  nodes=nodes.filter(
+    node=>node.id!==id
+  );
 
-  links =
-    links.filter(
-      link =>
-        link.source !== id &&
-        link.target !== id
-    );
+  links=links.filter(
+    link=>
+      link.source!==id &&
+      link.target!==id
+  );
 
-  if(
-    selectedNode === id
-  ){
-    selectedNode = null;
-  }
+  if(selectedNode===id)
+    selectedNode=null;
 
   saveCurrentProject();
 
@@ -2599,28 +1857,42 @@ function removeNode(id){
 
 }
 
+function deleteSelectedNode(){
+
+  if(!selectedNode){
+
+    toast("Select a node first.");
+    return;
+
+  }
+
+  const node=getNode(selectedNode);
+
+  if(!node)return;
+
+  if(!confirm(`Delete "${node.value}"?`))
+    return;
+
+  removeNode(node.id);
+
+  toast("Node deleted.");
+
+}
 
 function editNode(node){
 
-  const value =
-    prompt(
-      "Edit node value:",
-      node.value
-    );
+  const value=prompt(
+    "Edit node value:",
+    node.value
+  );
 
-  if(value === null){
-    return;
-  }
+  if(value===null)return;
 
-  const clean =
-    value.trim();
+  const clean=value.trim();
 
-  if(!clean){
-    return;
-  }
+  if(!clean)return;
 
-  node.value =
-    clean;
+  node.value=clean;
 
   saveCurrentProject();
 
@@ -2636,129 +1908,86 @@ function editNode(node){
 
 function renderNodes(){
 
-  const world =
-    $("world");
+  const world=$("world");
 
-  world
-    .querySelectorAll(
-      ".node"
-    )
-    .forEach(
-      el =>
-        el.remove()
-    );
+  world.querySelectorAll(".node")
+    .forEach(el=>el.remove());
 
-  nodes.forEach(
-    node=>{
+  nodes.forEach(node=>{
 
-      const el =
-        document.createElement(
-          "div"
-        );
+    const el=document.createElement("div");
 
-      el.className =
-        "node" +
-        (
-          selectedNode === node.id
-            ? " selected"
-            : ""
-        );
+    el.className=
+      "node"+
+      (selectedNode===node.id?" selected":"");
 
-      el.dataset.id =
-        node.id;
+    el.dataset.id=node.id;
 
-      el.style.left =
-        `${node.x + 5000}px`;
+    el.style.left=
+      `${node.x+5000}px`;
 
-      el.style.top =
-        `${node.y + 5000}px`;
+    el.style.top=
+      `${node.y+5000}px`;
 
-      el.innerHTML = `
+    el.innerHTML=`
 
-        <div class="node-title">
-          ${escapeHtml(node.type)}
-        </div>
+      <div class="node-title">
+        ${escapeHtml(node.type)}
+      </div>
 
-        <div class="node-value">
-          ${escapeHtml(node.value)}
-        </div>
+      <div class="node-value">
+        ${escapeHtml(node.value)}
+      </div>
 
-        ${
-          node.note
-            ? `
-              <div
-                class="node-value"
-                style="
-                  margin-top:5px;
-                  color:#666;
-                "
-              >
-                ${escapeHtml(node.note)}
-              </div>
-            `
-            : ""
-        }
+      ${
+        node.note
+        ? `
+          <div class="node-value"
+            style="margin-top:5px;color:#666">
+            ${escapeHtml(node.note)}
+          </div>
+        `
+        :""
+      }
 
-        <div class="node-type">
-          NODE
-        </div>
+      <div class="node-type">
+        NODE
+      </div>
 
-      `;
+    `;
 
-      el.addEventListener(
-        "click",
-        event=>{
+    el.addEventListener("click",event=>{
 
-          event.stopPropagation();
+      event.stopPropagation();
 
-          selectedNode =
-            node.id;
+      selectedNode=node.id;
 
-          renderNodes();
-          renderLines();
+      renderNodes();
+      renderLines();
 
-        }
-      );
+    });
 
-      el.addEventListener(
-        "dblclick",
-        event=>{
+    el.addEventListener("dblclick",event=>{
 
-          event.stopPropagation();
+      event.stopPropagation();
 
-          editNode(node);
+      editNode(node);
 
-        }
-      );
+    });
 
-      el.addEventListener(
-        "contextmenu",
-        event=>{
+    el.addEventListener("contextmenu",event=>{
 
-          event.preventDefault();
-          event.stopPropagation();
+      event.preventDefault();
+      event.stopPropagation();
 
-          if(
-            confirm(
-              "Delete this node?"
-            )
-          ){
+      if(confirm("Delete this node?"))
+        removeNode(node.id);
 
-            removeNode(
-              node.id
-            );
+    });
 
-          }
+    world.appendChild(el);
 
-        }
-      );
-
-      world.appendChild(
-        el
-      );
-
-    }
-  );
+  });
 
   updateProfileUI();
 
@@ -2766,355 +1995,196 @@ function renderNodes(){
 
 
 /* =========================================================
-   LINE ENGINE
+   LINES
 ========================================================= */
 
 function getCenterPoint(node){
 
-  return {
-
-    x:
-      Number(node.x) +
-      5000,
-
-    y:
-      Number(node.y) +
-      5000
-
+  return{
+    x:Number(node.x)+5000,
+    y:Number(node.y)+5000
   };
 
 }
 
+function buildCurvePath(a,b){
 
-function buildCurvePath(
-  a,
-  b
-){
+  const p1=getCenterPoint(a);
+  const p2=getCenterPoint(b);
 
-  const p1 =
-    getCenterPoint(a);
+  const dx=p2.x-p1.x;
+  const dy=p2.y-p1.y;
 
-  const p2 =
-    getCenterPoint(b);
+  const distance=Math.sqrt(
+    dx*dx+dy*dy
+  );
 
-  const dx =
-    p2.x - p1.x;
+  const curve=Math.max(
+    70,
+    Math.min(260,distance*.35)
+  );
 
-  const dy =
-    p2.y - p1.y;
+  let c1x,c1y,c2x,c2y;
 
-  const distance =
-    Math.sqrt(
-      dx * dx +
-      dy * dy
-    );
+  if(Math.abs(dx)>=Math.abs(dy)){
 
-  const curve =
-    Math.max(
-      70,
-      Math.min(
-        260,
-        distance * .35
-      )
-    );
+    const direction=dx>=0?1:-1;
 
-  let c1x;
-  let c1y;
-  let c2x;
-  let c2y;
+    c1x=p1.x+curve*direction;
+    c1y=p1.y;
 
-  if(
-    Math.abs(dx) >=
-    Math.abs(dy)
-  ){
-
-    const direction =
-      dx >= 0
-        ? 1
-        : -1;
-
-    c1x =
-      p1.x +
-      curve *
-      direction;
-
-    c1y =
-      p1.y;
-
-    c2x =
-      p2.x -
-      curve *
-      direction;
-
-    c2y =
-      p2.y;
+    c2x=p2.x-curve*direction;
+    c2y=p2.y;
 
   }else{
 
-    const direction =
-      dy >= 0
-        ? 1
-        : -1;
+    const direction=dy>=0?1:-1;
 
-    c1x =
-      p1.x;
+    c1x=p1.x;
+    c1y=p1.y+curve*direction;
 
-    c1y =
-      p1.y +
-      curve *
-      direction;
-
-    c2x =
-      p2.x;
-
-    c2y =
-      p2.y -
-      curve *
-      direction;
+    c2x=p2.x;
+    c2y=p2.y-curve*direction;
 
   }
 
-  return `
+  return`
     M ${p1.x} ${p1.y}
     C
-      ${c1x} ${c1y},
-      ${c2x} ${c2y},
-      ${p2.x} ${p2.y}
+    ${c1x} ${c1y},
+    ${c2x} ${c2y},
+    ${p2.x} ${p2.y}
   `;
 
 }
 
-
 function renderLines(){
 
-  const svg =
-    $("lines");
+  const svg=$("lines");
 
-  if(!svg){
-    return;
-  }
+  if(!svg)return;
 
-  svg.innerHTML = "";
+  svg.innerHTML="";
 
-  svg.setAttribute(
-    "viewBox",
-    "0 0 10000 10000"
-  );
+  links.forEach(link=>{
 
-  svg.setAttribute(
-    "width",
-    "10000"
-  );
+    const source=getNode(link.source);
+    const target=getNode(link.target);
 
-  svg.setAttribute(
-    "height",
-    "10000"
-  );
+    if(!source||!target)return;
 
-  links.forEach(
-    link=>{
+    const path=document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path"
+    );
 
-      const source =
-        getNode(
-          link.source
-        );
+    path.setAttribute(
+      "d",
+      buildCurvePath(source,target)
+    );
 
-      const target =
-        getNode(
-          link.target
-        );
-
-      if(
-        !source ||
-        !target
-      ){
-        return;
-      }
-
-      const path =
-        document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "path"
-        );
-
-      path.setAttribute(
-        "d",
-        buildCurvePath(
-          source,
-          target
-        )
-      );
-
-      path.setAttribute(
-        "fill",
-        "none"
-      );
-
-      path.setAttribute(
-        "class",
-        "edge" +
+    path.setAttribute("class",
+      "edge"+
+      (
+        selectedNode &&
         (
-          selectedNode &&
-          (
-            source.id === selectedNode ||
-            target.id === selectedNode
-          )
-            ? " active"
-            : ""
+          source.id===selectedNode||
+          target.id===selectedNode
         )
-      );
+        ?" active":""
+      )
+    );
 
-      svg.appendChild(
-        path
-      );
+    svg.appendChild(path);
 
-    }
-  );
+  });
 
 }
 
 
 /* =========================================================
-   PHONE LAYOUT
+   PHONE GRAPH
 ========================================================= */
 
-function layoutPhoneData(
-  root,
-  metadata
-){
+function layoutPhoneData(root,metadata){
 
-  const valid =
-    metadata.filter(
-      item =>
-        item &&
-        item.value !== undefined &&
-        item.value !== null &&
-        String(
-          item.value
-        ).trim() !== ""
+  const valid=metadata.filter(
+    item=>
+      item &&
+      item.value!==undefined &&
+      item.value!==null &&
+      String(item.value).trim()!==""
+  );
+
+  const perColumn=5;
+  const columnGap=420;
+  const rowGap=125;
+
+  root.x=0;
+  root.y=0;
+
+  valid.forEach((item,index)=>{
+
+    const column=Math.floor(index/perColumn);
+    const row=index%perColumn;
+
+    const columnItems=Math.min(
+      perColumn,
+      valid.length-column*perColumn
     );
 
-  const perColumn = 5;
+    const y=
+      (
+        row-
+        (columnItems-1)/2
+      )*rowGap;
 
-  const columnGap = 420;
+    let existing=nodes.find(
+      n=>
+        n.type===item.type &&
+        n.value===String(item.value)
+    );
 
-  const rowGap = 125;
+    if(!existing){
 
-  root.x = 0;
-  root.y = 0;
+      existing={
+        id:makeId(),
+        type:item.type||"DATA",
+        value:String(item.value),
+        note:item.note||"",
+        x:(column+1)*columnGap,
+        y,
+        createdAt:Date.now()
+      };
 
-  valid.forEach(
-    (item,index)=>{
+      nodes.push(existing);
 
-      const column =
-        Math.floor(
-          index /
-          perColumn
-        );
+    }else{
 
-      const row =
-        index %
-        perColumn;
-
-      const columnItems =
-        Math.min(
-          perColumn,
-          valid.length -
-          column *
-          perColumn
-        );
-
-      const y =
-        (
-          row -
-          (columnItems - 1) / 2
-        ) *
-        rowGap;
-
-      let existing =
-        nodes.find(
-          n =>
-            n.type === item.type &&
-            n.value ===
-              String(item.value)
-        );
-
-      if(!existing){
-
-        existing = {
-
-          id:makeId(),
-
-          type:
-            item.type ||
-            "DATA",
-
-          value:
-            String(
-              item.value
-            ),
-
-          note:
-            item.note ||
-            "",
-
-          x:
-            (column + 1) *
-            columnGap,
-
-          y,
-
-          createdAt:
-            Date.now()
-
-        };
-
-        nodes.push(
-          existing
-        );
-
-      }else{
-
-        existing.x =
-          (column + 1) *
-          columnGap;
-
-        existing.y =
-          y;
-
-      }
-
-      const previousCandidates =
-        nodes.filter(
-          n =>
-            n.id !== existing.id &&
-            Number(n.x) <
-              Number(existing.x)
-        );
-
-      if(
-        previousCandidates.length
-      ){
-
-        const nearest =
-          findNearestNode(
-            existing,
-            previousCandidates
-          );
-
-        if(nearest){
-
-          addLink(
-            nearest.id,
-            existing.id
-          );
-
-        }
-
-      }
+      existing.x=(column+1)*columnGap;
+      existing.y=y;
 
     }
-  );
+
+    const previousCandidates=nodes.filter(
+      n=>
+        n.id!==existing.id &&
+        Number(n.x)<Number(existing.x)
+    );
+
+    if(previousCandidates.length){
+
+      const nearest=findNearestNode(
+        existing,
+        previousCandidates
+      );
+
+      if(nearest)
+        addLink(nearest.id,existing.id);
+
+    }
+
+  });
 
 }
 
@@ -3125,58 +2195,189 @@ function layoutPhoneData(
 
 function openTool(type){
 
-  activeTool =
-    type;
+  activeTool=type;
 
-  $("toolInput").value =
-    "";
+  $("toolInput").value="";
+  $("toolResult").style.display="none";
+  $("toolResult").innerHTML="";
 
-  $("toolResult").style.display =
-    "none";
+  if(type==="phone"){
 
-  $("toolResult").textContent =
-    "";
-
-  if(
-    type === "phone"
-  ){
-
-    $("toolTitle").textContent =
-      "CHECK NUMBER";
-
-    $("toolLabel").textContent =
-      "PHONE NUMBER";
-
-    $("toolInput").placeholder =
-      "+374...";
+    $("toolTitle").textContent="CHECK NUMBER";
+    $("toolLabel").textContent="PHONE NUMBER";
+    $("toolInput").placeholder="+374...";
 
   }
 
-  if(
-    type === "address"
-  ){
+  if(type==="address"){
 
-    $("toolTitle").textContent =
-      "CHECK ADDRESS";
-
-    $("toolLabel").textContent =
-      "ADDRESS";
-
-    $("toolInput").placeholder =
-      "Yerevan, Armenia...";
+    $("toolTitle").textContent="CHECK ADDRESS";
+    $("toolLabel").textContent="ADDRESS";
+    $("toolInput").placeholder="Yerevan, Armenia...";
 
   }
 
-  openModal(
-    "toolModal"
+  if(type==="name"){
+
+    $("toolTitle").textContent="CHECK NAME";
+    $("toolLabel").textContent="FULL NAME";
+    $("toolInput").placeholder="First Last...";
+
+  }
+
+  openModal("toolModal");
+
+  setTimeout(()=>{
+    $("toolInput").focus();
+  },50);
+
+}
+
+
+/* =========================================================
+   RESULT HELPERS
+========================================================= */
+
+function firstValue(data,keys){
+
+  if(!data||typeof data!=="object")
+    return "";
+
+  for(const key of keys){
+
+    if(
+      data[key]!==undefined &&
+      data[key]!==null &&
+      String(data[key]).trim()!==""
+    ){
+      return String(data[key]);
+    }
+
+  }
+
+  return "";
+
+}
+
+function recursiveFind(data,keys){
+
+  if(data===null||data===undefined)
+    return "";
+
+  if(typeof data!=="object")
+    return "";
+
+  for(const key of keys){
+
+    if(
+      data[key]!==undefined &&
+      data[key]!==null &&
+      typeof data[key]!=="object" &&
+      String(data[key]).trim()!==""
+    ){
+      return String(data[key]);
+    }
+
+  }
+
+  for(const value of Object.values(data)){
+
+    if(
+      value &&
+      typeof value==="object"
+    ){
+
+      const found=recursiveFind(
+        value,
+        keys
+      );
+
+      if(found)return found;
+
+    }
+
+  }
+
+  return "";
+
+}
+
+function getPhoneField(data,keys){
+
+  return firstValue(
+    data,
+    keys
+  ) ||
+  recursiveFind(
+    data,
+    keys
   );
 
-  setTimeout(
-    ()=>{
-      $("toolInput").focus();
-    },
-    50
+}
+
+function renderPhoneResult(phone,data){
+
+  const country=getPhoneField(
+    data,
+    ["country","country_name","countryName"]
   );
+
+  const region=getPhoneField(
+    data,
+    ["region","region_name","state"]
+  );
+
+  const city=getPhoneField(
+    data,
+    ["city","location"]
+  );
+
+  const timezone=getPhoneField(
+    data,
+    ["timezone","time_zone","tz"]
+  );
+
+  const fullName=getPhoneField(
+    data,
+    [
+      "full_name",
+      "fullname",
+      "name",
+      "person",
+      "owner"
+    ]
+  );
+
+  const rows=[
+    ["NUMBER",phone],
+    ["COUNTRY",country],
+    ["REGION",region],
+    ["CITY",city],
+    ["TIME ZONE",timezone],
+    ["FULL NAME",fullName]
+  ];
+
+  $("toolResult").innerHTML=rows.map(
+    ([key,value])=>`
+
+      <div class="result-row">
+
+        <span class="result-key">
+          ${escapeHtml(key)}
+        </span>
+
+        <span class="result-value ${
+          value?"":"empty"
+        }">
+          ${escapeHtml(value||"Not found")}
+        </span>
+
+      </div>
+
+    `
+  ).join("");
+
+  $("toolResult").style.display="block";
 
 }
 
@@ -3187,78 +2388,74 @@ function openTool(type){
 
 async function runTool(){
 
-  const value =
-    $("toolInput")
-      .value
-      .trim();
+  const value=$("toolInput")
+    .value
+    .trim();
 
   if(!value){
 
-    toast(
-      "Enter a value."
-    );
-
+    toast("Enter a value.");
     return;
 
   }
 
-  const result =
-    $("toolResult");
+  const result=$("toolResult");
 
-  result.style.display =
-    "block";
+  result.style.display="block";
 
-  result.textContent =
-    "PROCESSING...";
+  result.innerHTML=`
+    <div class="result-row">
+      <span class="result-key">STATUS</span>
+      <span class="result-value">CHECKING...</span>
+    </div>
+  `;
 
-  if(
-    activeTool === "phone"
-  ){
+  /* PHONE */
+
+  if(activeTool==="phone"){
 
     try{
 
-      const body =
-        new URLSearchParams();
+      const body=new URLSearchParams();
 
-      body.append(
-        "phone",
-        value
+      body.append("phone",value);
+
+      const response=await fetch(
+        "/api/osint/phone",
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":
+              "application/x-www-form-urlencoded"
+          },
+          body
+        }
       );
 
-      const response =
-        await fetch(
-          "/api/osint/phone",
-          {
-            method:"POST",
-
-            headers:{
-              "Content-Type":
-                "application/x-www-form-urlencoded"
-            },
-
-            body
-          }
-        );
-
-      const data =
-        await response.json();
+      const data=await response.json();
 
       if(!response.ok){
 
-        result.textContent =
-          data.detail ||
-          "Phone lookup failed.";
+        result.innerHTML=`
+          <div class="result-row">
+            <span class="result-key">ERROR</span>
+            <span class="result-value">
+              ${escapeHtml(
+                data.detail||
+                "Phone lookup failed."
+              )}
+            </span>
+          </div>
+        `;
 
         return;
 
       }
 
-      result.textContent =
-        JSON.stringify(
-          data,
-          null,
-          2
-        );
+      renderPhoneResult(
+        value,
+        data
+      );
 
       addPhoneResultToGraph(
         value,
@@ -3267,11 +2464,14 @@ async function runTool(){
 
     }catch(error){
 
-      console.error(error);
-
-      result.textContent =
-        "REQUEST ERROR\n\n" +
-        error.message;
+      result.innerHTML=`
+        <div class="result-row">
+          <span class="result-key">ERROR</span>
+          <span class="result-value">
+            ${escapeHtml(error.message)}
+          </span>
+        </div>
+      `;
 
     }
 
@@ -3280,39 +2480,71 @@ async function runTool(){
   }
 
 
-  if(
-    activeTool === "address"
-  ){
+  /* ADDRESS */
+
+  if(activeTool==="address"){
 
     try{
 
-      const response =
-        await fetch(
-          "/api/map/search?q=" +
-          encodeURIComponent(
-            value
-          )
-        );
+      const response=await fetch(
+        "/api/map/search?q="+
+        encodeURIComponent(value)
+      );
 
-      const data =
-        await response.json();
+      const data=await response.json();
 
       if(!response.ok){
 
-        result.textContent =
-          data.detail ||
-          "Address lookup failed.";
+        result.innerHTML=`
+          <div class="result-row">
+            <span class="result-key">ERROR</span>
+            <span class="result-value">
+              ${escapeHtml(
+                data.detail||
+                "Address lookup failed."
+              )}
+            </span>
+          </div>
+        `;
 
         return;
 
       }
 
-      result.textContent =
-        JSON.stringify(
-          data,
-          null,
-          2
-        );
+      let display="";
+
+      if(Array.isArray(data)&&data.length){
+
+        const item=data[0];
+
+        display=
+          item.display_name||
+          item.name||
+          item.address||
+          value;
+
+      }else if(data&&typeof data==="object"){
+
+        display=
+          data.display_name||
+          data.address||
+          data.name||
+          value;
+
+      }else{
+
+        display=value;
+
+      }
+
+      result.innerHTML=`
+        <div class="result-row">
+          <span class="result-key">ADDRESS</span>
+          <span class="result-value">
+            ${escapeHtml(display)}
+          </span>
+        </div>
+      `;
 
       addAddressResultToGraph(
         value,
@@ -3321,11 +2553,120 @@ async function runTool(){
 
     }catch(error){
 
-      console.error(error);
+      result.innerHTML=`
+        <div class="result-row">
+          <span class="result-key">ERROR</span>
+          <span class="result-value">
+            ${escapeHtml(error.message)}
+          </span>
+        </div>
+      `;
 
-      result.textContent =
-        "REQUEST ERROR\n\n" +
-        error.message;
+    }
+
+    return;
+
+  }
+
+
+  /* NAME */
+
+  if(activeTool==="name"){
+
+    /*
+      The frontend supports a name-search endpoint.
+      If the backend has /api/osint/name it will be used.
+    */
+
+    try{
+
+      const body=new URLSearchParams();
+
+      body.append("name",value);
+
+      const response=await fetch(
+        "/api/osint/name",
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":
+              "application/x-www-form-urlencoded"
+          },
+          body
+        }
+      );
+
+      let data=null;
+
+      try{
+        data=await response.json();
+      }catch{
+        data=null;
+      }
+
+      if(!response.ok){
+
+        result.innerHTML=`
+          <div class="result-row">
+            <span class="result-key">FULL NAME</span>
+            <span class="result-value">
+              ${escapeHtml(value)}
+            </span>
+          </div>
+
+          <div class="result-row">
+            <span class="result-key">STATUS</span>
+            <span class="result-value">
+              Name search is not configured on the backend.
+            </span>
+          </div>
+        `;
+
+        return;
+
+      }
+
+      const foundName=
+        getPhoneField(
+          data,
+          [
+            "full_name",
+            "fullname",
+            "name"
+          ]
+        )||value;
+
+      result.innerHTML=`
+        <div class="result-row">
+          <span class="result-key">FULL NAME</span>
+          <span class="result-value">
+            ${escapeHtml(foundName)}
+          </span>
+        </div>
+      `;
+
+      addNameResultToGraph(
+        value,
+        data
+      );
+
+    }catch(error){
+
+      result.innerHTML=`
+        <div class="result-row">
+          <span class="result-key">FULL NAME</span>
+          <span class="result-value">
+            ${escapeHtml(value)}
+          </span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-key">STATUS</span>
+          <span class="result-value">
+            Search service unavailable.
+          </span>
+        </div>
+      `;
 
     }
 
@@ -3338,151 +2679,96 @@ async function runTool(){
    PHONE -> GRAPH
 ========================================================= */
 
-function addPhoneResultToGraph(
-  phone,
-  data
-){
+function addPhoneResultToGraph(phone,data){
 
-  let root =
-    nodes.find(
-      node =>
-        node.type === "PHONE" &&
-        node.value === phone
-    );
+  let root=nodes.find(
+    node=>
+      node.type==="PHONE" &&
+      node.value===phone
+  );
 
   if(!root){
 
-    root = {
-
+    root={
       id:makeId(),
-
       type:"PHONE",
-
       value:phone,
-
       note:"Phone lookup",
-
       x:0,
       y:0,
-
-      createdAt:
-        Date.now()
-
+      createdAt:Date.now()
     };
 
-    nodes.push(
-      root
-    );
+    nodes.push(root);
 
   }
 
-  const metadata = [];
+  const metadata=[];
 
-  function collect(
-    object,
-    prefix=""
-  ){
-
-    if(
-      object === null ||
-      object === undefined
-    ){
-      return;
-    }
-
-    if(
-      typeof object !== "object"
-    ){
-
-      metadata.push({
-
-        type:
-          prefix
-            .replaceAll(
-              "_",
-              " "
-            )
-            .toUpperCase(),
-
-        value:
-          String(
-            object
-          )
-
-      });
-
-      return;
-
-    }
-
-    if(
-      Array.isArray(object)
-    ){
-
-      object.forEach(
-        (item,index)=>{
-          collect(
-            item,
-            `${prefix}_${index}`
-          );
-        }
-      );
-
-      return;
-
-    }
-
-    Object.entries(
-      object
-    ).forEach(
-      ([key,value])=>{
-
-        collect(
-          value,
-          key
-        );
-
-      }
-    );
-
-  }
-
-  collect(
-    data
+  const country=getPhoneField(
+    data,
+    ["country","country_name","countryName"]
   );
 
-  const unique = [];
-  const seen = new Set();
-
-  metadata.forEach(
-    item=>{
-
-      const key =
-        item.type +
-        "|" +
-        item.value;
-
-      if(
-        seen.has(key)
-      ){
-        return;
-      }
-
-      seen.add(key);
-
-      unique.push(
-        item
-      );
-
-    }
+  const region=getPhoneField(
+    data,
+    ["region","region_name","state"]
   );
+
+  const city=getPhoneField(
+    data,
+    ["city","location"]
+  );
+
+  const timezone=getPhoneField(
+    data,
+    ["timezone","time_zone","tz"]
+  );
+
+  const fullName=getPhoneField(
+    data,
+    [
+      "full_name",
+      "fullname",
+      "name",
+      "person",
+      "owner"
+    ]
+  );
+
+  if(country)
+    metadata.push({
+      type:"COUNTRY",
+      value:country
+    });
+
+  if(region)
+    metadata.push({
+      type:"REGION",
+      value:region
+    });
+
+  if(city)
+    metadata.push({
+      type:"CITY",
+      value:city
+    });
+
+  if(timezone)
+    metadata.push({
+      type:"TIME ZONE",
+      value:timezone
+    });
+
+  if(fullName)
+    metadata.push({
+      type:"FULL NAME",
+      value:fullName
+    });
 
   layoutPhoneData(
     root,
-    unique.slice(
-      0,
-      30
-    )
+    metadata
   );
 
   saveCurrentProject();
@@ -3490,9 +2776,96 @@ function addPhoneResultToGraph(
   renderNodes();
   renderLines();
 
-  toast(
-    "Phone data added."
+  toast("Phone data added.");
+
+}
+
+
+/* =========================================================
+   NAME -> GRAPH
+========================================================= */
+
+function addNameResultToGraph(name,data){
+
+  let root=nodes.find(
+    node=>
+      node.type==="FULL NAME" &&
+      node.value.toLowerCase()===
+      name.toLowerCase()
   );
+
+  if(!root){
+
+    root={
+      id:makeId(),
+      type:"FULL NAME",
+      value:name,
+      note:"Name lookup",
+      x:0,
+      y:0,
+      createdAt:Date.now()
+    };
+
+    nodes.push(root);
+
+  }
+
+  const phone=getPhoneField(
+    data,
+    ["phone","phone_number","number"]
+  );
+
+  const country=getPhoneField(
+    data,
+    ["country","country_name","countryName"]
+  );
+
+  const city=getPhoneField(
+    data,
+    ["city","location"]
+  );
+
+  const values=[
+    phone?{type:"PHONE",value:phone}:null,
+    country?{type:"COUNTRY",value:country}:null,
+    city?{type:"CITY",value:city}:null
+  ].filter(Boolean);
+
+  values.forEach((item,index)=>{
+
+    let node=nodes.find(
+      n=>
+        n.type===item.type &&
+        n.value===item.value
+    );
+
+    if(!node){
+
+      node={
+        id:makeId(),
+        type:item.type,
+        value:item.value,
+        note:"Name lookup",
+        x:420,
+        y:(index-.5)*125,
+        createdAt:Date.now()
+      };
+
+      nodes.push(node);
+
+    }
+
+    addLink(
+      root.id,
+      node.id
+    );
+
+  });
+
+  saveCurrentProject();
+
+  renderNodes();
+  renderLines();
 
 }
 
@@ -3501,180 +2874,112 @@ function addPhoneResultToGraph(
    ADDRESS -> GRAPH
 ========================================================= */
 
-function addAddressResultToGraph(
-  address,
-  data
-){
+function addAddressResultToGraph(address,data){
 
-  let root =
-    nodes.find(
-      node =>
-        node.type === "ADDRESS" &&
-        node.value === address
-    );
+  let root=nodes.find(
+    node=>
+      node.type==="ADDRESS" &&
+      node.value===address
+  );
 
   if(!root){
 
-    root = {
-
+    root={
       id:makeId(),
-
       type:"ADDRESS",
-
       value:address,
-
       note:"Address lookup",
-
       x:0,
       y:0,
-
-      createdAt:
-        Date.now()
-
+      createdAt:Date.now()
     };
 
-    nodes.push(
-      root
-    );
+    nodes.push(root);
 
   }
 
-  const values = [];
+  const values=[];
 
-  function add(
-    type,
-    value
-  ){
+  function add(type,value){
 
     if(
-      value === undefined ||
-      value === null
-    ){
-      return;
-    }
+      value===undefined||
+      value===null
+    )return;
 
-    const clean =
-      String(
-        value
-      ).trim();
+    const clean=String(value).trim();
 
-    if(!clean){
-      return;
-    }
+    if(!clean)return;
 
     values.push({
-
       type,
       value:clean
-
     });
 
   }
 
-  if(
-    Array.isArray(data)
-  ){
+  if(Array.isArray(data)){
 
-    data.forEach(
-      item=>{
+    data.forEach(item=>{
 
-        if(!item){
-          return;
-        }
+      if(!item)return;
 
-        add(
-          "RESULT",
-          item.display_name ||
-          item.name ||
-          item.address ||
-          JSON.stringify(item)
-        );
+      add(
+        "RESULT",
+        item.display_name||
+        item.name||
+        item.address
+      );
 
-      }
-    );
+    });
 
   }else if(
     data &&
-    typeof data === "object"
+    typeof data==="object"
   ){
 
-    Object.entries(
-      data
-    ).forEach(
-      ([key,value])=>{
+    const display=
+      data.display_name||
+      data.address||
+      data.name;
 
-        if(
-          typeof value !==
-          "object"
-        ){
-
-          add(
-            key.toUpperCase(),
-            value
-          );
-
-        }
-
-      }
-    );
+    if(display)
+      add("RESULT",display);
 
   }
 
-  values
-    .slice(0,30)
-    .forEach(
-      (item,index)=>{
+  values.slice(0,10).forEach(
+    (item,index)=>{
 
-        const node = {
+      const node={
+        id:makeId(),
+        type:item.type,
+        value:item.value,
+        note:"Address lookup result",
+        x:420,
+        y:(
+          index-
+          (Math.min(values.length,10)-1)/2
+        )*125,
+        createdAt:Date.now()
+      };
 
-          id:makeId(),
+      nodes.push(node);
 
-          type:item.type,
+      addLink(
+        root.id,
+        node.id
+      );
 
-          value:item.value,
-
-          note:
-            "Address lookup result",
-
-          x:420,
-
-          y:
-            (
-              index -
-              (
-                Math.min(
-                  values.length,
-                  30
-                ) - 1
-              ) / 2
-            ) *
-            125,
-
-          createdAt:
-            Date.now()
-
-        };
-
-        nodes.push(
-          node
-        );
-
-        addLink(
-          root.id,
-          node.id
-        );
-
-      }
-    );
+    }
+  );
 
   saveCurrentProject();
 
   renderNodes();
   renderLines();
 
-  toast(
-    "Address data added."
-  );
+  toast("Address data added.");
 
 }
 
@@ -3685,7 +2990,7 @@ function addAddressResultToGraph(
 
 function applyWorld(){
 
-  $("world").style.transform =
+  $("world").style.transform=
     `
       translate(
         calc(-50% + ${graphX}px),
@@ -3696,62 +3001,43 @@ function applyWorld(){
 
 }
 
-
 function centerGraph(){
 
-  graphScale = 1;
-
-  graphX = 0;
-  graphY = 0;
+  graphScale=1;
+  graphX=0;
+  graphY=0;
 
   applyWorld();
 
 }
 
+function zoomGraph(delta,centerX,centerY){
 
-function zoomGraph(
-  delta,
-  centerX,
-  centerY
-){
+  const oldScale=graphScale;
 
-  const oldScale =
-    graphScale;
-
-  graphScale =
-    Math.max(
-      .35,
-      Math.min(
-        2.5,
-        graphScale +
-        delta
-      )
-    );
+  graphScale=Math.max(
+    .35,
+    Math.min(
+      2.5,
+      graphScale+delta
+    )
+  );
 
   if(
-    centerX !== undefined &&
-    centerY !== undefined
+    centerX!==undefined &&
+    centerY!==undefined
   ){
 
-    const factor =
-      graphScale /
-      oldScale;
+    const factor=
+      graphScale/oldScale;
 
-    graphX =
-      centerX -
-      (
-        centerX -
-        graphX
-      ) *
-      factor;
+    graphX=
+      centerX-
+      (centerX-graphX)*factor;
 
-    graphY =
-      centerY -
-      (
-        centerY -
-        graphY
-      ) *
-      factor;
+    graphY=
+      centerY-
+      (centerY-graphY)*factor;
 
   }
 
@@ -3764,78 +3050,54 @@ function zoomGraph(
    MOUSE GRAPH
 ========================================================= */
 
-$("graph")
-  .addEventListener(
-    "mousedown",
-    event=>{
+$("graph").addEventListener(
+  "mousedown",
+  event=>{
 
-      if(
-        event.target.closest(
-          ".node"
-        )
-      ){
-        return;
-      }
+    if(event.target.closest(".node"))
+      return;
 
-      draggingGraph =
-        true;
+    draggingGraph=true;
 
-      $("graph")
-        .classList
-        .add("dragging");
+    $("graph")
+      .classList
+      .add("dragging");
 
-      dragStartX =
-        event.clientX;
+    dragStartX=event.clientX;
+    dragStartY=event.clientY;
 
-      dragStartY =
-        event.clientY;
+    dragOriginX=graphX;
+    dragOriginY=graphY;
 
-      dragOriginX =
-        graphX;
-
-      dragOriginY =
-        graphY;
-
-    }
-  );
-
+  }
+);
 
 window.addEventListener(
   "mousemove",
   event=>{
 
-    if(
-      !draggingGraph
-    ){
-      return;
-    }
+    if(!draggingGraph)return;
 
-    graphX =
-      dragOriginX +
-      (
-        event.clientX -
-        dragStartX
-      );
+    graphX=
+      dragOriginX+
+      event.clientX-
+      dragStartX;
 
-    graphY =
-      dragOriginY +
-      (
-        event.clientY -
-        dragStartY
-      );
+    graphY=
+      dragOriginY+
+      event.clientY-
+      dragStartY;
 
     applyWorld();
 
   }
 );
 
-
 window.addEventListener(
   "mouseup",
   ()=>{
 
-    draggingGraph =
-      false;
+    draggingGraph=false;
 
     $("graph")
       .classList
@@ -3844,113 +3106,92 @@ window.addEventListener(
   }
 );
 
+$("graph").addEventListener(
+  "wheel",
+  event=>{
 
-$("graph")
-  .addEventListener(
-    "wheel",
-    event=>{
+    event.preventDefault();
 
-      event.preventDefault();
+    const rect=$("graph")
+      .getBoundingClientRect();
 
-      const rect =
-        $("graph")
-          .getBoundingClientRect();
+    const cx=
+      event.clientX-
+      rect.left-
+      rect.width/2;
 
-      const cx =
-        event.clientX -
-        rect.left -
-        rect.width / 2;
+    const cy=
+      event.clientY-
+      rect.top-
+      rect.height/2;
 
-      const cy =
-        event.clientY -
-        rect.top -
-        rect.height / 2;
+    zoomGraph(
+      event.deltaY>0?-.08:.08,
+      cx,
+      cy
+    );
 
-      zoomGraph(
-        event.deltaY > 0
-          ? -.08
-          : .08,
-        cx,
-        cy
-      );
-
-    },
-    {
-      passive:false
-    }
-  );
+  },
+  {passive:false}
+);
 
 
 /* =========================================================
    SEARCH
 ========================================================= */
 
-$("chainSearch")
-  .addEventListener(
-    "input",
-    event=>{
+$("chainSearch").addEventListener(
+  "input",
+  event=>{
 
-      const query =
-        event.target.value
-          .trim()
-          .toLowerCase();
+    const query=
+      event.target.value
+        .trim()
+        .toLowerCase();
 
-      if(!query){
+    if(!query){
 
-        selectedNode =
-          null;
-
-        renderNodes();
-        renderLines();
-
-        return;
-
-      }
-
-      const found =
-        nodes.find(
-          node =>
-            String(
-              node.value
-            )
-            .toLowerCase()
-            .includes(query) ||
-
-            String(
-              node.type
-            )
-            .toLowerCase()
-            .includes(query) ||
-
-            String(
-              node.note || ""
-            )
-            .toLowerCase()
-            .includes(query)
-        );
-
-      if(found){
-
-        selectedNode =
-          found.id;
-
-        graphX =
-          -Number(found.x) *
-          graphScale;
-
-        graphY =
-          -Number(found.y) *
-          graphScale;
-
-        applyWorld();
-
-      }
+      selectedNode=null;
 
       renderNodes();
       renderLines();
 
+      return;
+
     }
-  );
+
+    const found=nodes.find(
+      node=>
+        String(node.value)
+          .toLowerCase()
+          .includes(query)||
+        String(node.type)
+          .toLowerCase()
+          .includes(query)||
+        String(node.note||"")
+          .toLowerCase()
+          .includes(query)
+    );
+
+    if(found){
+
+      selectedNode=found.id;
+
+      graphX=
+        -Number(found.x)*graphScale;
+
+      graphY=
+        -Number(found.y)*graphScale;
+
+      applyWorld();
+
+    }
+
+    renderNodes();
+    renderLines();
+
+  }
+);
 
 
 /* =========================================================
@@ -3959,75 +3200,50 @@ $("chainSearch")
 
 function resizeSaturn(){
 
-  saturnCanvas =
-    $("saturn");
+  saturnCanvas=$("saturn");
 
-  saturnCtx =
-    saturnCanvas.getContext(
-      "2d"
-    );
+  saturnCtx=
+    saturnCanvas.getContext("2d");
 
-  const rect =
-    saturnCanvas
-      .getBoundingClientRect();
+  const rect=
+    saturnCanvas.getBoundingClientRect();
 
-  const dpr =
-    window.devicePixelRatio ||
-    1;
+  const dpr=
+    window.devicePixelRatio||1;
 
-  saturnCanvas.width =
-    rect.width *
-    dpr;
+  saturnCanvas.width=
+    rect.width*dpr;
 
-  saturnCanvas.height =
-    rect.height *
-    dpr;
+  saturnCanvas.height=
+    rect.height*dpr;
 
   saturnCtx.setTransform(
-    dpr,
-    0,
-    0,
-    dpr,
-    0,
-    0
+    dpr,0,0,dpr,0,0
   );
 
   createSaturnParticles();
 
 }
 
-
 function createSaturnParticles(){
 
-  saturnParticles = [];
+  saturnParticles=[];
 
-  const count = 1100;
+  const count=1100;
 
-  for(
-    let i=0;
-    i<count;
-    i++
-  ){
+  for(let i=0;i<count;i++){
 
-    const theta =
-      Math.random() *
-      Math.PI *
-      2;
+    const theta=
+      Math.random()*Math.PI*2;
 
-    const phi =
+    const phi=
       Math.acos(
-        2 *
-        Math.random() -
-        1
+        2*Math.random()-1
       );
 
-    const radius =
-      150 +
-      (
-        Math.random() -
-        .5
-      ) *
-      14;
+    const radius=
+      150+
+      (Math.random()-.5)*14;
 
     saturnParticles.push({
 
@@ -4036,14 +3252,10 @@ function createSaturnParticles(){
       radius,
 
       size:
-        Math.random() *
-        1.4 +
-        .25,
+        Math.random()*1.4+.25,
 
       alpha:
-        Math.random() *
-        .55 +
-        .18
+        Math.random()*.55+.18
 
     });
 
@@ -4051,121 +3263,84 @@ function createSaturnParticles(){
 
 }
 
-
 function drawSaturn(){
 
-  if(
-    !saturnCtx ||
-    !saturnCanvas
-  ){
+  if(!saturnCtx||!saturnCanvas)
     return;
-  }
 
-  const rect =
-    saturnCanvas
-      .getBoundingClientRect();
+  const rect=
+    saturnCanvas.getBoundingClientRect();
 
-  const width =
-    rect.width;
-
-  const height =
-    rect.height;
+  const width=rect.width;
+  const height=rect.height;
 
   saturnCtx.clearRect(
-    0,
-    0,
-    width,
-    height
+    0,0,width,height
   );
 
-  const cx =
-    width / 2;
+  const cx=width/2;
+  const cy=height/2;
 
-  const cy =
-    height / 2;
+  saturnParticles.forEach(particle=>{
 
-  saturnParticles.forEach(
-    particle=>{
-
-      const x =
-        particle.radius *
-        Math.sin(
-          particle.phi
-        ) *
-        Math.cos(
-          particle.theta +
-          saturnRotation
-        );
-
-      const y =
-        particle.radius *
-        Math.sin(
-          particle.phi
-        ) *
-        Math.sin(
-          particle.theta +
-          saturnRotation
-        );
-
-      const z =
-        particle.radius *
-        Math.cos(
-          particle.phi
-        );
-
-      const perspective =
-        1 +
-        z / 700;
-
-      const px =
-        cx +
-        x *
-        perspective;
-
-      const py =
-        cy +
-        y *
-        perspective;
-
-      const size =
-        particle.size *
-        perspective;
-
-      const alpha =
-        Math.max(
-          .03,
-          particle.alpha *
-          (
-            .65 +
-            z / 400
-          )
-        );
-
-      saturnCtx.beginPath();
-
-      saturnCtx.arc(
-        px,
-        py,
-        size,
-        0,
-        Math.PI * 2
+    const x=
+      particle.radius*
+      Math.sin(particle.phi)*
+      Math.cos(
+        particle.theta+
+        saturnRotation
       );
 
-      saturnCtx.fillStyle =
-        `rgba(255,255,255,${alpha})`;
+    const y=
+      particle.radius*
+      Math.sin(particle.phi)*
+      Math.sin(
+        particle.theta+
+        saturnRotation
+      );
 
-      saturnCtx.fill();
+    const z=
+      particle.radius*
+      Math.cos(particle.phi);
 
-    }
-  );
+    const perspective=
+      1+z/700;
+
+    const px=cx+x*perspective;
+    const py=cy+y*perspective;
+
+    const size=
+      particle.size*perspective;
+
+    const alpha=
+      Math.max(
+        .03,
+        particle.alpha*
+        (.65+z/400)
+      );
+
+    saturnCtx.beginPath();
+
+    saturnCtx.arc(
+      px,
+      py,
+      size,
+      0,
+      Math.PI*2
+    );
+
+    saturnCtx.fillStyle=
+      `rgba(255,255,255,${alpha})`;
+
+    saturnCtx.fill();
+
+  });
 
 }
 
-
 function animateSaturn(){
 
-  saturnRotation +=
-    .00065;
+  saturnRotation+=.00065;
 
   drawSaturn();
 
@@ -4175,20 +3350,15 @@ function animateSaturn(){
 
 }
 
-
 function animateRing(){
 
-  const ring =
-    $("saturnRing");
+  const ring=$("saturnRing");
 
-  if(!ring){
-    return;
-  }
+  if(!ring)return;
 
-  ringRotation +=
-    .055;
+  ringRotation+=.055;
 
-  ring.style.transform =
+  ring.style.transform=
     `
       translate(-50%,-50%)
       rotateX(67deg)
@@ -4210,33 +3380,23 @@ window.addEventListener(
   "keydown",
   event=>{
 
-    if(
-      event.key ===
-      "Escape"
-    ){
+    if(event.key==="Escape"){
 
       document
-        .querySelectorAll(
-          ".modal-backdrop"
-        )
+        .querySelectorAll(".modal-backdrop")
         .forEach(
-          modal =>
-            modal.classList.remove(
-              "open"
-            )
+          modal=>
+            modal.classList.remove("open")
         );
 
     }
 
     if(
-      event.key ===
-      "Delete" &&
+      event.key==="Delete" &&
       selectedNode
     ){
 
-      removeNode(
-        selectedNode
-      );
+      deleteSelectedNode();
 
     }
 
@@ -4249,32 +3409,25 @@ window.addEventListener(
 ========================================================= */
 
 document
-  .querySelectorAll(
-    ".modal-backdrop"
-  )
-  .forEach(
-    backdrop=>{
+  .querySelectorAll(".modal-backdrop")
+  .forEach(backdrop=>{
 
-      backdrop.addEventListener(
-        "click",
-        event=>{
+    backdrop.addEventListener(
+      "click",
+      event=>{
 
-          if(
-            event.target ===
-            backdrop
-          ){
+        if(event.target===backdrop){
 
-            backdrop.classList.remove(
-              "open"
-            );
-
-          }
+          backdrop.classList.remove(
+            "open"
+          );
 
         }
-      );
 
-    }
-  );
+      }
+    );
+
+  });
 
 
 /* =========================================================
@@ -4290,50 +3443,34 @@ setInterval(
 
 
 /* =========================================================
-   INTRO -> APP
+   INTRO
 ========================================================= */
 
 function startIntro(){
 
-  const boot =
-    $("bootScreen");
+  const boot=$("bootScreen");
+  const app=$("app");
 
-  const app =
-    $("app");
+  setTimeout(()=>{
 
-  /*
-    Intro lasts 3 seconds.
-    At exactly 3 seconds it disappears
-    instantly. No fade / no glitch.
-  */
-  setTimeout(
-    ()=>{
+    if(boot){
 
-      if(boot){
+      boot.style.display="none";
+      boot.style.visibility="hidden";
 
-        boot.style.display =
-          "none";
+    }
 
-        boot.style.visibility =
-          "hidden";
+    if(app){
 
-      }
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          app.classList.add("app-ready");
+        });
+      });
 
-      /*
-        Start the main site animation.
-        Exactly 0.8 seconds.
-      */
-      if(app){
+    }
 
-        app.classList.add(
-          "app-ready"
-        );
-
-      }
-
-    },
-    3000
-  );
+  },3000);
 
 }
 
@@ -4346,14 +3483,11 @@ function init(){
 
   loadDB();
 
-  const projects =
-    getProjects();
+  const projects=getProjects();
 
-  if(
-    !projects[currentProject]
-  ){
+  if(!projects[currentProject]){
 
-    projects[currentProject] = {
+    projects[currentProject]={
 
       nodes:
         JSON.parse(
@@ -4365,17 +3499,12 @@ function init(){
           JSON.stringify(links)
         ),
 
-      createdAt:
-        Date.now(),
-
-      updatedAt:
-        Date.now()
+      createdAt:Date.now(),
+      updatedAt:Date.now()
 
     };
 
-    saveProjects(
-      projects
-    );
+    saveProjects(projects);
 
   }
 
@@ -4395,18 +3524,11 @@ function init(){
 
   animateRing();
 
-  /*
-    Start intro AFTER the whole app
-    has been initialized.
-  */
-  requestAnimationFrame(
-    ()=>{
-      startIntro();
-    }
-  );
+  requestAnimationFrame(()=>{
+    startIntro();
+  });
 
 }
-
 
 window.addEventListener(
   "resize",
@@ -4415,7 +3537,6 @@ window.addEventListener(
     renderLines();
   }
 );
-
 
 init();
 
