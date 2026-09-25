@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 
-<title>nezzx|osint</title>
+<title>NZX OSINT TOOL</title>
 
 <style>
 :root{
@@ -61,9 +61,6 @@ button{
   justify-content:center;
 
   overflow:hidden;
-
-  animation:bootHide .01s steps(1,end) forwards;
-  animation-delay:3s;
 }
 
 .intro-wrap{
@@ -170,20 +167,8 @@ button{
   }
 }
 
-@keyframes bootHide{
-  from{
-    opacity:1;
-    visibility:visible;
-  }
-  to{
-    opacity:0;
-    visibility:hidden;
-    pointer-events:none;
-  }
-}
-
 /* =========================================================
-   APP
+   APP INTRO ENTER ANIMATION
 ========================================================= */
 
 #app{
@@ -199,6 +184,24 @@ button{
       transparent 35%
     ),
     #050505;
+
+  opacity:0;
+  visibility:hidden;
+}
+
+#app.app-ready{
+  visibility:visible;
+  animation:appAppear .8s ease-out forwards;
+}
+
+@keyframes appAppear{
+  from{
+    opacity:0;
+  }
+
+  to{
+    opacity:1;
+  }
 }
 
 /* =========================================================
@@ -479,10 +482,6 @@ button{
   cursor:grabbing;
 }
 
-/*
-  IMPORTANT:
-  World and SVG use exactly the same coordinate system.
-*/
 .world{
   position:absolute;
 
@@ -515,9 +514,6 @@ button{
   z-index:1;
 }
 
-/*
-  Nodes are above SVG.
-*/
 .node{
   position:absolute;
 
@@ -954,10 +950,6 @@ button{
   display:block;
 }
 
-/* =========================================================
-   MOBILE
-========================================================= */
-
 @media(max-width:900px){
 
   .top-tools .top-btn{
@@ -1182,10 +1174,6 @@ button{
 </header>
 
 
-<!-- =========================================================
-     SIDEBAR
-========================================================= -->
-
 <aside class="sidebar">
 
   <button
@@ -1206,10 +1194,6 @@ button{
 
 </aside>
 
-
-<!-- =========================================================
-     CHAIN
-========================================================= -->
 
 <section
   class="page chain-page active"
@@ -1294,7 +1278,6 @@ button{
       id="world"
     >
 
-      <!-- SVG IS FIRST SO NODES ARE ALWAYS ABOVE IT -->
       <svg
         class="lines"
         id="lines"
@@ -1310,10 +1293,6 @@ button{
 
 </section>
 
-
-<!-- =========================================================
-     PROFILE
-========================================================= -->
 
 <section
   class="page profile-page"
@@ -1401,10 +1380,6 @@ button{
 
 </div>
 
-
-<!-- =========================================================
-     NODE MODAL
-========================================================= -->
 
 <div
   class="modal-backdrop"
@@ -1500,10 +1475,6 @@ button{
 
 </div>
 
-
-<!-- =========================================================
-     TOOL MODAL
-========================================================= -->
 
 <div
   class="modal-backdrop"
@@ -2462,11 +2433,6 @@ function createNode(){
     node
   );
 
-  /*
-    Every new node after the first one
-    automatically connects to the closest
-    existing node.
-  */
   if(nodes.length > 1){
 
     const candidates =
@@ -2701,11 +2667,6 @@ function renderNodes(){
       el.dataset.id =
         node.id;
 
-      /*
-        IMPORTANT:
-        Node coordinates are in exactly
-        the same 10000x10000 world as SVG.
-      */
       el.style.left =
         `${node.x + 5000}px`;
 
@@ -2805,7 +2766,7 @@ function renderNodes(){
 
 
 /* =========================================================
-   FIXED LINE ENGINE
+   LINE ENGINE
 ========================================================= */
 
 function getCenterPoint(node){
@@ -2842,11 +2803,6 @@ function buildCurvePath(
   const dy =
     p2.y - p1.y;
 
-  /*
-    Curvature is based on horizontal
-    distance, but also works for
-    vertical / diagonal nodes.
-  */
   const distance =
     Math.sqrt(
       dx * dx +
@@ -2938,15 +2894,8 @@ function renderLines(){
     return;
   }
 
-  /*
-    Completely rebuild SVG every time.
-    This prevents stale paths.
-  */
   svg.innerHTML = "";
 
-  /*
-    Force the exact coordinate system.
-  */
   svg.setAttribute(
     "viewBox",
     "0 0 10000 10000"
@@ -3051,9 +3000,6 @@ function layoutPhoneData(
 
   const rowGap = 125;
 
-  /*
-    Root stays in center.
-  */
   root.x = 0;
   root.y = 0;
 
@@ -3138,11 +3084,6 @@ function layoutPhoneData(
 
       }
 
-      /*
-        Root -> first column
-        Later columns -> nearest node
-        from previous column.
-      */
       const previousCandidates =
         nodes.filter(
           n =>
@@ -3637,9 +3578,7 @@ function addAddressResultToGraph(
     data.forEach(
       item=>{
 
-        if(
-          !item
-        ){
+        if(!item){
           return;
         }
 
@@ -4351,13 +4290,57 @@ setInterval(
 
 
 /* =========================================================
-   INIT
+   INTRO -> APP
 ========================================================= */
 
-function initBoot(){
-  /* CSS controls intro */
+function startIntro(){
+
+  const boot =
+    $("bootScreen");
+
+  const app =
+    $("app");
+
+  /*
+    Intro lasts 3 seconds.
+    At exactly 3 seconds it disappears
+    instantly. No fade / no glitch.
+  */
+  setTimeout(
+    ()=>{
+
+      if(boot){
+
+        boot.style.display =
+          "none";
+
+        boot.style.visibility =
+          "hidden";
+
+      }
+
+      /*
+        Start the main site animation.
+        Exactly 0.8 seconds.
+      */
+      if(app){
+
+        app.classList.add(
+          "app-ready"
+        );
+
+      }
+
+    },
+    3000
+  );
+
 }
 
+
+/* =========================================================
+   INIT
+========================================================= */
 
 function init(){
 
@@ -4412,7 +4395,15 @@ function init(){
 
   animateRing();
 
-  initBoot();
+  /*
+    Start intro AFTER the whole app
+    has been initialized.
+  */
+  requestAnimationFrame(
+    ()=>{
+      startIntro();
+    }
+  );
 
 }
 
