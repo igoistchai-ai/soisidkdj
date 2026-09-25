@@ -32,14 +32,8 @@ html,body{
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
 }
 
-button,input,textarea{
-  font:inherit;
-}
-
-button{
-  color:inherit;
-  border:0;
-}
+button,input,textarea{font:inherit}
+button{color:inherit;border:0}
 
 .app{
   position:fixed;
@@ -47,10 +41,6 @@ button{
   display:flex;
   flex-direction:column;
 }
-
-/* =========================
-   TOP
-========================= */
 
 .topbar{
   height:70px;
@@ -75,7 +65,6 @@ button{
   color:#050505;
   font-weight:1000;
   font-size:20px;
-  box-shadow:0 0 35px rgba(255,255,255,.08);
 }
 
 .brand b{
@@ -90,30 +79,6 @@ button{
   color:#555;
   font-size:8px;
   letter-spacing:2px;
-}
-
-.profile-mini{
-  width:40px;
-  height:40px;
-  margin-left:8px;
-  flex:none;
-  padding:0;
-  border:1px solid var(--line2);
-  border-radius:50%;
-  overflow:hidden;
-  background:#111;
-  cursor:pointer;
-}
-
-.profile-mini img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.profile-mini img:not([src]),
-.profile-mini img[src=""]{
-  display:none;
 }
 
 .top-tools{
@@ -142,15 +107,23 @@ button{
   background:#151515;
 }
 
-.top-btn.primary{
-  background:#fff;
-  color:#050505;
-  border-color:#fff;
+.profile-mini{
+  width:40px;
+  height:40px;
+  margin-left:8px;
+  padding:0;
+  border:1px solid var(--line2);
+  border-radius:50%;
+  overflow:hidden;
+  background:#111;
+  cursor:pointer;
 }
 
-/* =========================
-   BODY
-========================= */
+.profile-mini img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
 
 .body{
   flex:1;
@@ -202,10 +175,6 @@ button{
   overflow:hidden;
 }
 
-/* =========================
-   PAGES
-========================= */
-
 .page{
   position:absolute;
   inset:0;
@@ -218,19 +187,11 @@ button{
 }
 
 @keyframes pageIn{
-  from{
-    opacity:0;
-    transform:translateY(5px);
-  }
-  to{
-    opacity:1;
-    transform:none;
-  }
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:none}
 }
 
-/* =========================
-   SATURN
-========================= */
+/* SATURN */
 
 .saturn{
   position:absolute;
@@ -254,10 +215,7 @@ button{
   top:50%;
   width:74%;
   height:24%;
-  transform:
-    translate(-50%,-50%)
-    rotateX(67deg)
-    rotateZ(-15deg);
+  transform:translate(-50%,-50%) rotateX(67deg) rotateZ(-15deg);
   border:1px solid rgba(220,220,220,.15);
   border-radius:50%;
   box-shadow:
@@ -265,9 +223,7 @@ button{
     0 0 35px rgba(255,255,255,.04);
 }
 
-/* =========================
-   CHAIN
-========================= */
+/* GRAPH */
 
 .chain-page{
   position:absolute;
@@ -302,9 +258,7 @@ button{
   padding:0 10px;
 }
 
-.chain-search::placeholder{
-  color:#555;
-}
+.chain-search::placeholder{color:#555}
 
 .graph{
   position:absolute;
@@ -318,9 +272,7 @@ button{
   background-size:80px 80px,80px 80px,30px 30px;
 }
 
-.graph.dragging{
-  cursor:grabbing;
-}
+.graph.dragging{cursor:grabbing}
 
 .world{
   position:absolute;
@@ -384,8 +336,7 @@ button{
   padding:16px;
   border:1px solid rgba(255,255,255,.12);
   border-radius:18px;
-  background:
-    linear-gradient(145deg,rgba(24,24,24,.98),rgba(9,9,9,.98));
+  background:linear-gradient(145deg,rgba(24,24,24,.98),rgba(9,9,9,.98));
   box-shadow:
     0 22px 60px rgba(0,0,0,.5),
     inset 0 1px rgba(255,255,255,.04);
@@ -427,9 +378,10 @@ button{
   color:#777;
   font-size:12px;
   line-height:1.45;
-  max-height:40px;
+  max-height:45px;
   overflow:hidden;
   white-space:pre-line;
+  word-break:break-word;
 }
 
 .node-dot{
@@ -480,13 +432,9 @@ button{
   opacity:0;
 }
 
-.node-card:hover .node-delete{
-  opacity:1;
-}
+.node-card:hover .node-delete{opacity:1}
 
-/* =========================
-   TOOL MODAL
-========================= */
+/* MODAL */
 
 .tool-modal{
   position:fixed;
@@ -499,9 +447,7 @@ button{
   padding:20px;
 }
 
-.tool-modal.show{
-  display:grid;
-}
+.tool-modal.show{display:grid}
 
 .modal-box{
   width:min(510px,100%);
@@ -510,21 +456,14 @@ button{
   padding:25px;
   border:1px solid rgba(255,255,255,.16);
   border-radius:22px;
-  background:
-    linear-gradient(145deg,#151515,#090909);
+  background:linear-gradient(145deg,#151515,#090909);
   box-shadow:0 35px 120px rgba(0,0,0,.75);
   animation:modalIn .25s ease;
 }
 
 @keyframes modalIn{
-  from{
-    opacity:0;
-    transform:translateY(15px) scale(.97);
-  }
-  to{
-    opacity:1;
-    transform:none;
-  }
+  from{opacity:0;transform:translateY(15px) scale(.97)}
+  to{opacity:1;transform:none}
 }
 
 .modal-top{
@@ -549,10 +488,6 @@ button{
   cursor:pointer;
 }
 
-.close:hover{
-  color:#fff;
-}
-
 .modal-description{
   color:#666;
   font-size:11px;
@@ -571,9 +506,7 @@ button{
   color:#fff;
 }
 
-.modal-input:focus{
-  border-color:var(--line2);
-}
+.modal-input:focus{border-color:var(--line2)}
 
 .modal-actions{
   display:flex;
@@ -595,7 +528,6 @@ button{
   background:#fff;
   color:#050505;
   border-color:#fff;
-  font-weight:850;
 }
 
 .results{
@@ -618,14 +550,8 @@ button{
 }
 
 @keyframes resultIn{
-  from{
-    opacity:0;
-    transform:translateY(5px);
-  }
-  to{
-    opacity:1;
-    transform:none;
-  }
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:none}
 }
 
 .result-icon{
@@ -654,18 +580,18 @@ button{
 .result-main small{
   display:block;
   margin-top:3px;
-  color:#666;
+  color:#777;
   font-size:10px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:normal;
+  white-space:pre-wrap;
   word-break:break-word;
+  line-height:1.45;
 }
 
 .result-status{
   font-size:9px;
   font-weight:900;
   letter-spacing:.8px;
+  flex:none;
 }
 
 .status-found{color:var(--good)}
@@ -673,9 +599,7 @@ button{
 .status-error{color:var(--bad)}
 .status-info{color:#aaa}
 
-/* =========================
-   PROFILE
-========================= */
+/* PROFILE */
 
 .profile{
   position:absolute;
@@ -736,18 +660,12 @@ button{
   cursor:pointer;
 }
 
-.profile-button:hover{
-  color:#fff;
-}
-
 .profile-button.primary{
   background:#fff;
   color:#000;
 }
 
-/* =========================
-   NODE MODAL
-========================= */
+/* NODE MODAL */
 
 #nodeModal{
   position:fixed;
@@ -769,9 +687,7 @@ button{
   box-shadow:0 35px 100px #000;
 }
 
-.field{
-  margin-top:13px;
-}
+.field{margin-top:13px}
 
 .field label{
   display:block;
@@ -805,7 +721,6 @@ button{
   background:#111;
   color:#aaa;
   cursor:pointer;
-  transition:.18s;
 }
 
 .btn:hover{
@@ -820,9 +735,7 @@ button{
   font-weight:850;
 }
 
-/* =========================
-   TOAST
-========================= */
+/* TOAST */
 
 .toast{
   position:fixed;
@@ -846,27 +759,15 @@ button{
   transform:translate(-50%,0);
 }
 
-/* =========================
-   MOBILE
-========================= */
-
 @media(max-width:760px){
 
-  .topbar{
-    height:62px;
-  }
+  .topbar{height:62px}
 
-  .brand small{
-    display:none;
-  }
+  .brand small{display:none}
 
-  .brand b{
-    font-size:11px;
-  }
+  .brand b{font-size:11px}
 
-  .top-tools{
-    display:none;
-  }
+  .top-tools{display:none}
 
   .sidebar{
     position:absolute;
@@ -888,9 +789,7 @@ button{
     height:48px;
   }
 
-  .main{
-    padding-bottom:57px;
-  }
+  .main{padding-bottom:57px}
 
   .saturn{
     width:520px;
@@ -903,13 +802,7 @@ button{
     top:9px;
   }
 
-  .chain-search{
-    min-width:0;
-  }
-
-  .profile{
-    padding:20px;
-  }
+  .profile{padding:20px}
 }
 </style>
 </head>
@@ -956,16 +849,14 @@ button{
   <button
     class="side-btn active"
     data-page="chain"
-    onclick="showPage('chain')"
-    title="Chain">
+    onclick="showPage('chain')">
     ⌘
   </button>
 
   <button
     class="side-btn"
     data-page="profile"
-    onclick="openProfile()"
-    title="Profile">
+    onclick="openProfile()">
     ◎
   </button>
 
@@ -982,8 +873,7 @@ button{
       <input
         class="chain-search"
         id="chainSearch"
-        placeholder="Search chain or node..."
-      >
+        placeholder="Search chain or node...">
 
       <button class="btn" onclick="openNodeModal()">
         ＋ Node
@@ -998,14 +888,8 @@ button{
     <div class="graph" id="graph">
 
       <div class="saturn">
-
         <canvas id="saturn"></canvas>
-
-        <div
-          class="saturn-ring"
-          id="saturnRing">
-        </div>
-
+        <div class="saturn-ring" id="saturnRing"></div>
       </div>
 
       <div class="world" id="world">
@@ -1035,8 +919,7 @@ button{
         <img
           class="profile-avatar"
           id="profileAvatar"
-          alt=""
-        >
+          alt="">
 
         <div class="profile-info">
 
@@ -1078,8 +961,7 @@ button{
         id="avatarFile"
         type="file"
         accept="image/*"
-        style="display:none"
-      >
+        style="display:none">
 
     </div>
 
@@ -1096,8 +978,7 @@ button{
 <div
   class="tool-modal"
   id="toolModal"
-  onclick="outsideToolModal(event)"
->
+  onclick="outsideToolModal(event)">
 
   <div
     class="modal-box"
@@ -1125,8 +1006,7 @@ button{
     <input
       class="modal-input"
       id="toolInput"
-      autocomplete="off"
-    >
+      autocomplete="off">
 
     <div class="modal-actions">
 
@@ -1149,7 +1029,6 @@ button{
     </div>
 
   </div>
-
 </div>
 
 <!-- NODE MODAL -->
@@ -1165,40 +1044,28 @@ button{
     </h2>
 
     <div class="field">
-
       <label>NAME</label>
-
       <input
         id="nodeTitle"
         placeholder="Username">
-
     </div>
 
     <div class="field">
-
       <label>TYPE</label>
-
       <input
         id="nodeType"
         placeholder="EMAIL / USERNAME / LOCATION">
-
     </div>
 
     <div class="field">
-
       <label>CONTENT</label>
-
       <textarea
         id="nodeContent"
         placeholder="Information..."></textarea>
-
     </div>
 
     <div
-      style="
-      display:flex;
-      gap:8px;
-      margin-top:17px">
+      style="display:flex;gap:8px;margin-top:17px">
 
       <button
         class="btn"
@@ -1216,7 +1083,6 @@ button{
     </div>
 
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
@@ -1225,10 +1091,10 @@ button{
 "use strict";
 
 /* =========================================================
-   LOCAL DATABASE
+   DATABASE
 ========================================================= */
 
-const STORAGE_KEY="nzx-osint-real-v2";
+const STORAGE_KEY="nzx-osint-real-v3";
 
 let db={
   nodes:{},
@@ -1258,64 +1124,84 @@ try{
         parsed
       );
 
-      if(!db.nodes)
-        db.nodes={};
-
-      if(!db.links)
-        db.links=[];
-
-      if(!db.profile)
-        db.profile={};
+      if(!db.nodes) db.nodes={};
+      if(!db.links) db.links=[];
+      if(!db.profile) db.profile={
+        name:"NZX User",
+        username:"nzx_user",
+        avatar:""
+      };
     }
   }
 
 }catch(e){
-
-  console.warn(
-    "Local database error",
-    e
-  );
+  console.warn(e);
 }
 
 function saveDB(){
 
   try{
-
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify(db)
     );
-
   }catch(e){
-
-    console.warn(
-      "Unable to save database",
-      e
-    );
+    console.warn(e);
   }
 }
 
-const $=
-  id=>document.getElementById(id);
+const $=id=>
+  document.getElementById(id);
 
 function escapeHTML(value){
 
-  const d=
+  const div=
     document.createElement("div");
 
-  d.textContent=
+  div.textContent=
     value==null
     ?""
     :String(value);
 
-  return d.innerHTML;
+  return div.innerHTML;
 }
 
-function sleep(ms){
+function objectToText(value){
 
-  return new Promise(
-    r=>setTimeout(r,ms)
-  );
+  if(value===null)
+    return "null";
+
+  if(value===undefined)
+    return "undefined";
+
+  if(typeof value==="string")
+    return value;
+
+  if(
+    typeof value==="number"||
+    typeof value==="boolean"
+  )
+    return String(value);
+
+  try{
+    return JSON.stringify(
+      value,
+      null,
+      2
+    );
+  }catch(e){
+    return String(value);
+  }
+}
+
+function uid(){
+
+  return "node_"+
+    Date.now().toString(36)+
+    "_"+
+    Math.random()
+      .toString(36)
+      .slice(2,8);
 }
 
 function toast(message){
@@ -1334,9 +1220,7 @@ function toast(message){
   toast.timer=
     setTimeout(
       ()=>{
-        el.classList.remove(
-          "show"
-        );
+        el.classList.remove("show");
       },
       1800
     );
@@ -1351,20 +1235,14 @@ function showPage(page){
   document
     .querySelectorAll(".page")
     .forEach(
-      p=>p.classList.remove(
-        "active"
-      )
+      p=>p.classList.remove("active")
     );
 
   const target=
     $("page-"+page);
 
-  if(target){
-
-    target.classList.add(
-      "active"
-    );
-  }
+  if(target)
+    target.classList.add("active");
 
   document
     .querySelectorAll(".side-btn")
@@ -1378,8 +1256,7 @@ function showPage(page){
     );
 }
 
-window.showPage=
-  showPage;
+window.showPage=showPage;
 
 function openProfile(){
 
@@ -1392,7 +1269,7 @@ window.openProfile=
   openProfile;
 
 /* =========================================================
-   TOOL CONFIG
+   TOOLS
 ========================================================= */
 
 let currentTool=null;
@@ -1403,20 +1280,19 @@ const toolConfig={
     title:"CHECK NUMBER",
     placeholder:"+374 XX XXX XXX",
     description:
-      "Проверка номера через backend. Показываются только данные, полученные от backend."
+      "Проверка номера через backend. Показываются только данные, которые вернул backend."
   },
 
   email:{
     title:"CHECK GMAIL",
     placeholder:"example@gmail.com",
     description:
-      "Проверка email через доступные реальные источники. Если источник не подтверждает результат — UNKNOWN."
+      "Проверка email через доступные реальные источники."
   },
 
   address:{
     title:"CHECK ADDRESS",
-    placeholder:
-      "Yerevan, Armenia или 40.1772, 44.5035",
+    placeholder:"Yerevan, Armenia или 40.1772, 44.5035",
     description:
       "Введите адрес или координаты. Используется геокодирование."
   }
@@ -1425,13 +1301,12 @@ const toolConfig={
 
 function openTool(type){
 
-  currentTool=
-    type;
+  currentTool=type;
 
   const cfg=
     toolConfig[type];
 
-  if(!cfg)return;
+  if(!cfg) return;
 
   $("toolTitle").textContent=
     cfg.title;
@@ -1450,38 +1325,27 @@ function openTool(type){
     .classList.add("show");
 
   setTimeout(
-    ()=>{
-      $("toolInput").focus();
-    },
+    ()=>$("toolInput").focus(),
     50
   );
 }
 
-window.openTool=
-  openTool;
+window.openTool=openTool;
 
 function closeTool(){
 
   $("toolModal")
-    .classList.remove(
-      "show"
-    );
+    .classList.remove("show");
 
   currentTool=null;
 }
 
-window.closeTool=
-  closeTool;
+window.closeTool=closeTool;
 
 function outsideToolModal(e){
 
-  if(
-    e.target.id===
-    "toolModal"
-  ){
-
+  if(e.target.id==="toolModal")
     closeTool();
-  }
 }
 
 window.outsideToolModal=
@@ -1490,18 +1354,15 @@ window.outsideToolModal=
 $("toolInput").addEventListener(
   "keydown",
   e=>{
-
     if(e.key==="Enter"){
-
       e.preventDefault();
-
       runTool();
     }
   }
 );
 
 /* =========================================================
-   RESULT UI
+   RESULT
 ========================================================= */
 
 function addResult(
@@ -1512,15 +1373,11 @@ function addResult(
 ){
 
   const el=
-    document.createElement(
-      "div"
-    );
+    document.createElement("div");
 
-  el.className=
-    "result";
+  el.className="result";
 
-  let cls=
-    "status-unknown";
+  let cls="status-unknown";
 
   if(status==="FOUND")
     cls="status-found";
@@ -1531,34 +1388,18 @@ function addResult(
   if(status==="INFO")
     cls="status-info";
 
-  const safeTitle=
-    escapeHTML(title);
-
-  const safeValue=
-    escapeHTML(value);
-
-  const safeIcon=
-    escapeHTML(icon);
-
-  const safeStatus=
-    escapeHTML(status);
-
   el.innerHTML=`
-
     <div class="result-icon">
-      ${safeIcon}
+      ${escapeHTML(icon)}
     </div>
 
     <div class="result-main">
-
-      <b>${safeTitle}</b>
-
-      <small>${safeValue}</small>
-
+      <b>${escapeHTML(title)}</b>
+      <small>${escapeHTML(value)}</small>
     </div>
 
     <span class="result-status ${cls}">
-      ${safeStatus}
+      ${escapeHTML(status)}
     </span>
   `;
 
@@ -1567,7 +1408,7 @@ function addResult(
 }
 
 /* =========================================================
-   RUN TOOL
+   RUN
 ========================================================= */
 
 async function runTool(){
@@ -1580,14 +1421,13 @@ async function runTool(){
       .value
       .trim();
 
-  $("toolResults")
-    .innerHTML="";
+  $("toolResults").innerHTML="";
 
   if(!value){
 
     addResult(
       "INPUT",
-      "Введите значение",
+      "Введите значение.",
       "ERROR",
       "!"
     );
@@ -1596,83 +1436,32 @@ async function runTool(){
   }
 
   db.searches++;
-
   saveDB();
 
   if(currentTool==="phone"){
-
-    await checkPhoneReal(
-      value
-    );
-
+    await checkPhoneReal(value);
     return;
   }
 
   if(currentTool==="email"){
-
-    await checkEmailReal(
-      value
-    );
-
+    await checkEmailReal(value);
     return;
   }
 
   if(currentTool==="address"){
-
-    await checkAddressReal(
-      value
-    );
-
+    await checkAddressReal(value);
     return;
   }
 }
 
-window.runTool=
-  runTool;
-
-/* =========================================================
-   SAFE ERROR TO TEXT
-========================================================= */
-
-function objectToText(value){
-
-  if(value===null)
-    return "null";
-
-  if(value===undefined)
-    return "undefined";
-
-  if(typeof value==="string")
-    return value;
-
-  if(
-    typeof value==="number"||
-    typeof value==="boolean"
-  ){
-    return String(value);
-  }
-
-  try{
-
-    return JSON.stringify(
-      value,
-      null,
-      2
-    );
-
-  }catch(e){
-
-    return String(value);
-  }
-}
+window.runTool=runTool;
 
 /* =========================================================
    PHONE
+   JSON -> FORM FALLBACK
 ========================================================= */
 
-async function checkPhoneReal(
-  value
-){
+async function checkPhoneReal(value){
 
   addResult(
     "REQUEST",
@@ -1681,47 +1470,70 @@ async function checkPhoneReal(
     "•"
   );
 
+  let response=null;
+  let data=null;
+
   try{
 
-    const response=
+    /* FIRST: JSON */
+
+    response=
       await fetch(
         "/api/osint/phone",
         {
           method:"POST",
-
           headers:{
-            "Content-Type":
-              "application/json",
-
-            "Accept":
-              "application/json"
+            "Content-Type":"application/json",
+            "Accept":"application/json"
           },
-
-          body:
-            JSON.stringify({
-              phone:value
-            })
+          body:JSON.stringify({
+            phone:value
+          })
         }
       );
 
-    let data=null;
-
     try{
-
-      data=
-        await response.json();
-
+      data=await response.json();
     }catch(e){
-
       data=null;
     }
 
-    $("toolResults")
-      .innerHTML="";
+    /*
+      Если backend отвечает 422,
+      пробуем form-urlencoded.
+      Это закрывает случай, когда
+      main.py использует Form(...).
+    */
 
-    /* ======================
-       BACKEND ERROR
-    ====================== */
+    if(response.status===422){
+
+      response=
+        await fetch(
+          "/api/osint/phone",
+          {
+            method:"POST",
+            headers:{
+              "Content-Type":
+                "application/x-www-form-urlencoded",
+              "Accept":
+                "application/json"
+            },
+            body:
+              "phone="+
+              encodeURIComponent(value)
+          }
+        );
+
+      try{
+        data=await response.json();
+      }catch(e){
+        data=null;
+      }
+    }
+
+    $("toolResults").innerHTML="";
+
+    /* ERROR */
 
     if(!response.ok){
 
@@ -1730,9 +1542,37 @@ async function checkPhoneReal(
 
       if(data){
 
-        if(
-          typeof data.detail===
-          "string"
+        if(Array.isArray(data)){
+
+          errorText=
+            data
+              .map(item=>{
+
+                if(
+                  !item||
+                  typeof item!=="object"
+                ){
+                  return String(item);
+                }
+
+                const loc=
+                  Array.isArray(item.loc)
+                  ?item.loc.join(" → ")
+                  :"";
+
+                const msg=
+                  item.msg||
+                  "";
+
+                return loc
+                  ?`${loc}: ${msg}`
+                  :msg;
+
+              })
+              .join("\n");
+
+        }else if(
+          typeof data.detail==="string"
         ){
 
           errorText=
@@ -1773,11 +1613,9 @@ async function checkPhoneReal(
       return;
     }
 
-    /* ======================
-       EMPTY RESPONSE
-    ====================== */
+    /* SUCCESS */
 
-    if(data===null){
+    if(!data){
 
       addResult(
         "RESPONSE",
@@ -1789,26 +1627,13 @@ async function checkPhoneReal(
       return;
     }
 
-    /* ======================
-       REAL RESPONSE
-    ====================== */
+    renderBackendObject(data);
 
-    renderBackendObject(
-      data
-    );
-
-    /* ======================
-       GRAPH
-    ====================== */
-
-    createPhoneGraph(
-      data
-    );
+    createPhoneGraph(data);
 
   }catch(error){
 
-    $("toolResults")
-      .innerHTML="";
+    $("toolResults").innerHTML="";
 
     addResult(
       "CONNECTION",
@@ -1824,31 +1649,19 @@ async function checkPhoneReal(
    PHONE GRAPH
 ========================================================= */
 
-function createPhoneGraph(
-  data
-){
+function createPhoneGraph(data){
 
   if(
     !data||
     typeof data!=="object"
-  ){
-
+  )
     return;
-  }
-
-  /*
-    Если backend вернул ошибку
-    внутри JSON, не создаём
-    ложные nodes.
-  */
 
   if(
     data.ok===false||
     data.success===false
-  ){
-
+  )
     return;
-  }
 
   const phone=
     data.phone||
@@ -1874,42 +1687,35 @@ function createPhoneGraph(
     if(
       content===null||
       content===undefined
-    ){
-
+    )
       return null;
-    }
 
-    const text=
+    const wanted=
       String(content)
         .trim()
         .toLowerCase();
 
-    if(!text)
+    if(!wanted)
       return null;
 
     const found=
       Object.values(db.nodes)
-        .find(
-          n=>
-            String(
-              n.type||""
-            )
+      .find(
+        n=>
+          String(n.type||"")
             .trim()
             .toLowerCase()===
-            String(type)
-              .trim()
-              .toLowerCase()
-            &&
-            String(
-              n.content||""
-            )
+          String(type)
+            .trim()
+            .toLowerCase()
+          &&
+          String(n.content||"")
             .trim()
             .toLowerCase()===
-            text
-        );
+          wanted
+      );
 
-    return found||
-      null;
+    return found||null;
   }
 
   function makeNode(
@@ -1922,37 +1728,28 @@ function createPhoneGraph(
     if(
       content===null||
       content===undefined
-    ){
-
+    )
       return null;
-    }
 
-    const normalized=
-      String(content)
-        .trim();
+    const text=
+      String(content).trim();
 
-    if(!normalized)
+    if(!text)
       return null;
 
     const existing=
       findExisting(
         type,
-        normalized
+        text
       );
 
-    if(existing){
-
+    if(existing)
       return existing.id;
-    }
 
-    const id=
-      uid();
+    const id=uid();
 
-    let x=
-      center.x;
-
-    let y=
-      center.y;
+    let x=center.x;
+    let y=center.y;
 
     if(index>0){
 
@@ -1962,45 +1759,25 @@ function createPhoneGraph(
 
       const radius=
         280+
-        Math.min(
-          index*18,
-          120
-        );
+        Math.min(index*18,120);
 
-      x+=
-        Math.cos(angle)*
-        radius;
-
-      y+=
-        Math.sin(angle)*
-        radius;
+      x+=Math.cos(angle)*radius;
+      y+=Math.sin(angle)*radius;
     }
 
     db.nodes[id]={
-
-      id,
-
-      title:
-        String(title),
-
-      type:
-        String(type),
-
-      content:
-        normalized,
-
-      x,
-      y
+      id:id,
+      title:String(title),
+      type:String(type),
+      content:text,
+      x:x,
+      y:y
     };
 
     created.push(id);
 
     return id;
   }
-
-  /* ======================
-     MAIN PHONE
-  ====================== */
 
   const phoneId=
     makeNode(
@@ -2010,47 +1787,31 @@ function createPhoneGraph(
       0
     );
 
-  let index=1;
-
-  /* ======================
-     COUNTRY
-  ====================== */
+  let i=1;
 
   const countryId=
     makeNode(
       "Country",
       "COUNTRY",
       data.country,
-      index++
+      i++
     );
-
-  /* ======================
-     REGION
-  ====================== */
 
   const regionId=
     makeNode(
       "Region",
       "REGION",
       data.region,
-      index++
+      i++
     );
-
-  /* ======================
-     APPROX CITY
-  ====================== */
 
   const cityId=
     makeNode(
       "Approx. City",
       "CITY",
       data.approx_city,
-      index++
+      i++
     );
-
-  /* ======================
-     VALID
-  ====================== */
 
   const validId=
     data.valid!==undefined
@@ -2058,13 +1819,9 @@ function createPhoneGraph(
       "Number Valid",
       "VALID",
       String(data.valid),
-      index++
+      i++
     )
     :null;
-
-  /* ======================
-     POSSIBLE
-  ====================== */
 
   const possibleId=
     data.possible!==undefined
@@ -2072,66 +1829,43 @@ function createPhoneGraph(
       "Number Possible",
       "POSSIBLE",
       String(data.possible),
-      index++
+      i++
     )
     :null;
-
-  /* ======================
-     CARRIER
-  ====================== */
 
   const carrierId=
     makeNode(
       "Carrier",
       "CARRIER",
       data.carrier,
-      index++
+      i++
     );
-
-  /* ======================
-     NATIONAL
-  ====================== */
 
   const nationalId=
     makeNode(
       "National Format",
       "NATIONAL",
       data.national,
-      index++
+      i++
     );
-
-  /* ======================
-     INTERNATIONAL
-  ====================== */
 
   const internationalId=
     makeNode(
       "International Format",
       "INTERNATIONAL",
       data.international,
-      index++
+      i++
     );
 
-  /* ======================
-     COUNTRY CODE
-  ====================== */
-
-  const countryCodeId=
+  const codeId=
     data.country_code!==undefined
     ?makeNode(
       "Country Code",
       "COUNTRY CODE",
-      "+"+
-      String(
-        data.country_code
-      ),
-      index++
+      "+"+String(data.country_code),
+      i++
     )
     :null;
-
-  /* ======================
-     CONNECT EVERYTHING
-  ====================== */
 
   if(phoneId){
 
@@ -2144,11 +1878,9 @@ function createPhoneGraph(
       carrierId,
       nationalId,
       internationalId,
-      countryCodeId
-    ]
-    .forEach(
+      codeId
+    ].forEach(
       id=>{
-
         if(
           id&&
           !linked(
@@ -2156,7 +1888,6 @@ function createPhoneGraph(
             id
           )
         ){
-
           connect(
             phoneId,
             id
@@ -2169,10 +1900,6 @@ function createPhoneGraph(
   saveDB();
 
   renderAll();
-
-  /* ======================
-     ANIMATION
-  ====================== */
 
   created.forEach(
     id=>{
@@ -2194,16 +1921,154 @@ function createPhoneGraph(
               "node-found"
             );
           },
-          3200
+          3000
         );
       }
     }
   );
 
-  if(created.length){
+  if(created.length)
+    toast("Phone data added to graph");
+}
 
-    toast(
-      "Phone data added to graph"
+/* =========================================================
+   BACKEND RENDER
+========================================================= */
+
+function renderBackendObject(data){
+
+  if(
+    data===null||
+    data===undefined
+  ){
+
+    addResult(
+      "BACKEND RESPONSE",
+      "Пустой ответ.",
+      "UNKNOWN",
+      "?"
+    );
+
+    return;
+  }
+
+  if(typeof data!=="object"){
+
+    addResult(
+      "BACKEND RESPONSE",
+      String(data),
+      "INFO",
+      "{"
+    );
+
+    return;
+  }
+
+  let rendered=false;
+
+  Object.entries(data)
+    .forEach(
+      ([key,value])=>{
+
+        if(
+          value===null||
+          value===undefined
+        )
+          return;
+
+        if(
+          key==="services"&&
+          Array.isArray(value)
+        ){
+
+          value.forEach(
+            service=>{
+
+              if(
+                !service||
+                typeof service!=="object"
+              )
+                return;
+
+              const name=
+                service.service||
+                service.name||
+                "SERVICE";
+
+              const raw=
+                String(
+                  service.status||
+                  "UNKNOWN"
+                ).toUpperCase();
+
+              let status="UNKNOWN";
+
+              if(raw==="FOUND")
+                status="FOUND";
+
+              if(raw==="ERROR")
+                status="ERROR";
+
+              if(raw==="INFO")
+                status="INFO";
+
+              const detail=
+                service.detail??
+                service.message??
+                service.url??
+                "No additional data";
+
+              addResult(
+                name,
+                objectToText(detail),
+                status,
+                String(name)[0]||"?"
+              );
+
+              rendered=true;
+            }
+          );
+
+          return;
+        }
+
+        let valueText=
+          objectToText(value);
+
+        let status="INFO";
+
+        const upper=
+          String(value).toUpperCase();
+
+        if(
+          upper==="TRUE"||
+          upper==="FOUND"
+        )
+          status="FOUND";
+
+        if(upper==="UNKNOWN")
+          status="UNKNOWN";
+
+        addResult(
+          key
+            .replace(/_/g," ")
+            .toUpperCase(),
+          valueText,
+          status,
+          key[0]||"?"
+        );
+
+        rendered=true;
+      }
+    );
+
+  if(!rendered){
+
+    addResult(
+      "BACKEND RESPONSE",
+      objectToText(data),
+      "INFO",
+      "{"
     );
   }
 }
@@ -2212,13 +2077,10 @@ function createPhoneGraph(
    EMAIL
 ========================================================= */
 
-async function checkEmailReal(
-  value
-){
+async function checkEmailReal(value){
 
   if(
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      .test(value)
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
   ){
 
     addResult(
@@ -2245,68 +2107,49 @@ async function checkEmailReal(
         "/api/osint/email",
         {
           method:"POST",
-
           headers:{
-            "Content-Type":
-              "application/json",
-
-            "Accept":
-              "application/json"
+            "Content-Type":"application/json",
+            "Accept":"application/json"
           },
-
-          body:
-            JSON.stringify({
-              email:value
-            })
+          body:JSON.stringify({
+            email:value
+          })
         }
       );
 
     let data=null;
 
     try{
-
-      data=
-        await response.json();
-
+      data=await response.json();
     }catch(e){}
 
-    $("toolResults")
-      .innerHTML="";
+    $("toolResults").innerHTML="";
 
     if(!response.ok){
 
-      let errorText=
+      let msg=
         `HTTP ${response.status}`;
 
       if(data){
 
         if(
-          typeof data.detail===
-          "string"
+          typeof data.detail==="string"
         ){
-
-          errorText=
-            data.detail;
-
+          msg=data.detail;
         }else if(
           data.detail!==undefined
         ){
-
-          errorText=
-            objectToText(
-              data.detail
-            );
-
+          msg=objectToText(
+            data.detail
+          );
         }else{
-
-          errorText=
-            objectToText(data);
+          msg=objectToText(data);
         }
       }
 
       addResult(
         "BACKEND ERROR",
-        errorText,
+        msg,
         "ERROR",
         "!"
       );
@@ -2314,26 +2157,11 @@ async function checkEmailReal(
       return;
     }
 
-    if(data===null){
-
-      addResult(
-        "RESPONSE",
-        "Backend не вернул JSON.",
-        "ERROR",
-        "!"
-      );
-
-      return;
-    }
-
-    renderBackendObject(
-      data
-    );
+    renderBackendObject(data);
 
   }catch(error){
 
-    $("toolResults")
-      .innerHTML="";
+    $("toolResults").innerHTML="";
 
     addResult(
       "CONNECTION",
@@ -2349,9 +2177,7 @@ async function checkEmailReal(
    ADDRESS
 ========================================================= */
 
-async function checkAddressReal(
-  value
-){
+async function checkAddressReal(value){
 
   addResult(
     "REQUEST",
@@ -2362,24 +2188,20 @@ async function checkAddressReal(
 
   try{
 
-    const coordinateMatch=
+    const coords=
       value.match(
         /^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/
       );
 
     let url;
 
-    if(coordinateMatch){
+    if(coords){
 
       const lat=
-        parseFloat(
-          coordinateMatch[1]
-        );
+        parseFloat(coords[1]);
 
       const lon=
-        parseFloat(
-          coordinateMatch[2]
-        );
+        parseFloat(coords[2]);
 
       if(
         lat<-90||
@@ -2388,12 +2210,11 @@ async function checkAddressReal(
         lon>180
       ){
 
-        $("toolResults")
-          .innerHTML="";
+        $("toolResults").innerHTML="";
 
         addResult(
           "COORDINATES",
-          "Координаты вне допустимого диапазона.",
+          "Неверные координаты.",
           "ERROR",
           "!"
         );
@@ -2404,10 +2225,8 @@ async function checkAddressReal(
       url=
         "https://nominatim.openstreetmap.org/reverse"+
         "?format=jsonv2"+
-        "&lat="+
-        encodeURIComponent(lat)+
-        "&lon="+
-        encodeURIComponent(lon)+
+        "&lat="+encodeURIComponent(lat)+
+        "&lon="+encodeURIComponent(lon)+
         "&addressdetails=1";
 
     }else{
@@ -2417,8 +2236,7 @@ async function checkAddressReal(
         "?format=jsonv2"+
         "&limit=1"+
         "&addressdetails=1"+
-        "&q="+
-        encodeURIComponent(value);
+        "&q="+encodeURIComponent(value);
     }
 
     const response=
@@ -2426,19 +2244,14 @@ async function checkAddressReal(
         url,
         {
           headers:{
-            "Accept":
-              "application/json",
-
-            "User-Agent":
-              "NZX-OSINT-TOOL/1.0"
+            "Accept":"application/json"
           }
         }
       );
 
     if(!response.ok){
 
-      $("toolResults")
-        .innerHTML="";
+      $("toolResults").innerHTML="";
 
       addResult(
         "GEOCODING ERROR",
@@ -2453,23 +2266,7 @@ async function checkAddressReal(
     const data=
       await response.json();
 
-    $("toolResults")
-      .innerHTML="";
-
-    if(
-      Array.isArray(data)&&
-      data.length===0
-    ){
-
-      addResult(
-        "LOCATION",
-        "Адрес не найден.",
-        "UNKNOWN",
-        "?"
-      );
-
-      return;
-    }
+    $("toolResults").innerHTML="";
 
     const place=
       Array.isArray(data)
@@ -2480,7 +2277,7 @@ async function checkAddressReal(
 
       addResult(
         "LOCATION",
-        "Нет результата.",
+        "Адрес не найден.",
         "UNKNOWN",
         "?"
       );
@@ -2529,21 +2326,19 @@ async function checkAddressReal(
 
     if(place.address){
 
-      const addressParts=
-        Object.entries(
-          place.address
-        )
+      const details=
+        Object.entries(place.address)
         .map(
           ([key,val])=>
             `${key}: ${val}`
         )
         .join(" · ");
 
-      if(addressParts){
+      if(details){
 
         addResult(
           "ADDRESS DETAILS",
-          addressParts,
+          details,
           "FOUND",
           "A"
         );
@@ -2552,8 +2347,7 @@ async function checkAddressReal(
 
   }catch(error){
 
-    $("toolResults")
-      .innerHTML="";
+    $("toolResults").innerHTML="";
 
     addResult(
       "CONNECTION",
@@ -2566,306 +2360,34 @@ async function checkAddressReal(
 }
 
 /* =========================================================
-   BACKEND RESULT RENDERER
-========================================================= */
-
-function renderBackendObject(
-  data
-){
-
-  if(
-    data===null||
-    data===undefined
-  ){
-
-    addResult(
-      "BACKEND RESPONSE",
-      "Пустой ответ.",
-      "UNKNOWN",
-      "?"
-    );
-
-    return;
-  }
-
-  if(
-    typeof data!=="object"
-  ){
-
-    addResult(
-      "BACKEND RESPONSE",
-      String(data),
-      "INFO",
-      "{"
-    );
-
-    return;
-  }
-
-  let rendered=false;
-
-  Object.entries(data)
-    .forEach(
-      ([key,value])=>{
-
-        /* ======================
-           SERVICES
-        ====================== */
-
-        if(
-          key==="services"&&
-          Array.isArray(value)
-        ){
-
-          value.forEach(
-            service=>{
-
-              if(
-                !service||
-                typeof service!==
-                "object"
-              ){
-
-                return;
-              }
-
-              const name=
-                service.service||
-                service.name||
-                "SERVICE";
-
-              const rawStatus=
-                String(
-                  service.status||
-                  "UNKNOWN"
-                )
-                .toUpperCase();
-
-              let finalStatus=
-                "UNKNOWN";
-
-              if(
-                rawStatus==="FOUND"
-              ){
-
-                finalStatus=
-                  "FOUND";
-
-              }else if(
-                rawStatus==="ERROR"
-              ){
-
-                finalStatus=
-                  "ERROR";
-
-              }else if(
-                rawStatus==="INFO"
-              ){
-
-                finalStatus=
-                  "INFO";
-              }
-
-              const detail=
-                service.detail??
-                service.message??
-                service.url??
-                "No additional data";
-
-              addResult(
-                name,
-                objectToText(
-                  detail
-                ),
-                finalStatus,
-                String(name)[0]||
-                "?"
-              );
-
-              rendered=true;
-            }
-          );
-
-          return;
-        }
-
-        /* ======================
-           NESTED OBJECT
-        ====================== */
-
-        if(
-          value&&
-          typeof value==="object"
-        ){
-
-          if(
-            Array.isArray(value)
-          ){
-
-            addResult(
-              key
-                .replace(/_/g," ")
-                .toUpperCase(),
-
-              objectToText(
-                value
-              ),
-
-              "INFO",
-
-              key[0]||"?"
-            );
-
-            rendered=true;
-
-            return;
-          }
-
-          /*
-            Не превращаем [object Object].
-            Показываем JSON.
-          */
-
-          addResult(
-            key
-              .replace(/_/g," ")
-              .toUpperCase(),
-
-            objectToText(
-              value
-            ),
-
-            "INFO",
-
-            key[0]||"?"
-          );
-
-          rendered=true;
-
-          return;
-        }
-
-        /* ======================
-           SCALAR
-        ====================== */
-
-        if(
-          value===null||
-          value===undefined
-        ){
-
-          return;
-        }
-
-        let status=
-          "INFO";
-
-        const upper=
-          String(value)
-            .toUpperCase();
-
-        if(
-          upper==="FOUND"||
-          upper==="TRUE"
-        ){
-
-          status="FOUND";
-        }
-
-        if(
-          upper==="UNKNOWN"
-        ){
-
-          status="UNKNOWN";
-        }
-
-        addResult(
-          key
-            .replace(/_/g," ")
-            .toUpperCase(),
-
-          String(value),
-
-          status,
-
-          key[0]||"?"
-        );
-
-        rendered=true;
-      }
-    );
-
-  if(!rendered){
-
-    addResult(
-      "BACKEND RESPONSE",
-      objectToText(data),
-      "INFO",
-      "{"
-    );
-  }
-}
-
-/* =========================================================
    GRAPH
 ========================================================= */
 
-const graph=
-  $("graph");
-
-const world=
-  $("world");
-
-const lines=
-  $("lines");
+const graph=$("graph");
+const world=$("world");
+const lines=$("lines");
 
 let scale=1;
-
-let panX=
-  innerWidth/2;
-
-let panY=
-  innerHeight/2;
+let panX=0;
+let panY=0;
 
 let draggingNode=null;
 let draggingCanvas=null;
 let linking=null;
 let nearest=null;
 
-function uid(){
-
-  return "node_"+
-    Date.now().toString(36)+
-    "_"+
-    Math.random()
-      .toString(36)
-      .slice(2,8);
-}
-
-function screenToWorld(
-  x,
-  y
-){
+function screenToWorld(x,y){
 
   const r=
     graph.getBoundingClientRect();
 
   return {
-
-    x:
-      (x-r.left-panX)/
-      scale,
-
-    y:
-      (y-r.top-panY)/
-      scale
+    x:(x-r.left-panX)/scale,
+    y:(y-r.top-panY)/scale
   };
 }
 
-function distance(
-  a,
-  b
-){
+function distance(a,b){
 
   return Math.hypot(
     a.x-b.x,
@@ -2873,10 +2395,7 @@ function distance(
   );
 }
 
-function linked(
-  a,
-  b
-){
+function linked(a,b){
 
   return db.links.some(
     l=>
@@ -2885,40 +2404,23 @@ function linked(
   );
 }
 
-function connect(
-  a,
-  b
-){
+function connect(a,b){
 
-  if(
-    !a||
-    !b||
-    a===b
-  ){
-
+  if(!a||!b||a===b)
     return;
-  }
 
-  if(
-    linked(a,b)
-  ){
-
+  if(linked(a,b))
     return;
-  }
 
   db.links.push({
-    a,
-    b
+    a:a,
+    b:b
   });
 
   saveDB();
 }
 
-function closestNode(
-  x,
-  y,
-  ignore
-){
+function closestNode(x,y,ignore){
 
   let result=null;
   let min=Infinity;
@@ -2927,19 +2429,12 @@ function closestNode(
     .forEach(
       n=>{
 
-        if(
-          n.id===ignore
-        ){
-
+        if(n.id===ignore)
           return;
-        }
 
         const d=
           distance(
-            {
-              x,
-              y
-            },
+            {x:x,y:y},
             n
           );
 
@@ -2951,17 +2446,14 @@ function closestNode(
       }
     );
 
-  return result
-    ?{
-      node:result,
-      dist:min
-    }
-    :null;
-}
+  if(!result)
+    return null;
 
-/* =========================================================
-   RENDER NODES
-========================================================= */
+  return {
+    node:result,
+    dist:min
+  };
+}
 
 function renderNodes(){
 
@@ -2976,15 +2468,10 @@ function renderNodes(){
       n=>{
 
         const el=
-          document.createElement(
-            "div"
-          );
+          document.createElement("div");
 
-        el.className=
-          "node";
-
-        el.dataset.id=
-          n.id;
+        el.className="node";
+        el.dataset.id=n.id;
 
         el.style.left=
           n.x+"px";
@@ -2996,8 +2483,7 @@ function renderNodes(){
 
           <div class="node-card">
 
-            <button
-              class="node-delete">
+            <button class="node-delete">
               ×
             </button>
 
@@ -3006,16 +2492,11 @@ function renderNodes(){
             </div>
 
             <div class="node-type">
-              ${escapeHTML(
-                n.type||"NODE"
-              )}
+              ${escapeHTML(n.type||"NODE")}
             </div>
 
             <div class="node-content">
-              ${escapeHTML(
-                n.content||
-                "No data"
-              )}
+              ${escapeHTML(n.content||"No data")}
             </div>
 
           </div>
@@ -3023,24 +2504,16 @@ function renderNodes(){
           <div class="node-dot"></div>
         `;
 
-        world.appendChild(
-          el
-        );
+        world.appendChild(el);
 
         const card=
-          el.querySelector(
-            ".node-card"
-          );
+          el.querySelector(".node-card");
 
         const dot=
-          el.querySelector(
-            ".node-dot"
-          );
+          el.querySelector(".node-dot");
 
         const del=
-          el.querySelector(
-            ".node-delete"
-          );
+          el.querySelector(".node-delete");
 
         card.addEventListener(
           "pointerdown",
@@ -3059,12 +2532,8 @@ function renderNodes(){
               !e.target.closest(
                 ".node-delete"
               )
-            ){
-
-              editNode(
-                n.id
-              );
-            }
+            )
+              editNode(n.id);
           }
         );
 
@@ -3095,9 +2564,7 @@ function renderNodes(){
               )
             ){
 
-              delete db.nodes[
-                n.id
-              ];
+              delete db.nodes[n.id];
 
               db.links=
                 db.links.filter(
@@ -3107,7 +2574,6 @@ function renderNodes(){
                 );
 
               saveDB();
-
               renderAll();
             }
           }
@@ -3118,51 +2584,25 @@ function renderNodes(){
   renderLines();
 }
 
-/* =========================================================
-   EDGE PATH
-========================================================= */
+function edgePath(a,b){
 
-function edgePath(
-  a,
-  b
-){
-
-  const dx=
-    b.x-a.x;
-
-  const dy=
-    b.y-a.y;
+  const dx=b.x-a.x;
+  const dy=b.y-a.y;
 
   const len=
     Math.max(
       1,
-      Math.hypot(
-        dx,
-        dy
-      )
+      Math.hypot(dx,dy)
     );
 
-  const nx=
-    dx/len;
+  const nx=dx/len;
+  const ny=dy/len;
 
-  const ny=
-    dy/len;
+  const x1=a.x+nx*105;
+  const y1=a.y+ny*40;
 
-  const x1=
-    a.x+
-    nx*105;
-
-  const y1=
-    a.y+
-    ny*40;
-
-  const x2=
-    b.x-
-    nx*105;
-
-  const y2=
-    b.y-
-    ny*40;
+  const x2=b.x-nx*105;
+  const y2=b.y-ny*40;
 
   const bend=
     Math.min(
@@ -3182,10 +2622,6 @@ function edgePath(
   `;
 }
 
-/* =========================================================
-   LINES
-========================================================= */
-
 function renderLines(){
 
   lines.innerHTML="";
@@ -3194,23 +2630,16 @@ function renderLines(){
     link=>{
 
       const a=
-        db.nodes[
-          link.a
-        ];
+        db.nodes[link.a];
 
       const b=
-        db.nodes[
-          link.b
-        ];
+        db.nodes[link.b];
 
       if(!a||!b)
         return;
 
       const path=
-        edgePath(
-          a,
-          b
-        );
+        edgePath(a,b);
 
       const glow=
         document.createElementNS(
@@ -3227,9 +2656,7 @@ function renderLines(){
         "edge-glow"
       );
 
-      lines.appendChild(
-        glow
-      );
+      lines.appendChild(glow);
 
       const edge=
         document.createElementNS(
@@ -3242,22 +2669,16 @@ function renderLines(){
         path
       );
 
-      edge.classList.add(
-        "edge"
-      );
+      edge.classList.add("edge");
 
-      lines.appendChild(
-        edge
-      );
+      lines.appendChild(edge);
     }
   );
 
   if(linking){
 
     const a=
-      db.nodes[
-        linking.id
-      ];
+      db.nodes[linking.id];
 
     if(a){
 
@@ -3267,9 +2688,7 @@ function renderLines(){
           "path"
         );
 
-      p.classList.add(
-        "edge"
-      );
+      p.classList.add("edge");
 
       p.setAttribute(
         "stroke-dasharray",
@@ -3279,20 +2698,15 @@ function renderLines(){
       p.setAttribute(
         "d",
         `
-        M${a.x+105} ${a.y}
+        M ${a.x+105} ${a.y}
         C
-        ${(a.x+105+linking.x)/2}
-        ${a.y},
-        ${(a.x+105+linking.x)/2}
-        ${linking.y},
-        ${linking.x}
-        ${linking.y}
+        ${(a.x+105+linking.x)/2} ${a.y},
+        ${(a.x+105+linking.x)/2} ${linking.y},
+        ${linking.x} ${linking.y}
         `
       );
 
-      lines.appendChild(
-        p
-      );
+      lines.appendChild(p);
     }
   }
 }
@@ -3300,15 +2714,13 @@ function renderLines(){
 function renderAll(){
 
   renderNodes();
+  applyGraph();
 }
 
 function applyGraph(){
 
   world.style.transform=
-    `
-    translate(${panX}px,${panY}px)
-    scale(${scale})
-    `;
+    `translate(${panX}px,${panY}px) scale(${scale})`;
 
   renderLines();
 }
@@ -3319,61 +2731,45 @@ function applyGraph(){
 
 let editingNode=null;
 
-function openNodeModal(
-  id=null
-){
+function openNodeModal(id=null){
 
   editingNode=id;
 
-  $("nodeModal")
-    .style.display="grid";
+  $("nodeModal").style.display="grid";
 
   if(id){
 
-    const n=
-      db.nodes[id];
+    const n=db.nodes[id];
 
     if(!n){
-
       closeNodeModal();
-
       return;
     }
 
-    $("nodeModalTitle")
-      .textContent=
+    $("nodeModalTitle").textContent=
       "Edit Node";
 
     $("nodeTitle").value=
       n.title||"";
 
     $("nodeType").value=
-      n.type||
-      "NODE";
+      n.type||"NODE";
 
     $("nodeContent").value=
-      n.content||
-      "";
+      n.content||"";
 
   }else{
 
-    $("nodeModalTitle")
-      .textContent=
+    $("nodeModalTitle").textContent=
       "New Node";
 
-    $("nodeTitle").value=
-      "";
-
-    $("nodeType").value=
-      "NODE";
-
-    $("nodeContent").value=
-      "";
+    $("nodeTitle").value="";
+    $("nodeType").value="NODE";
+    $("nodeContent").value="";
   }
 
   setTimeout(
-    ()=>
-      $("nodeTitle").focus(),
+    ()=>$("nodeTitle").focus(),
     40
   );
 }
@@ -3383,10 +2779,7 @@ window.openNodeModal=
 
 function closeNodeModal(){
 
-  $("nodeModal")
-    .style.display=
-    "none";
-
+  $("nodeModal").style.display="none";
   editingNode=null;
 }
 
@@ -3402,29 +2795,21 @@ function saveNode(){
 
   if(!title){
 
-    toast(
-      "Введите название"
-    );
-
+    toast("Введите название");
     return;
   }
 
   if(editingNode){
 
     const n=
-      db.nodes[
-        editingNode
-      ];
+      db.nodes[editingNode];
 
     if(!n){
-
       closeNodeModal();
-
       return;
     }
 
-    n.title=
-      title;
+    n.title=title;
 
     n.type=
       $("nodeType")
@@ -3446,9 +2831,7 @@ function saveNode(){
       );
 
     const count=
-      Object.keys(
-        db.nodes
-      ).length;
+      Object.keys(db.nodes).length;
 
     const angle=
       count*.8;
@@ -3459,14 +2842,13 @@ function saveNode(){
         250
       );
 
-    const id=
-      uid();
+    const id=uid();
 
     db.nodes[id]={
 
-      id,
+      id:id,
 
-      title,
+      title:title,
 
       type:
         $("nodeType")
@@ -3489,70 +2871,37 @@ function saveNode(){
         Math.sin(angle)*
         radius
     };
-
-    const near=
-      closestNode(
-        db.nodes[id].x,
-        db.nodes[id].y,
-        id
-      );
-
-    if(
-      near&&
-      near.dist<450
-    ){
-
-      connect(
-        id,
-        near.node.id
-      );
-    }
   }
 
   saveDB();
-
   closeNodeModal();
-
   renderAll();
 
-  toast(
-    "Node saved"
-  );
+  toast("Node saved");
 }
 
-window.saveNode=
-  saveNode;
+window.saveNode=saveNode;
 
 function editNode(id){
-
-  openNodeModal(
-    id
-  );
+  openNodeModal(id);
 }
 
 /* =========================================================
-   NODE DRAG
+   DRAG
 ========================================================= */
 
-function startNodeDrag(
-  e,
-  id
-){
+function startNodeDrag(e,id){
 
   if(
     e.button!==undefined&&
     e.button!==0
-  ){
-
+  )
     return;
-  }
 
   e.preventDefault();
-
   e.stopPropagation();
 
-  const n=
-    db.nodes[id];
+  const n=db.nodes[id];
 
   if(!n)
     return;
@@ -3564,14 +2913,9 @@ function startNodeDrag(
     );
 
   draggingNode={
-
-    id,
-
-    dx:
-      n.x-p.x,
-
-    dy:
-      n.y-p.y
+    id:id,
+    dx:n.x-p.x,
+    dy:n.y-p.y
   };
 
   const el=
@@ -3579,25 +2923,13 @@ function startNodeDrag(
       `.node[data-id="${id}"]`
     );
 
-  if(el){
-
-    el.classList.add(
-      "moving"
-    );
-  }
+  if(el)
+    el.classList.add("moving");
 }
 
-/* =========================================================
-   LINK
-========================================================= */
-
-function startLink(
-  e,
-  id
-){
+function startLink(e,id){
 
   e.preventDefault();
-
   e.stopPropagation();
 
   const p=
@@ -3607,20 +2939,13 @@ function startLink(
     );
 
   linking={
-
-    id,
-
+    id:id,
     x:p.x,
-
     y:p.y
   };
 
   renderLines();
 }
-
-/* =========================================================
-   POINTER MOVE
-========================================================= */
 
 window.addEventListener(
   "pointermove",
@@ -3672,14 +2997,9 @@ window.addEventListener(
         );
 
       document
-        .querySelectorAll(
-          ".node.near"
-        )
+        .querySelectorAll(".node.near")
         .forEach(
-          x=>
-            x.classList.remove(
-              "near"
-            )
+          x=>x.classList.remove("near")
         );
 
       nearest=null;
@@ -3697,12 +3017,8 @@ window.addEventListener(
             `.node[data-id="${nearest}"]`
           );
 
-        if(target){
-
-          target.classList.add(
-            "near"
-          );
-        }
+        if(target)
+          target.classList.add("near");
       }
 
       renderLines();
@@ -3716,11 +3032,8 @@ window.addEventListener(
           e.clientY
         );
 
-      linking.x=
-        p.x;
-
-      linking.y=
-        p.y;
+      linking.x=p.x;
+      linking.y=p.y;
 
       const near=
         closestNode(
@@ -3730,14 +3043,9 @@ window.addEventListener(
         );
 
       document
-        .querySelectorAll(
-          ".node.near"
-        )
+        .querySelectorAll(".node.near")
         .forEach(
-          x=>
-            x.classList.remove(
-              "near"
-            )
+          x=>x.classList.remove("near")
         );
 
       nearest=null;
@@ -3755,12 +3063,8 @@ window.addEventListener(
             `.node[data-id="${nearest}"]`
           );
 
-        if(target){
-
-          target.classList.add(
-            "near"
-          );
-        }
+        if(target)
+          target.classList.add("near");
       }
 
       renderLines();
@@ -3782,10 +3086,6 @@ window.addEventListener(
     }
   }
 );
-
-/* =========================================================
-   POINTER UP
-========================================================= */
 
 window.addEventListener(
   "pointerup",
@@ -3809,52 +3109,32 @@ window.addEventListener(
 
         if(
           near&&
-          near.dist<160&&
-          !linked(
-            n.id,
-            near.node.id
-          )
+          near.dist<160
         ){
 
           connect(
             n.id,
             near.node.id
           );
-
-          toast(
-            "Automatic connection created"
-          );
         }
       }
 
       document
-        .querySelectorAll(
-          ".node.moving"
-        )
+        .querySelectorAll(".node.moving")
         .forEach(
-          x=>
-            x.classList.remove(
-              "moving"
-            )
+          x=>x.classList.remove("moving")
         );
 
       document
-        .querySelectorAll(
-          ".node.near"
-        )
+        .querySelectorAll(".node.near")
         .forEach(
-          x=>
-            x.classList.remove(
-              "near"
-            )
+          x=>x.classList.remove("near")
         );
 
       draggingNode=null;
-
       nearest=null;
 
       saveDB();
-
       renderAll();
     }
 
@@ -3873,24 +3153,16 @@ window.addEventListener(
           nearest
         );
 
-        toast(
-          "Connection created"
-        );
+        toast("Connection created");
       }
 
       linking=null;
-
       nearest=null;
 
       document
-        .querySelectorAll(
-          ".node.near"
-        )
+        .querySelectorAll(".node.near")
         .forEach(
-          x=>
-            x.classList.remove(
-              "near"
-            )
+          x=>x.classList.remove("near")
         );
 
       renderLines();
@@ -3908,7 +3180,7 @@ window.addEventListener(
 );
 
 /* =========================================================
-   CANVAS DRAG
+   CANVAS PAN
 ========================================================= */
 
 graph.addEventListener(
@@ -3916,36 +3188,24 @@ graph.addEventListener(
   e=>{
 
     if(
-      e.target.closest(
-        ".node"
-      )
-    ){
-
+      e.target.closest(".node")
+    )
       return;
-    }
 
     if(
       e.button!==undefined&&
       e.button!==0
-    ){
-
+    )
       return;
-    }
 
     draggingCanvas={
-
       sx:e.clientX,
-
       sy:e.clientY,
-
       ox:panX,
-
       oy:panY
     };
 
-    graph.classList.add(
-      "dragging"
-    );
+    graph.classList.add("dragging");
   }
 );
 
@@ -3996,9 +3256,7 @@ graph.addEventListener(
     applyGraph();
 
   },
-  {
-    passive:false
-  }
+  {passive:false}
 );
 
 /* =========================================================
@@ -4036,9 +3294,7 @@ $("chainSearch")
           .toLowerCase();
 
       document
-        .querySelectorAll(
-          ".node"
-        )
+        .querySelectorAll(".node")
         .forEach(
           el=>{
 
@@ -4048,9 +3304,7 @@ $("chainSearch")
 
             if(!q){
 
-              el.style.opacity=
-                "1";
-
+              el.style.opacity="1";
               return;
             }
 
@@ -4067,24 +3321,18 @@ $("chainSearch")
                 n.title+" "+
                 n.type+" "+
                 n.content
-              )
-              .toLowerCase();
+              ).toLowerCase();
 
-            if(
-              text.includes(q)
-            ){
+            if(text.includes(q)){
 
-              el.style.opacity=
-                "1";
-
+              el.style.opacity="1";
               el.classList.add(
                 "node-found"
               );
 
             }else{
 
-              el.style.opacity=
-                ".13";
+              el.style.opacity=".13";
             }
           }
         );
@@ -4097,49 +3345,37 @@ $("chainSearch")
 
 function updateProfile(){
 
-  $("profileName")
-    .textContent=
-      db.profile.name||
-      "NZX User";
+  $("profileName").textContent=
+    db.profile.name||
+    "NZX User";
 
-  $("profileUsername")
-    .textContent=
-      "@"+
-      (
-        db.profile.username||
-        "nzx_user"
-      );
+  $("profileUsername").textContent=
+    "@"+
+    (
+      db.profile.username||
+      "nzx_user"
+    );
 
-  if(
-    db.profile.avatar
-  ){
+  if(db.profile.avatar){
 
-    $("profileAvatar")
-      .src=
-        db.profile.avatar;
+    $("profileAvatar").src=
+      db.profile.avatar;
 
-    $("miniAvatar")
-      .src=
-        db.profile.avatar;
+    $("miniAvatar").src=
+      db.profile.avatar;
 
   }else{
 
     $("profileAvatar")
-      .removeAttribute(
-        "src"
-      );
+      .removeAttribute("src");
 
     $("miniAvatar")
-      .removeAttribute(
-        "src"
-      );
+      .removeAttribute("src");
   }
 }
 
 function chooseAvatar(){
-
-  $("avatarFile")
-    .click();
+  $("avatarFile").click();
 }
 
 window.chooseAvatar=
@@ -4157,15 +3393,10 @@ $("avatarFile")
         return;
 
       if(
-        !file.type.startsWith(
-          "image/"
-        )
+        !file.type.startsWith("image/")
       ){
 
-        toast(
-          "Выберите изображение"
-        );
-
+        toast("Выберите изображение");
         return;
       }
 
@@ -4178,17 +3409,12 @@ $("avatarFile")
           reader.result;
 
         saveDB();
-
         updateProfile();
 
-        toast(
-          "Avatar updated"
-        );
+        toast("Avatar updated");
       };
 
-      reader.readAsDataURL(
-        file
-      );
+      reader.readAsDataURL(file);
     }
   );
 
@@ -4221,23 +3447,14 @@ function editProfileName(){
   db.profile.username=
     username
       .trim()
-      .replace(
-        /\s+/g,
-        ""
-      )
-      .replace(
-        /^@/,
-        ""
-      )||
+      .replace(/\s+/g,"")
+      .replace(/^@/,"")||
     "nzx_user";
 
   saveDB();
-
   updateProfile();
 
-  toast(
-    "Profile updated"
-  );
+  toast("Profile updated");
 }
 
 /* =========================================================
@@ -4246,22 +3463,15 @@ function editProfileName(){
 
 (function(){
 
-  const canvas=
-    $("saturn");
-
-  const ctx=
-    canvas.getContext(
-      "2d"
-    );
+  const canvas=$("saturn");
+  const ctx=canvas.getContext("2d");
 
   let W=0;
   let H=0;
   let dpr=1;
 
   const points=[];
-
   const count=1100;
-
   let rotation=0;
 
   function resize(){
@@ -4271,28 +3481,18 @@ function editProfileName(){
 
     dpr=
       Math.min(
-        window.devicePixelRatio||
-        1,
+        window.devicePixelRatio||1,
         2
       );
 
     W=r.width;
-
     H=r.height;
 
-    canvas.width=
-      W*dpr;
-
-    canvas.height=
-      H*dpr;
+    canvas.width=W*dpr;
+    canvas.height=H*dpr;
 
     ctx.setTransform(
-      dpr,
-      0,
-      0,
-      dpr,
-      0,
-      0
+      dpr,0,0,dpr,0,0
     );
   }
 
@@ -4322,20 +3522,17 @@ function editProfileName(){
           )
         );
 
-      const a=
-        i*golden;
+      const a=i*golden;
 
       points.push({
 
         x:
-          Math.cos(a)*
-          radius,
+          Math.cos(a)*radius,
 
-        y,
+        y:y,
 
         z:
-          Math.sin(a)*
-          radius,
+          Math.sin(a)*radius,
 
         size:
           .35+
@@ -4347,43 +3544,23 @@ function editProfileName(){
   function draw(time){
 
     ctx.clearRect(
-      0,
-      0,
-      W,
-      H
+      0,0,W,H
     );
 
-    rotation+=
-      .00065;
+    rotation+=.00065;
 
-    const cx=
-      W/2;
-
-    const cy=
-      H/2;
+    const cx=W/2;
+    const cy=H/2;
 
     const R=
-      Math.min(
-        W,
-        H
-      )*.235;
+      Math.min(W,H)*.235;
 
     const projected=[];
 
-    for(
-      const p
-      of points
-    ){
+    for(const p of points){
 
-      const c=
-        Math.cos(
-          rotation
-        );
-
-      const s=
-        Math.sin(
-          rotation
-        );
+      const c=Math.cos(rotation);
+      const s=Math.sin(rotation);
 
       const x=
         p.x*c-
@@ -4393,19 +3570,12 @@ function editProfileName(){
         p.x*s+
         p.z*c;
 
-      if(
-        z<-.62
-      ){
-
+      if(z<-.62)
         continue;
-      }
 
       const perspective=
         2.2/
-        (
-          2.2-
-          z*.55
-        );
+        (2.2-z*.55);
 
       projected.push({
 
@@ -4421,7 +3591,7 @@ function editProfileName(){
           R*
           perspective,
 
-        z,
+        z:z,
 
         size:
           p.size*
@@ -4429,30 +3599,22 @@ function editProfileName(){
 
         alpha:
           .13+
-          ((z+1)/2)*
-          .57
+          ((z+1)/2)*.57
       });
     }
 
     projected.sort(
-      (a,b)=>
-        a.z-b.z
+      (a,b)=>a.z-b.z
     );
 
-    for(
-      const p
-      of projected
-    ){
+    for(const p of projected){
 
       ctx.beginPath();
 
       ctx.arc(
         p.x,
         p.y,
-        Math.max(
-          .35,
-          p.size
-        ),
+        Math.max(.35,p.size),
         0,
         Math.PI*2
       );
@@ -4463,8 +3625,7 @@ function editProfileName(){
       ctx.fill();
     }
 
-    const ring=
-      $("saturnRing");
+    const ring=$("saturnRing");
 
     const degrees=
       (time*.012)%360;
@@ -4476,18 +3637,13 @@ function editProfileName(){
       rotateZ(${-15+degrees}deg)
       `;
 
-    requestAnimationFrame(
-      draw
-    );
+    requestAnimationFrame(draw);
   }
 
   resize();
-
   seed();
 
-  requestAnimationFrame(
-    draw
-  );
+  requestAnimationFrame(draw);
 
   addEventListener(
     "resize",
@@ -4497,7 +3653,7 @@ function editProfileName(){
 })();
 
 /* =========================================================
-   MODAL EVENTS
+   MODALS
 ========================================================= */
 
 $("nodeModal")
@@ -4506,39 +3662,12 @@ $("nodeModal")
     e=>{
 
       if(
-        e.target.id===
-        "nodeModal"
+        e.target.id==="nodeModal"
       ){
-
         closeNodeModal();
       }
     }
   );
-
-/* =========================================================
-   RESIZE
-========================================================= */
-
-addEventListener(
-  "resize",
-  ()=>{
-
-    if(
-      !Object.keys(
-        db.nodes
-      ).length
-    ){
-
-      panX=
-        graph.clientWidth/2;
-
-      panY=
-        graph.clientHeight/2;
-    }
-
-    applyGraph();
-  }
-);
 
 /* =========================================================
    INIT
@@ -4548,7 +3677,7 @@ renderAll();
 
 setTimeout(
   centerGraph,
-  50
+  80
 );
 
 updateProfile();
