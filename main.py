@@ -1,47 +1,41 @@
 import os
 import re
 import json
-import time
+import uuid
+import sqlite3
 import hashlib
 import secrets
-import sqlite3
-import socket
-import asyncio
-from datetime import datetime, timezone
-from urllib.parse import quote
+from pathlib import Path
+from datetime import datetime
 
 import httpx
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, UploadFile, File
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 
 # ============================================================
 # NZX OSINT TOOL
-# Backend: FastAPI
-# Files required:
-#   main.py
-#   index.html
+# MAIN BACKEND
 # ============================================================
 
-APP_NAME = "NZX OSINT TOOL"
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH = os.getenv("DB_PATH", str(BASE_DIR / "nzx.db"))
+
+PHONE_API_KEY = os.getenv("ABSTRACT_PHONE_API_KEY", "").strip()
+EMAIL_API_KEY = os.getenv("ABSTRACT_EMAIL_API_KEY", "").strip()
 
 PORT = int(os.getenv("PORT", "10000"))
-DB_PATH = os.getenv("DB_PATH", "nzx.db")
 
-GRAVATAR_API_KEY = os.getenv("GRAVATAR_API_KEY", "").strip()
+AVATAR_DIR = BASE_DIR / "avatars"
+AVATAR_DIR.mkdir(exist_ok=True)
 
-# Optional external APIs.
-# Leave empty if you don't have them.
-ABSTRACT_PHONE_API_KEY = os.getenv("ABSTRACT_PHONE_API_KEY", "").strip()
-ABSTRACT_EMAIL_API_KEY = os.getenv("ABSTRACT_EMAIL_API_KEY", "").strip()
 
-NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
-GRAVATAR_URL = "https://api.gravatar.com/v3/profiles"
-
-USER_AGENT = "NZX-OSINT-TOOL/1.0"
-
-app = FastAPI(title=APP_NAME)
+app = FastAPI(
+    title="NZX OSINT TOOL",
+    version="3.0"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -51,16 +45,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount(
+    "/avatars",
+    StaticFiles(directory=str(AVATAR_DIR)),
+    name="avatars"
+)
+
 
 # ============================================================
 # DATABASE
 # ============================================================
 
-db_lock = asyncio.Lock()
-
-
 def db():
-    conn = sqlite3.connect(DB_PATH, timeout=20)
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -72,21 +69,18 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
-            avatar TEXT DEFAULT '',
+            email TEXT UNIQUE,
+            password TEXT NOT NULL,
+            avatar TEXT,
             created_at TEXT NOT NULL
         )
     """)
 
     conn.execute("""
-        CREATE TABLE IF NOT EXISTS chains (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+        CREATE TABLE IF NOT EXISTS sessions (
+            token TEXT PRIMARY KEY,
             user_id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            data TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
+            created_at TEXT NOT NULL
         )
     """)
 
@@ -98,91 +92,105 @@ init_db()
 
 
 # ============================================================
-# SESSION
+# HELPERS
 # ============================================================
 
-SESSIONS = {}
-
-
-def hash_password(password: str):
-    return hashlib.sha256(password.encode("utf-8")).hexdigest()
-
-
 def now():
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.utcnow().isoformat()
 
 
-def create_session(user_id: int):
-    token = secrets.token_urlsafe(40)
-    SESSIONS[token] = {
-        "user_id": user_id,
-        "created_at": time.time()
+def response_ok(data=None):
+    return JSONResponse({
+        "ok": True,
+        "data": data
+    })
+
+
+def response_error(message, code=400, extra=None):
+    payload = {
+        "ok": False,
+        "error": message
     }
-    return token
+
+    if extra:
+        payload["details"] = extra
+
+    return JSONResponse(payload, status_code=code)
 
 
-def get_session(request: Request):
+def clean_email(email):
+    return email.strip().lower()
+
+
+def valid_email(email):
+    return bool(
+        re.match(
+            r"^[^@\s]+@[^@\s]+\.[^@\s]+$",
+            email
+        )
+    )
+
+
+def normalize_phone(phone):
+    phone = phone.strip()
+
+    # сохраняем +
+    if phone.startswith("+"):
+        return "+" + re.sub(r"\D", "", phone[1:])
+
+    return re.sub(r"\D", "", phone)
+
+
+def get_current_user(request: Request):
     token = request.cookies.get("nzx_session")
 
     if not token:
         return None
 
-    session = SESSIONS.get(token)
-
-    if not session:
-        return None
-
-    # 30 days
-    if time.time() - session["created_at"] > 60 * 60 * 24 * 30:
-        SESSIONS.pop(token, None)
-        return None
-
-    return session
-
-
-def get_current_user(request: Request):
-    session = get_session(request)
-
-    if not session:
-        return None
-
     conn = db()
 
-    user = conn.execute(
-        "SELECT * FROM users WHERE id = ?",
-        (session["user_id"],)
-    ).fetchone()
+    row = conn.execute("""
+        SELECT users.*
+        FROM sessions
+        JOIN users ON users.id = sessions.user_id
+        WHERE sessions.token = ?
+    """, (token,)).fetchone()
 
     conn.close()
 
-    return dict(user) if user else None
+    return row
 
 
 # ============================================================
-# BASIC
+# FRONTEND
 # ============================================================
 
 @app.get("/", response_class=HTMLResponse)
 async def index():
-    try:
-        with open("index.html", "r", encoding="utf-8") as f:
-            return f.read()
-    except FileNotFoundError:
+    path = BASE_DIR / "index.html"
+
+    if not path.exists():
         return HTMLResponse(
             "<h1>NZX OSINT TOOL</h1><p>index.html not found</p>",
             status_code=500
         )
 
+    return HTMLResponse(
+        path.read_text(encoding="utf-8")
+    )
+
+
+# ============================================================
+# HEALTH
+# ============================================================
 
 @app.get("/api/health")
 async def health():
     return {
         "ok": True,
-        "app": APP_NAME,
-        "time": now(),
-        "gravatar": bool(GRAVATAR_API_KEY),
-        "phone_provider": bool(ABSTRACT_PHONE_API_KEY),
-        "email_provider": bool(ABSTRACT_EMAIL_API_KEY)
+        "name": "NZX OSINT TOOL",
+        "phone_api": bool(PHONE_API_KEY),
+        "email_api": bool(EMAIL_API_KEY)
     }
 
 
@@ -192,111 +200,110 @@ async def health():
 
 @app.post("/api/register")
 async def register(request: Request):
-    data = await request.json()
 
-    username = str(data.get("username", "")).strip()
-    email = str(data.get("email", "")).strip().lower()
-    password = str(data.get("password", ""))
+    try:
+        body = await request.json()
+    except Exception:
+        return response_error("Invalid JSON")
+
+    username = str(body.get("username", "")).strip()
+    email = clean_email(str(body.get("email", "")))
+    password = str(body.get("password", ""))
 
     if len(username) < 3:
-        raise HTTPException(400, "Username must contain at least 3 characters")
+        return response_error("Username must contain at least 3 characters")
 
-    if not re.match(
-        r"^[^@\s]+@[^@\s]+\.[^@\s]+$",
-        email
-    ):
-        raise HTTPException(400, "Invalid email")
+    if len(password) < 4:
+        return response_error("Password must contain at least 4 characters")
 
-    if len(password) < 6:
-        raise HTTPException(400, "Password must contain at least 6 characters")
+    if email and not valid_email(email):
+        return response_error("Invalid email")
 
     conn = db()
 
-    exists = conn.execute(
-        "SELECT id FROM users WHERE username = ? OR email = ?",
-        (username, email)
-    ).fetchone()
-
-    if exists:
-        conn.close()
-        raise HTTPException(409, "Username or email already exists")
-
-    cur = conn.execute(
-        """
-        INSERT INTO users
-        (username, email, password_hash, avatar, created_at)
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (
+    try:
+        conn.execute("""
+            INSERT INTO users
+            (username, email, password, avatar, created_at)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
             username,
-            email,
-            hash_password(password),
-            "",
+            email or None,
+            hashlib.sha256(password.encode()).hexdigest(),
+            None,
             now()
-        )
-    )
+        ))
 
-    conn.commit()
-    user_id = cur.lastrowid
+        conn.commit()
+
+    except sqlite3.IntegrityError:
+        conn.close()
+        return response_error(
+            "Username or email already exists",
+            409
+        )
+
     conn.close()
 
-    token = create_session(user_id)
-
-    response = JSONResponse({
-        "ok": True,
-        "user": {
-            "id": user_id,
-            "username": username,
-            "email": email,
-            "avatar": ""
-        }
+    return response_ok({
+        "message": "Account created"
     })
-
-    response.set_cookie(
-        "nzx_session",
-        token,
-        httponly=True,
-        samesite="lax",
-        max_age=60 * 60 * 24 * 30
-    )
-
-    return response
 
 
 @app.post("/api/login")
 async def login(request: Request):
-    data = await request.json()
 
-    login_value = str(data.get("login", "")).strip()
-    password = str(data.get("password", ""))
+    try:
+        body = await request.json()
+    except Exception:
+        return response_error("Invalid JSON")
+
+    login_value = str(body.get("login", "")).strip()
+    password = str(body.get("password", ""))
+
+    password_hash = hashlib.sha256(
+        password.encode()
+    ).hexdigest()
 
     conn = db()
 
-    user = conn.execute(
-        """
-        SELECT * FROM users
-        WHERE username = ? OR email = ?
-        """,
-        (login_value, login_value.lower())
-    ).fetchone()
-
-    conn.close()
+    user = conn.execute("""
+        SELECT *
+        FROM users
+        WHERE (username = ? OR email = ?)
+        AND password = ?
+    """, (
+        login_value,
+        login_value.lower(),
+        password_hash
+    )).fetchone()
 
     if not user:
-        raise HTTPException(401, "Invalid login or password")
+        conn.close()
+        return response_error(
+            "Invalid login or password",
+            401
+        )
 
-    if user["password_hash"] != hash_password(password):
-        raise HTTPException(401, "Invalid login or password")
+    token = secrets.token_urlsafe(48)
 
-    token = create_session(user["id"])
+    conn.execute("""
+        INSERT INTO sessions
+        (token, user_id, created_at)
+        VALUES (?, ?, ?)
+    """, (
+        token,
+        user["id"],
+        now()
+    ))
+
+    conn.commit()
+    conn.close()
 
     response = JSONResponse({
         "ok": True,
-        "user": {
-            "id": user["id"],
-            "username": user["username"],
-            "email": user["email"],
-            "avatar": user["avatar"] or ""
+        "data": {
+            "username": user["username"]
         }
     })
 
@@ -313,12 +320,24 @@ async def login(request: Request):
 
 @app.post("/api/logout")
 async def logout(request: Request):
+
     token = request.cookies.get("nzx_session")
 
     if token:
-        SESSIONS.pop(token, None)
+        conn = db()
 
-    response = JSONResponse({"ok": True})
+        conn.execute(
+            "DELETE FROM sessions WHERE token = ?",
+            (token,)
+        )
+
+        conn.commit()
+        conn.close()
+
+    response = JSONResponse({
+        "ok": True
+    })
+
     response.delete_cookie("nzx_session")
 
     return response
@@ -326,73 +345,166 @@ async def logout(request: Request):
 
 @app.get("/api/me")
 async def me(request: Request):
+
     user = get_current_user(request)
 
     if not user:
-        return {
-            "authenticated": False,
-            "user": None
-        }
+        return response_ok({
+            "authenticated": False
+        })
 
-    return {
+    avatar = user["avatar"]
+
+    if avatar:
+        avatar = "/avatars/" + avatar
+
+    return response_ok({
         "authenticated": True,
-        "user": {
-            "id": user["id"],
-            "username": user["username"],
-            "email": user["email"],
-            "avatar": user["avatar"] or ""
-        }
-    }
+        "id": user["id"],
+        "username": user["username"],
+        "email": user["email"],
+        "avatar": avatar
+    })
 
+
+# ============================================================
+# PROFILE / AVATAR
+# ============================================================
 
 @app.post("/api/profile")
 async def profile(request: Request):
+
     user = get_current_user(request)
 
     if not user:
-        raise HTTPException(401, "Login required")
+        return response_error(
+            "Authentication required",
+            401
+        )
 
-    data = await request.json()
+    try:
+        body = await request.json()
+    except Exception:
+        return response_error("Invalid JSON")
 
     username = str(
-        data.get("username", user["username"])
+        body.get("username", user["username"])
     ).strip()
 
-    avatar = str(
-        data.get("avatar", user["avatar"] or "")
-    ).strip()
+    email = clean_email(
+        str(body.get("email", user["email"] or ""))
+    )
 
     if len(username) < 3:
-        raise HTTPException(400, "Invalid username")
+        return response_error("Invalid username")
+
+    if email and not valid_email(email):
+        return response_error("Invalid email")
 
     conn = db()
 
-    duplicate = conn.execute(
-        "SELECT id FROM users WHERE username = ? AND id != ?",
-        (username, user["id"])
-    ).fetchone()
+    try:
+        conn.execute("""
+            UPDATE users
+            SET username = ?, email = ?
+            WHERE id = ?
+        """, (
+            username,
+            email or None,
+            user["id"]
+        ))
 
-    if duplicate:
+        conn.commit()
+
+    except sqlite3.IntegrityError:
         conn.close()
-        raise HTTPException(409, "Username already exists")
+        return response_error(
+            "Username or email already used",
+            409
+        )
 
-    conn.execute(
-        """
-        UPDATE users
-        SET username = ?, avatar = ?
-        WHERE id = ?
-        """,
-        (username, avatar, user["id"])
+    conn.close()
+
+    return response_ok()
+
+
+@app.post("/api/profile/avatar")
+async def upload_avatar(
+    request: Request,
+    file: UploadFile = File(...)
+):
+
+    user = get_current_user(request)
+
+    if not user:
+        return response_error(
+            "Authentication required",
+            401
+        )
+
+    if not file.filename:
+        return response_error("No file selected")
+
+    extension = Path(file.filename).suffix.lower()
+
+    allowed = {
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".webp"
+    }
+
+    if extension not in allowed:
+        return response_error(
+            "Only PNG, JPG, JPEG and WEBP are allowed"
+        )
+
+    data = await file.read()
+
+    if len(data) > 5 * 1024 * 1024:
+        return response_error(
+            "Maximum avatar size is 5 MB"
+        )
+
+    filename = (
+        str(user["id"])
+        + "_"
+        + uuid.uuid4().hex
+        + extension
     )
+
+    path = AVATAR_DIR / filename
+
+    path.write_bytes(data)
+
+    conn = db()
+
+    old_avatar = user["avatar"]
+
+    conn.execute("""
+        UPDATE users
+        SET avatar = ?
+        WHERE id = ?
+    """, (
+        filename,
+        user["id"]
+    ))
 
     conn.commit()
     conn.close()
 
-    return {
-        "ok": True,
-        "username": username,
-        "avatar": avatar
-    }
+    # remove previous avatar
+    if old_avatar:
+        try:
+            old_path = AVATAR_DIR / old_avatar
+            if old_path.exists():
+                old_path.unlink()
+        except Exception:
+            pass
+
+    return response_ok({
+        "avatar": "/avatars/" + filename
+    })
 
 
 # ============================================================
@@ -401,671 +513,598 @@ async def profile(request: Request):
 
 @app.get("/api/users/search")
 async def search_users(q: str = ""):
+
     q = q.strip()
 
-    if not q:
-        return {"results": []}
+    if len(q) < 1:
+        return response_ok([])
 
     conn = db()
 
-    rows = conn.execute(
-        """
+    rows = conn.execute("""
         SELECT id, username, avatar, created_at
         FROM users
         WHERE username LIKE ?
         ORDER BY username
         LIMIT 30
-        """,
-        (f"%{q}%",)
-    ).fetchall()
-
-    conn.close()
-
-    return {
-        "results": [
-            {
-                "id": x["id"],
-                "username": x["username"],
-                "avatar": x["avatar"] or "",
-                "created_at": x["created_at"]
-            }
-            for x in rows
-        ]
-    }
-
-
-# ============================================================
-# CHAINS
-# ============================================================
-
-@app.get("/api/chains")
-async def get_chains(request: Request):
-    user = get_current_user(request)
-
-    if not user:
-        raise HTTPException(401, "Login required")
-
-    conn = db()
-
-    rows = conn.execute(
-        """
-        SELECT id, name, data, created_at, updated_at
-        FROM chains
-        WHERE user_id = ?
-        ORDER BY updated_at DESC
-        """,
-        (user["id"],)
-    ).fetchall()
+    """, (
+        "%" + q + "%",
+    )).fetchall()
 
     conn.close()
 
     result = []
 
     for row in rows:
-        try:
-            parsed = json.loads(row["data"])
-        except Exception:
-            parsed = {}
+
+        avatar = row["avatar"]
+
+        if avatar:
+            avatar = "/avatars/" + avatar
 
         result.append({
             "id": row["id"],
-            "name": row["name"],
-            "data": parsed,
-            "created_at": row["created_at"],
-            "updated_at": row["updated_at"]
+            "username": row["username"],
+            "avatar": avatar
         })
 
-    return {"chains": result}
-
-
-@app.post("/api/chains")
-async def create_chain(request: Request):
-    user = get_current_user(request)
-
-    if not user:
-        raise HTTPException(401, "Login required")
-
-    data = await request.json()
-
-    name = str(data.get("name", "")).strip() or "Untitled Chain"
-    chain_data = data.get("data", {})
-
-    conn = db()
-
-    cur = conn.execute(
-        """
-        INSERT INTO chains
-        (user_id, name, data, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (
-            user["id"],
-            name,
-            json.dumps(chain_data, ensure_ascii=False),
-            now(),
-            now()
-        )
-    )
-
-    conn.commit()
-    chain_id = cur.lastrowid
-    conn.close()
-
-    return {
-        "ok": True,
-        "id": chain_id
-    }
-
-
-@app.put("/api/chains/{chain_id}")
-async def update_chain(chain_id: int, request: Request):
-    user = get_current_user(request)
-
-    if not user:
-        raise HTTPException(401, "Login required")
-
-    data = await request.json()
-
-    name = str(data.get("name", "")).strip() or "Untitled Chain"
-    chain_data = data.get("data", {})
-
-    conn = db()
-
-    result = conn.execute(
-        """
-        UPDATE chains
-        SET name = ?, data = ?, updated_at = ?
-        WHERE id = ? AND user_id = ?
-        """,
-        (
-            name,
-            json.dumps(chain_data, ensure_ascii=False),
-            now(),
-            chain_id,
-            user["id"]
-        )
-    )
-
-    conn.commit()
-    conn.close()
-
-    if result.rowcount == 0:
-        raise HTTPException(404, "Chain not found")
-
-    return {"ok": True}
-
-
-@app.delete("/api/chains/{chain_id}")
-async def delete_chain(chain_id: int, request: Request):
-    user = get_current_user(request)
-
-    if not user:
-        raise HTTPException(401, "Login required")
-
-    conn = db()
-
-    result = conn.execute(
-        """
-        DELETE FROM chains
-        WHERE id = ? AND user_id = ?
-        """,
-        (chain_id, user["id"])
-    )
-
-    conn.commit()
-    conn.close()
-
-    if result.rowcount == 0:
-        raise HTTPException(404, "Chain not found")
-
-    return {"ok": True}
+    return response_ok(result)
 
 
 # ============================================================
-# EMAIL
+# PHONE OSINT
 # ============================================================
-
-EMAIL_RE = re.compile(
-    r"^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@"
-    r"[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+$"
-)
-
-
-def email_parts(email):
-    email = email.strip().lower()
-
-    if "@" not in email:
-        return None, None
-
-    local, domain = email.rsplit("@", 1)
-
-    return local, domain
-
-
-async def dns_mx(domain):
-    """
-    Uses Google's DNS-over-HTTPS resolver.
-    This checks whether DNS has MX records.
-    It does NOT prove that an individual mailbox exists.
-    """
-
-    url = (
-        "https://dns.google/resolve"
-        f"?name={quote(domain)}&type=MX"
-    )
-
-    try:
-        async with httpx.AsyncClient(
-            timeout=8,
-            headers={"User-Agent": USER_AGENT}
-        ) as client:
-
-            response = await client.get(url)
-
-        if response.status_code != 200:
-            return {
-                "status": "UNKNOWN",
-                "reason": "DNS provider unavailable"
-            }
-
-        payload = response.json()
-
-        answers = payload.get("Answer", [])
-
-        mx = []
-
-        for answer in answers:
-            value = str(answer.get("data", "")).strip()
-
-            if value:
-                mx.append(value)
-
-        if mx:
-            return {
-                "status": "FOUND",
-                "reason": "MX records exist",
-                "records": mx
-            }
-
-        return {
-            "status": "NOT_FOUND",
-            "reason": "No MX records found",
-            "records": []
-        }
-
-    except Exception as e:
-        return {
-            "status": "UNKNOWN",
-            "reason": str(e),
-            "records": []
-        }
-
-
-async def gravatar_lookup(email):
-    clean = email.strip().lower()
-
-    email_hash = hashlib.sha256(
-        clean.encode("utf-8")
-    ).hexdigest()
-
-    result = {
-        "service": "Gravatar",
-        "status": "UNKNOWN",
-        "url": f"https://gravatar.com/{email_hash}",
-        "avatar": (
-            f"https://0.gravatar.com/avatar/{email_hash}"
-        ),
-        "profile": None,
-        "hash": email_hash
-    }
-
-    try:
-        headers = {
-            "User-Agent": USER_AGENT,
-            "Accept": "application/json"
-        }
-
-        if GRAVATAR_API_KEY:
-            headers["Authorization"] = (
-                f"Bearer {GRAVATAR_API_KEY}"
-            )
-
-        async with httpx.AsyncClient(
-            timeout=10,
-            follow_redirects=True,
-            headers=headers
-        ) as client:
-
-            response = await client.get(
-                f"{GRAVATAR_URL}/{email_hash}"
-            )
-
-        if response.status_code == 200:
-            payload = response.json()
-
-            result["status"] = "FOUND"
-            result["profile"] = payload
-
-            if payload.get("profile_url"):
-                result["url"] = payload["profile_url"]
-
-            if payload.get("avatar_url"):
-                result["avatar"] = payload["avatar_url"]
-
-        elif response.status_code == 404:
-            result["status"] = "NOT_FOUND"
-
-        elif response.status_code == 429:
-            result["status"] = "UNKNOWN"
-            result["reason"] = "Rate limit exceeded"
-
-        else:
-            result["status"] = "UNKNOWN"
-            result["reason"] = f"HTTP {response.status_code}"
-
-    except Exception as e:
-        result["status"] = "UNKNOWN"
-        result["reason"] = str(e)
-
-    return result
-
-
-async def abstract_email_check(email):
-    if not ABSTRACT_EMAIL_API_KEY:
-        return {
-            "service": "Email Intelligence",
-            "status": "UNKNOWN",
-            "reason": "API key not configured"
-        }
-
-    # Abstract Email Validation API.
-    url = (
-        "https://emailvalidation.abstractapi.com/v1/"
-        f"?api_key={quote(ABSTRACT_EMAIL_API_KEY)}"
-        f"&email={quote(email)}"
-    )
-
-    try:
-        async with httpx.AsyncClient(
-            timeout=12,
-            headers={"User-Agent": USER_AGENT}
-        ) as client:
-
-            response = await client.get(url)
-
-        if response.status_code != 200:
-            return {
-                "service": "Email Intelligence",
-                "status": "UNKNOWN",
-                "reason": f"HTTP {response.status_code}"
-            }
-
-        payload = response.json()
-
-        deliverability = (
-            payload.get("is_smtp_valid", {})
-            .get("value")
-        )
-
-        if deliverability is True:
-            status = "FOUND"
-            reason = "SMTP validation indicates the domain/mail system accepts validation"
-        elif deliverability is False:
-            status = "NOT_FOUND"
-            reason = "SMTP validation failed"
-        else:
-            status = "UNKNOWN"
-            reason = "Provider did not return a definitive result"
-
-        return {
-            "service": "Email Intelligence",
-            "status": status,
-            "reason": reason,
-            "raw": payload
-        }
-
-    except Exception as e:
-        return {
-            "service": "Email Intelligence",
-            "status": "UNKNOWN",
-            "reason": str(e)
-        }
-
-
-@app.post("/api/osint/email")
-async def osint_email(request: Request):
-    data = await request.json()
-
-    email = str(data.get("email", "")).strip().lower()
-
-    if not EMAIL_RE.match(email):
-        raise HTTPException(400, "Invalid email address")
-
-    local, domain = email_parts(email)
-
-    started = time.time()
-
-    results = []
-
-    # 1. Syntax
-    results.append({
-        "service": "Email Syntax",
-        "status": "FOUND",
-        "reason": "Email format is syntactically valid"
-    })
-
-    # 2. Domain
-    results.append({
-        "service": "Domain",
-        "status": "FOUND",
-        "value": domain,
-        "reason": "Domain extracted from email"
-    })
-
-    # 3. MX
-    mx = await dns_mx(domain)
-
-    results.append({
-        "service": "DNS / MX",
-        "status": mx["status"],
-        "reason": mx.get("reason", ""),
-        "records": mx.get("records", [])
-    })
-
-    # 4. Gravatar
-    gravatar = await gravatar_lookup(email)
-    results.append(gravatar)
-
-    # 5. Optional email intelligence provider
-    provider = await abstract_email_check(email)
-    results.append(provider)
-
-    return {
-        "ok": True,
-        "query": email,
-        "local": local,
-        "domain": domain,
-        "elapsed_ms": round(
-            (time.time() - started) * 1000
-        ),
-        "results": results,
-        "summary": {
-            "found": sum(
-                1 for x in results
-                if x.get("status") == "FOUND"
-            ),
-            "not_found": sum(
-                1 for x in results
-                if x.get("status") == "NOT_FOUND"
-            ),
-            "unknown": sum(
-                1 for x in results
-                if x.get("status") == "UNKNOWN"
-            )
-        }
-    }
-
-
-# ============================================================
-# PHONE
-# ============================================================
-
-def normalize_phone(phone):
-    phone = phone.strip()
-
-    if phone.startswith("00"):
-        phone = "+" + phone[2:]
-
-    cleaned = re.sub(
-        r"[^\d+]",
-        "",
-        phone
-    )
-
-    if cleaned.startswith("+"):
-        cleaned = "+" + re.sub(
-            r"\D",
-            "",
-            cleaned[1:]
-        )
-    else:
-        cleaned = re.sub(r"\D", "", cleaned)
-
-    return cleaned
-
-
-async def abstract_phone_lookup(phone):
-    if not ABSTRACT_PHONE_API_KEY:
-        return {
-            "service": "Phone Intelligence",
-            "status": "UNKNOWN",
-            "reason": "API key not configured"
-        }
-
-    url = (
-        "https://phonevalidation.abstractapi.com/v1/"
-        f"?api_key={quote(ABSTRACT_PHONE_API_KEY)}"
-        f"&phone={quote(phone)}"
-    )
-
-    try:
-        async with httpx.AsyncClient(
-            timeout=12,
-            headers={"User-Agent": USER_AGENT}
-        ) as client:
-
-            response = await client.get(url)
-
-        if response.status_code != 200:
-            return {
-                "service": "Phone Intelligence",
-                "status": "UNKNOWN",
-                "reason": f"HTTP {response.status_code}"
-            }
-
-        payload = response.json()
-
-        valid = payload.get("valid")
-
-        if valid is True:
-            status = "FOUND"
-            reason = "Provider considers the number valid"
-        elif valid is False:
-            status = "NOT_FOUND"
-            reason = "Provider considers the number invalid"
-        else:
-            status = "UNKNOWN"
-            reason = "Provider returned no definitive validation"
-
-        return {
-            "service": "Phone Intelligence",
-            "status": status,
-            "reason": reason,
-            "country": payload.get("country"),
-            "country_code": payload.get("country_code"),
-            "type": payload.get("type"),
-            "carrier": payload.get("carrier"),
-            "raw": payload
-        }
-
-    except Exception as e:
-        return {
-            "service": "Phone Intelligence",
-            "status": "UNKNOWN",
-            "reason": str(e)
-        }
-
 
 @app.post("/api/osint/phone")
-async def osint_phone(request: Request):
-    data = await request.json()
+async def check_phone(request: Request):
 
-    original = str(data.get("phone", "")).strip()
+    try:
+        body = await request.json()
+    except Exception:
+        return response_error("Invalid JSON")
+
+    original = str(body.get("phone", "")).strip()
 
     if not original:
-        raise HTTPException(400, "Phone is required")
+        return response_error(
+            "Enter a phone number"
+        )
 
     phone = normalize_phone(original)
 
     digits = re.sub(r"\D", "", phone)
 
-    results = []
+    if len(digits) < 7 or len(digits) > 15:
+        return response_error(
+            "Invalid phone number length"
+        )
 
-    if 7 <= len(digits) <= 15:
-        results.append({
-            "service": "Phone Format",
-            "status": "FOUND",
-            "reason": "Number has a plausible international length",
-            "value": phone
+    # --------------------------------------------------------
+    # API KEY NOT CONFIGURED
+    # --------------------------------------------------------
+
+    if not PHONE_API_KEY:
+
+        return response_ok({
+            "status": "UNKNOWN",
+            "message": "Phone API key is not configured",
+            "phone": phone,
+            "valid": None,
+            "country": "UNKNOWN",
+            "region": "UNKNOWN",
+            "carrier": "UNKNOWN",
+            "line_type": "UNKNOWN",
+            "location": "UNKNOWN"
         })
-    else:
-        results.append({
-            "service": "Phone Format",
-            "status": "NOT_FOUND",
-            "reason": "Number length is outside the normal international range",
-            "value": phone
-        })
 
-    # Do NOT claim carrier/operator/etc. without a real provider.
-    provider = await abstract_phone_lookup(phone)
-    results.append(provider)
+    # --------------------------------------------------------
+    # ABSTRACT PHONE API
+    # --------------------------------------------------------
 
-    return {
-        "ok": True,
-        "query": original,
-        "normalized": phone,
-        "results": results
+    url = "https://phonevalidation.abstractapi.com/v1/"
+
+    params = {
+        "api_key": PHONE_API_KEY,
+        "phone": phone
     }
 
+    try:
+
+        async with httpx.AsyncClient(
+            timeout=15,
+            follow_redirects=True
+        ) as client:
+
+            r = await client.get(
+                url,
+                params=params
+            )
+
+            try:
+                data = r.json()
+            except Exception:
+                data = {}
+
+    except Exception as e:
+
+        return response_error(
+            "Phone API connection failed",
+            502,
+            {
+                "message": str(e)
+            }
+        )
+
+    # --------------------------------------------------------
+    # AUTH ERROR
+    # --------------------------------------------------------
+
+    if r.status_code == 401:
+
+        return response_ok({
+            "status": "API_ERROR",
+            "error_code": 401,
+            "message": (
+                "Phone API key is invalid or not authorized"
+            ),
+            "phone": phone
+        })
+
+    if r.status_code == 422:
+
+        return response_ok({
+            "status": "API_ERROR",
+            "error_code": 422,
+            "message": (
+                "Phone API rejected the request or quota "
+                "was reached"
+            ),
+            "phone": phone,
+            "api_response": data
+        })
+
+    if r.status_code >= 400:
+
+        return response_ok({
+            "status": "API_ERROR",
+            "error_code": r.status_code,
+            "message": "Phone API returned an error",
+            "phone": phone,
+            "api_response": data
+        })
+
+    # --------------------------------------------------------
+    # ABSTRACT RESPONSE
+    # --------------------------------------------------------
+
+    country = data.get("country")
+
+    if isinstance(country, dict):
+        country_name = (
+            country.get("name")
+            or country.get("country_name")
+            or "UNKNOWN"
+        )
+
+        country_code = (
+            country.get("code")
+            or country.get("country_code")
+            or "UNKNOWN"
+        )
+    else:
+        country_name = (
+            data.get("country_name")
+            or "UNKNOWN"
+        )
+
+        country_code = (
+            data.get("country_code")
+            or "UNKNOWN"
+        )
+
+    location = (
+        data.get("registered_location")
+        or data.get("location")
+        or "UNKNOWN"
+    )
+
+    region = (
+        data.get("region")
+        or data.get("state")
+        or location
+        or "UNKNOWN"
+    )
+
+    carrier = (
+        data.get("carrier")
+        or (
+            data.get("phone_carrier", {}).get("name")
+            if isinstance(data.get("phone_carrier"), dict)
+            else None
+        )
+        or "UNKNOWN"
+    )
+
+    line_type = (
+        data.get("line_type")
+        or data.get("type")
+        or (
+            data.get("phone_carrier", {}).get("line_type")
+            if isinstance(data.get("phone_carrier"), dict)
+            else None
+        )
+        or "UNKNOWN"
+    )
+
+    international = (
+        data.get("international_format")
+        or data.get("phone_format", {}).get("international")
+        if isinstance(data.get("phone_format"), dict)
+        else None
+    )
+
+    if not international:
+        international = phone
+
+    return response_ok({
+
+        "status": "FOUND",
+
+        "phone": phone,
+
+        "valid": data.get("valid"),
+
+        "country": country_name,
+
+        "country_code": country_code,
+
+        "region": region,
+
+        "location": location,
+
+        "carrier": carrier,
+
+        "line_type": line_type,
+
+        "risk_score": data.get("risk_score"),
+
+        "international_format": international,
+
+        "local_format": (
+            data.get("local_format")
+            or (
+                data.get("phone_format", {}).get("national")
+                if isinstance(data.get("phone_format"), dict)
+                else None
+            )
+        ),
+
+        "raw": data
+    })
+
 
 # ============================================================
-# MAP
+# EMAIL / GMAIL OSINT
 # ============================================================
 
-@app.get("/api/map/search")
-async def map_search(q: str = ""):
+@app.post("/api/osint/email")
+async def check_email(request: Request):
+
+    try:
+        body = await request.json()
+    except Exception:
+        return response_error("Invalid JSON")
+
+    email = clean_email(
+        str(body.get("email", ""))
+    )
+
+    if not email:
+        return response_error(
+            "Enter an email address"
+        )
+
+    if not valid_email(email):
+        return response_error(
+            "Invalid email format"
+        )
+
+    # basic domain
+    domain = email.split("@", 1)[1]
+
+    result = {
+        "status": "UNKNOWN",
+        "email": email,
+        "domain": domain,
+        "format": True,
+        "mx": None,
+        "smtp": None,
+        "deliverability": None,
+        "disposable": None,
+        "quality_score": None,
+        "message": ""
+    }
+
+    # --------------------------------------------------------
+    # ABSTRACT EMAIL API
+    # --------------------------------------------------------
+
+    if EMAIL_API_KEY:
+
+        url = "https://emailvalidation.abstractapi.com/v1/"
+
+        params = {
+            "api_key": EMAIL_API_KEY,
+            "email": email
+        }
+
+        try:
+
+            async with httpx.AsyncClient(
+                timeout=15,
+                follow_redirects=True
+            ) as client:
+
+                r = await client.get(
+                    url,
+                    params=params
+                )
+
+                try:
+                    data = r.json()
+                except Exception:
+                    data = {}
+
+        except Exception as e:
+
+            result["status"] = "API_ERROR"
+            result["message"] = (
+                "Email API connection failed"
+            )
+            result["details"] = str(e)
+
+            return response_ok(result)
+
+        if r.status_code == 401:
+
+            result["status"] = "API_ERROR"
+            result["message"] = (
+                "Email API key is invalid or not authorized"
+            )
+            result["error_code"] = 401
+
+            return response_ok(result)
+
+        if r.status_code >= 400:
+
+            result["status"] = "API_ERROR"
+            result["error_code"] = r.status_code
+            result["message"] = (
+                "Email API returned an error"
+            )
+            result["api_response"] = data
+
+            return response_ok(result)
+
+        result["mx"] = data.get(
+            "is_mx_found"
+        )
+
+        result["smtp"] = data.get(
+            "is_smtp_valid"
+        )
+
+        result["deliverability"] = data.get(
+            "deliverability"
+        )
+
+        result["disposable"] = data.get(
+            "is_disposable_email"
+        )
+
+        result["quality_score"] = data.get(
+            "quality_score"
+        )
+
+        result["format"] = data.get(
+            "is_valid_format",
+            True
+        )
+
+        if (
+            result["format"] is True
+            and result["mx"] is True
+        ):
+            result["status"] = "FOUND"
+
+        elif (
+            result["format"] is False
+            or result["mx"] is False
+        ):
+            result["status"] = "NOT_FOUND"
+
+        else:
+            result["status"] = "UNKNOWN"
+
+        # Never claim a specific website account exists
+        result["accounts"] = "UNKNOWN"
+
+        return response_ok(result)
+
+    # --------------------------------------------------------
+    # NO API KEY
+    # --------------------------------------------------------
+
+    result["message"] = (
+        "Email API key is not configured. "
+        "Only syntax can be checked locally."
+    )
+
+    return response_ok(result)
+
+
+# ============================================================
+# ADDRESS / COORDINATES
+# ============================================================
+
+@app.get("/api/osint/address")
+async def address_search(q: str = ""):
+
     q = q.strip()
 
     if not q:
-        raise HTTPException(400, "Search query required")
+        return response_error(
+            "Enter an address, place name or coordinates"
+        )
+
+    # --------------------------------------------------------
+    # COORDINATES
+    # --------------------------------------------------------
+
+    coordinate_match = re.match(
+        r"^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$",
+        q
+    )
+
+    if coordinate_match:
+
+        lat = float(coordinate_match.group(1))
+        lon = float(coordinate_match.group(2))
+
+        if not (-90 <= lat <= 90):
+            return response_error(
+                "Latitude must be between -90 and 90"
+            )
+
+        if not (-180 <= lon <= 180):
+            return response_error(
+                "Longitude must be between -180 and 180"
+            )
+
+        reverse_url = (
+            "https://nominatim.openstreetmap.org/reverse"
+        )
+
+        params = {
+            "lat": lat,
+            "lon": lon,
+            "format": "jsonv2",
+            "zoom": 18,
+            "addressdetails": 1
+        }
+
+        try:
+
+            async with httpx.AsyncClient(
+                timeout=15,
+                headers={
+                    "User-Agent": "NZX-OSINT-TOOL/3.0"
+                }
+            ) as client:
+
+                r = await client.get(
+                    reverse_url,
+                    params=params
+                )
+
+                data = r.json()
+
+        except Exception as e:
+
+            return response_error(
+                "Map service unavailable",
+                502,
+                {
+                    "message": str(e)
+                }
+            )
+
+        return response_ok({
+            "type": "coordinates",
+            "lat": lat,
+            "lon": lon,
+            "display_name": data.get(
+                "display_name",
+                "UNKNOWN"
+            ),
+            "address": data.get(
+                "address",
+                {}
+            ),
+            "osm_type": data.get("osm_type"),
+            "osm_id": data.get("osm_id")
+        })
+
+    # --------------------------------------------------------
+    # TEXT SEARCH
+    # --------------------------------------------------------
+
+    url = "https://nominatim.openstreetmap.org/search"
 
     params = {
         "q": q,
         "format": "jsonv2",
         "addressdetails": 1,
-        "limit": 8,
-        "accept-language": "en"
-    }
-
-    headers = {
-        "User-Agent": USER_AGENT,
-        "Accept": "application/json"
+        "limit": 8
     }
 
     try:
+
         async with httpx.AsyncClient(
-            timeout=12,
-            headers=headers
+            timeout=15,
+            headers={
+                "User-Agent": "NZX-OSINT-TOOL/3.0"
+            }
         ) as client:
 
-            response = await client.get(
-                NOMINATIM_URL,
+            r = await client.get(
+                url,
                 params=params
             )
 
-        if response.status_code != 200:
-            return {
-                "ok": False,
-                "error": f"Map provider HTTP {response.status_code}"
-            }
-
-        payload = response.json()
-
-        results = []
-
-        for item in payload:
-            results.append({
-                "place_id": item.get("place_id"),
-                "display_name": item.get("display_name"),
-                "lat": float(item["lat"]),
-                "lon": float(item["lon"]),
-                "type": item.get("type"),
-                "class": item.get("class"),
-                "importance": item.get("importance"),
-                "address": item.get("address", {})
-            })
-
-        return {
-            "ok": True,
-            "query": q,
-            "results": results
-        }
+            data = r.json()
 
     except Exception as e:
-        return {
-            "ok": False,
-            "error": str(e)
-        }
+
+        return response_error(
+            "Map service unavailable",
+            502,
+            {
+                "message": str(e)
+            }
+        )
+
+    results = []
+
+    for item in data:
+
+        results.append({
+            "lat": float(item["lat"]),
+            "lon": float(item["lon"]),
+            "display_name": item.get(
+                "display_name",
+                "UNKNOWN"
+            ),
+            "type": item.get(
+                "type",
+                "UNKNOWN"
+            ),
+            "category": item.get(
+                "category",
+                "UNKNOWN"
+            ),
+            "address": item.get(
+                "address",
+                {}
+            ),
+            "osm_type": item.get("osm_type"),
+            "osm_id": item.get("osm_id")
+        })
+
+    return response_ok({
+        "query": q,
+        "results": results
+    })
 
 
 # ============================================================
@@ -1073,6 +1112,7 @@ async def map_search(q: str = ""):
 # ============================================================
 
 if __name__ == "__main__":
+
     import uvicorn
 
     uvicorn.run(
@@ -1080,4 +1120,4 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=PORT,
         reload=False
-    )
+        )
