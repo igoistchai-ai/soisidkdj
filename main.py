@@ -7,7 +7,8 @@ from pathlib import Path
 from typing import Optional
 
 import httpx
-from fastapi import FastAPI, HTTPException, Request, Form
+
+from fastapi import FastAPI, HTTPException, Form
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -18,13 +19,38 @@ from pydantic import BaseModel
 # ============================================================
 
 BASE_DIR = Path(__file__).resolve().parent
-DB_PATH = os.getenv("DB_PATH", str(BASE_DIR / "nzx.db"))
-PORT = int(os.getenv("PORT", "10000"))
 
-ABSTRACT_PHONE_API_KEY = os.getenv("ABSTRACT_PHONE_API_KEY", "").strip()
-ABSTRACT_EMAIL_API_KEY = os.getenv("ABSTRACT_EMAIL_API_KEY", "").strip()
+DB_PATH = os.getenv(
+    "DB_PATH",
+    str(BASE_DIR / "nzx.db")
+)
 
-app = FastAPI(title="NZX OSINT TOOL")
+PORT = int(
+    os.getenv("PORT", "10000")
+)
+
+# ============================================================
+# PHONE VALIDATION API
+# ============================================================
+
+PHONEVALIDATION_API_KEY = os.getenv(
+    "PHONEVALIDATION_API_KEY",
+    ""
+).strip()
+
+PHONEVALIDATION_URL = (
+    "https://phonevalidationapi.com/api/v1/validate"
+)
+
+
+# ============================================================
+# APP
+# ============================================================
+
+app = FastAPI(
+    title="NZX OSINT TOOL",
+    version="2.0"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -46,6 +72,7 @@ def db():
 
 
 def init_db():
+
     conn = db()
 
     conn.execute("""
@@ -82,11 +109,18 @@ init_db()
 # ============================================================
 
 def hash_password(password: str):
-    return hashlib.sha256(password.encode()).hexdigest()
+    return hashlib.sha256(
+        password.encode()
+    ).hexdigest()
 
 
 def valid_phone_format(phone: str):
-    cleaned = re.sub(r"[()\s\-]", "", phone)
+
+    cleaned = re.sub(
+        r"[()\s\-]",
+        "",
+        phone
+    )
 
     if not cleaned.startswith("+"):
         return False, cleaned
@@ -106,30 +140,63 @@ def clean_email(email: str):
     return email.strip().lower()
 
 
+def safe_value(value, default="UNKNOWN"):
+
+    if value is None:
+        return default
+
+    if isinstance(value, str):
+
+        value = value.strip()
+
+        if not value:
+            return default
+
+        return value
+
+    return value
+
+
 # ============================================================
 # BASIC
 # ============================================================
 
-@app.get("/", response_class=HTMLResponse)
+@app.get(
+    "/",
+    response_class=HTMLResponse
+)
 async def home():
+
     html_file = BASE_DIR / "index.html"
 
     if not html_file.exists():
+
         return HTMLResponse(
-            "<h1>NZX OSINT TOOL</h1><p>index.html not found</p>",
+            """
+            <h1>NZX OSINT TOOL</h1>
+            <p>index.html not found</p>
+            """,
             status_code=500
         )
 
     return HTMLResponse(
-        html_file.read_text(encoding="utf-8")
+        html_file.read_text(
+            encoding="utf-8"
+        )
     )
 
 
 @app.get("/api/health")
 async def health():
+
     return {
         "status": "ok",
-        "service": "NZX OSINT TOOL"
+        "service": "NZX OSINT TOOL",
+        "phone_provider": (
+            "configured"
+            if PHONEVALIDATION_API_KEY
+            else "not_configured"
+        )
     }
 
 
@@ -138,234 +205,537 @@ async def health():
 # ============================================================
 
 @app.post("/api/osint/phone")
-async def phone_osint(phone: str = Form(...)):
-    """
-    Real phone validation.
+async def phone_osint(
+    phone: str = Form(...)
+):
 
-    We NEVER invent:
-      - city
-      - region
-      - carrier
-      - validity
+    phone = phone.strip()
 
-    If provider doesn't return something, it becomes UNKNOWN.
-    """
+    # --------------------------------------------------------
+    # BASIC LOCAL VALIDATION
+    # --------------------------------------------------------
 
-    valid_format, normalized = valid_phone_format(phone)
+    valid_format, normalized = valid_phone_format(
+        phone
+    )
 
     if not valid_format:
+
         return {
             "success": True,
             "phone": phone,
             "valid": False,
+            "possible": False,
+            "confidence": "invalid",
+            "score": 0,
+            "country": "UNKNOWN",
+            "country_code": "UNKNOWN",
             "region": "UNKNOWN",
             "city": "UNKNOWN",
-            "country": "UNKNOWN",
             "carrier": "UNKNOWN",
             "line_type": "UNKNOWN",
+            "disposable": "UNKNOWN",
+            "national": "UNKNOWN",
+            "international": "UNKNOWN",
+            "e164": "UNKNOWN",
             "source": "local-format-check",
             "provider_status": "INVALID_FORMAT"
         }
 
+    # --------------------------------------------------------
+    # BASE RESULT
+    # --------------------------------------------------------
+
     result = {
+
         "success": True,
+
         "phone": normalized,
+
         "valid": None,
-        "region": "UNKNOWN",
-        "city": "UNKNOWN",
+
+        "possible": None,
+
+        "confidence": "UNKNOWN",
+
+        "score": None,
+
+        "reason": "UNKNOWN",
+
         "country": "UNKNOWN",
+
+        "country_code": "UNKNOWN",
+
+        "region": "UNKNOWN",
+
+        "city": "UNKNOWN",
+
         "carrier": "UNKNOWN",
+
         "line_type": "UNKNOWN",
+
+        "disposable": "UNKNOWN",
+
+        "national": "UNKNOWN",
+
+        "international": "UNKNOWN",
+
+        "e164": normalized,
+
         "source": "none",
-        "provider_status": "NO_PROVIDER"
+
+        "provider_status": "NO_API_KEY",
+
+        "credits_remaining": None,
+
+        "diagnostics": {}
     }
-
-    # --------------------------------------------------------
-    # ABSTRACT API
-    # --------------------------------------------------------
-
-    if ABSTRACT_PHONE_API_KEY:
-        try:
-            url = "https://phonevalidation.abstractapi.com/v1/"
-
-            params = {
-                "api_key": ABSTRACT_PHONE_API_KEY,
-                "phone": normalized
-            }
-
-            async with httpx.AsyncClient(timeout=15) as client:
-                response = await client.get(
-                    url,
-                    params=params
-                )
-
-            if response.status_code == 200:
-                data = response.json()
-
-                result["source"] = "abstractapi"
-                result["provider_status"] = "OK"
-
-                # Actual API fields only.
-                if "valid" in data:
-                    result["valid"] = data.get("valid")
-
-                country = data.get("country") or {}
-
-                if isinstance(country, dict):
-                    result["country"] = (
-                        country.get("name")
-                        or country.get("code")
-                        or "UNKNOWN"
-                    )
-
-                    result["region"] = (
-                        country.get("name")
-                        or country.get("code")
-                        or "UNKNOWN"
-                    )
-
-                elif country:
-                    result["country"] = str(country)
-                    result["region"] = str(country)
-
-                result["carrier"] = (
-                    data.get("carrier")
-                    or "UNKNOWN"
-                )
-
-                result["line_type"] = (
-                    data.get("type")
-                    or data.get("line_type")
-                    or "UNKNOWN"
-                )
-
-                # Some providers may expose city/location.
-                # We only use it if actually returned.
-                result["city"] = (
-                    data.get("city")
-                    or data.get("location")
-                    or "UNKNOWN"
-                )
-
-            elif response.status_code == 401:
-                result["provider_status"] = "API_KEY_REJECTED"
-
-            elif response.status_code == 403:
-                result["provider_status"] = "FORBIDDEN"
-
-            elif response.status_code == 429:
-                result["provider_status"] = "RATE_LIMITED"
-
-            else:
-                result["provider_status"] = (
-                    f"PROVIDER_HTTP_{response.status_code}"
-                )
-
-        except httpx.TimeoutException:
-            result["provider_status"] = "PROVIDER_TIMEOUT"
-
-        except Exception:
-            result["provider_status"] = "PROVIDER_ERROR"
 
     # --------------------------------------------------------
     # NO API KEY
     # --------------------------------------------------------
 
-    else:
+    if not PHONEVALIDATION_API_KEY:
+
+        result["source"] = "local-format-check"
+
         result["provider_status"] = "NO_API_KEY"
 
-    return result
+        result["valid"] = None
 
+        result["possible"] = True
 
-# ============================================================
-# EMAIL OSINT
-# ============================================================
+        return result
 
-@app.post("/api/osint/email")
-async def email_osint(email: str = Form(...)):
-    email = clean_email(email)
+    # --------------------------------------------------------
+    # PHONE VALIDATION API
+    # --------------------------------------------------------
 
-    syntax_valid = bool(
-        re.match(
-            r"^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$",
-            email
-        )
-    )
-
-    if not syntax_valid:
-        return {
-            "success": True,
-            "email": email,
-            "valid": False,
-            "domain": "UNKNOWN",
-            "mx": "UNKNOWN",
-            "source": "local-format-check"
-        }
-
-    domain = email.split("@", 1)[1]
-
-    result = {
-        "success": True,
-        "email": email,
-        "valid": None,
-        "domain": domain,
-        "mx": "UNKNOWN",
-        "disposable": "UNKNOWN",
-        "source": "none",
-        "provider_status": "NO_PROVIDER"
+    payload = {
+        "phone": normalized,
+        "level": "basic"
     }
 
-    # DNS MX lookup using Google DNS over HTTPS.
+    headers = {
+
+        "Authorization":
+            f"Bearer {PHONEVALIDATION_API_KEY}",
+
+        "Content-Type":
+            "application/json",
+
+        "Accept":
+            "application/json",
+
+        "User-Agent":
+            "NZX-OSINT-TOOL/2.0"
+    }
+
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
-            response = await client.get(
-                "https://dns.google/resolve",
-                params={
-                    "name": domain,
-                    "type": "MX"
-                }
+
+        async with httpx.AsyncClient(
+            timeout=20,
+            follow_redirects=True
+        ) as client:
+
+            response = await client.post(
+                PHONEVALIDATION_URL,
+                headers=headers,
+                json=payload
             )
+
+        # ----------------------------------------------------
+        # SUCCESS
+        # ----------------------------------------------------
 
         if response.status_code == 200:
-            data = response.json()
 
-            answers = data.get("Answer", [])
+            try:
+                data = response.json()
+            except Exception:
 
-            result["mx"] = "FOUND" if answers else "NOT FOUND"
-            result["source"] = "google-dns"
-            result["provider_status"] = "OK"
+                result["provider_status"] = (
+                    "INVALID_PROVIDER_RESPONSE"
+                )
 
-        else:
-            result["provider_status"] = (
-                f"DNS_HTTP_{response.status_code}"
+                return result
+
+            result["source"] = (
+                "phonevalidationapi"
             )
 
-    except Exception:
-        result["provider_status"] = "DNS_ERROR"
+            result["provider_status"] = "OK"
 
-    return result
+            # ------------------------------------------------
+            # MAIN
+            # ------------------------------------------------
+
+            if "valid" in data:
+                result["valid"] = data.get(
+                    "valid"
+                )
+
+            if "is_possible" in data:
+                result["possible"] = data.get(
+                    "is_possible"
+                )
+
+            result["confidence"] = safe_value(
+                data.get("confidence")
+            )
+
+            result["score"] = data.get(
+                "score"
+            )
+
+            result["reason"] = safe_value(
+                data.get("reason")
+            )
+
+            # ------------------------------------------------
+            # COUNTRY
+            # ------------------------------------------------
+
+            country = data.get(
+                "country"
+            )
+
+            if isinstance(country, dict):
+
+                result["country"] = safe_value(
+                    country.get("iso2")
+                )
+
+                result["country_code"] = safe_value(
+                    country.get("code")
+                )
+
+            elif country:
+
+                result["country"] = str(
+                    country
+                )
+
+            # ------------------------------------------------
+            # REGION
+            # ------------------------------------------------
+
+            result["region"] = safe_value(
+                data.get("region")
+            )
+
+            # ------------------------------------------------
+            # CARRIER
+            # ------------------------------------------------
+
+            result["carrier"] = safe_value(
+                data.get("carrier")
+            )
+
+            # ------------------------------------------------
+            # LINE TYPE
+            # ------------------------------------------------
+
+            result["line_type"] = safe_value(
+                data.get("line_type")
+            )
+
+            # ------------------------------------------------
+            # DISPOSABLE
+            # ------------------------------------------------
+
+            if "is_disposable" in data:
+
+                disposable = data.get(
+                    "is_disposable"
+                )
+
+                if disposable is True:
+                    result["disposable"] = "YES"
+
+                elif disposable is False:
+                    result["disposable"] = "NO"
+
+                else:
+                    result["disposable"] = (
+                        "UNKNOWN"
+                    )
+
+            # ------------------------------------------------
+            # FORMATS
+            # ------------------------------------------------
+
+            formatted = data.get(
+                "formatted"
+            )
+
+            if isinstance(
+                formatted,
+                dict
+            ):
+
+                result["e164"] = safe_value(
+                    formatted.get("e164"),
+                    normalized
+                )
+
+                result["national"] = safe_value(
+                    formatted.get("national")
+                )
+
+                result["international"] = safe_value(
+                    formatted.get(
+                        "international"
+                    )
+                )
+
+            # ------------------------------------------------
+            # DIAGNOSTICS
+            # ------------------------------------------------
+
+            diagnostics = data.get(
+                "diagnostics"
+            )
+
+            if isinstance(
+                diagnostics,
+                dict
+            ):
+
+                result["diagnostics"] = (
+                    diagnostics
+                )
+
+            # ------------------------------------------------
+            # CREDITS
+            # ------------------------------------------------
+
+            if (
+                "credits_remaining"
+                in data
+            ):
+
+                result["credits_remaining"] = (
+                    data.get(
+                        "credits_remaining"
+                    )
+                )
+
+            # ------------------------------------------------
+            # CITY
+            #
+            # API does not promise exact city.
+            # Do NOT invent it.
+            # ------------------------------------------------
+
+            result["city"] = "UNKNOWN"
+
+            return result
+
+        # ----------------------------------------------------
+        # API KEY ERROR
+        # ----------------------------------------------------
+
+        if response.status_code == 401:
+
+            result["provider_status"] = (
+                "API_KEY_REJECTED"
+            )
+
+            result["source"] = (
+                "phonevalidationapi"
+            )
+
+            return result
+
+        # ----------------------------------------------------
+        # QUOTA
+        # ----------------------------------------------------
+
+        if response.status_code == 402:
+
+            result["provider_status"] = (
+                "QUOTA_EXCEEDED"
+            )
+
+            result["source"] = (
+                "phonevalidationapi"
+            )
+
+            try:
+
+                error_data = response.json()
+
+                result["provider_error"] = (
+                    error_data
+                )
+
+            except Exception:
+                pass
+
+            return result
+
+        # ----------------------------------------------------
+        # BAD REQUEST
+        # ----------------------------------------------------
+
+        if response.status_code == 400:
+
+            result["provider_status"] = (
+                "BAD_REQUEST"
+            )
+
+            result["source"] = (
+                "phonevalidationapi"
+            )
+
+            try:
+
+                result["provider_error"] = (
+                    response.json()
+                )
+
+            except Exception:
+                pass
+
+            return result
+
+        # ----------------------------------------------------
+        # VALIDATION ERROR
+        # ----------------------------------------------------
+
+        if response.status_code == 422:
+
+            result["provider_status"] = (
+                "VALIDATION_ERROR"
+            )
+
+            result["source"] = (
+                "phonevalidationapi"
+            )
+
+            try:
+
+                result["provider_error"] = (
+                    response.json()
+                )
+
+            except Exception:
+                pass
+
+            return result
+
+        # ----------------------------------------------------
+        # RATE LIMIT
+        # ----------------------------------------------------
+
+        if response.status_code == 429:
+
+            result["provider_status"] = (
+                "RATE_LIMITED"
+            )
+
+            result["source"] = (
+                "phonevalidationapi"
+            )
+
+            return result
+
+        # ----------------------------------------------------
+        # SERVER ERRORS
+        # ----------------------------------------------------
+
+        if response.status_code in (
+            500,
+            502,
+            503,
+            504
+        ):
+
+            result["provider_status"] = (
+                f"PROVIDER_HTTP_{response.status_code}"
+            )
+
+            result["source"] = (
+                "phonevalidationapi"
+            )
+
+            return result
+
+        # ----------------------------------------------------
+        # OTHER
+        # ----------------------------------------------------
+
+        result["provider_status"] = (
+            f"PROVIDER_HTTP_{response.status_code}"
+        )
+
+        result["source"] = (
+            "phonevalidationapi"
+        )
+
+        return result
+
+    except httpx.TimeoutException:
+
+        result["provider_status"] = (
+            "PROVIDER_TIMEOUT"
+        )
+
+        result["source"] = (
+            "phonevalidationapi"
+        )
+
+        return result
+
+    except Exception as error:
+
+        result["provider_status"] = (
+            "PROVIDER_ERROR"
+        )
+
+        result["source"] = (
+            "phonevalidationapi"
+        )
+
+        result["provider_error"] = str(
+            error
+        )
+
+        return result
 
 
 # ============================================================
-# MAP SEARCH
+# MAP SEARCH / ADDRESS
 # ============================================================
 
 @app.get("/api/map/search")
 async def map_search(q: str):
+
     q = q.strip()
 
     if not q:
+
         return {
             "success": False,
             "results": []
         }
 
     headers = {
-        "User-Agent": "NZX-OSINT-TOOL/1.0"
+
+        "User-Agent":
+            "NZX-OSINT-TOOL/2.0",
+
+        "Accept":
+            "application/json"
     }
 
     try:
-        async with httpx.AsyncClient(timeout=15) as client:
+
+        async with httpx.AsyncClient(
+            timeout=15
+        ) as client:
+
             response = await client.get(
                 "https://nominatim.openstreetmap.org/search",
                 params={
@@ -378,6 +748,7 @@ async def map_search(q: str):
             )
 
         if response.status_code != 200:
+
             return {
                 "success": False,
                 "results": []
@@ -388,30 +759,73 @@ async def map_search(q: str):
         results = []
 
         for item in data:
-            address = item.get("address", {})
+
+            address = item.get(
+                "address",
+                {}
+            )
 
             results.append({
-                "display_name": item.get(
-                    "display_name",
-                    "UNKNOWN"
-                ),
-                "lat": item.get("lat"),
-                "lon": item.get("lon"),
-                "type": item.get("type"),
-                "city": (
-                    address.get("city")
-                    or address.get("town")
-                    or address.get("village")
-                    or "UNKNOWN"
-                ),
-                "country": address.get(
-                    "country",
-                    "UNKNOWN"
-                ),
-                "postcode": address.get(
-                    "postcode",
-                    "UNKNOWN"
-                )
+
+                "display_name":
+                    item.get(
+                        "display_name",
+                        "UNKNOWN"
+                    ),
+
+                "lat":
+                    item.get("lat"),
+
+                "lon":
+                    item.get("lon"),
+
+                "type":
+                    item.get("type"),
+
+                "city":
+                    (
+                        address.get("city")
+                        or address.get("town")
+                        or address.get("village")
+                        or address.get("municipality")
+                        or "UNKNOWN"
+                    ),
+
+                "country":
+                    address.get(
+                        "country",
+                        "UNKNOWN"
+                    ),
+
+                "country_code":
+                    address.get(
+                        "country_code",
+                        "UNKNOWN"
+                    ),
+
+                "postcode":
+                    address.get(
+                        "postcode",
+                        "UNKNOWN"
+                    ),
+
+                "state":
+                    address.get(
+                        "state",
+                        "UNKNOWN"
+                    ),
+
+                "road":
+                    address.get(
+                        "road",
+                        "UNKNOWN"
+                    ),
+
+                "house_number":
+                    address.get(
+                        "house_number",
+                        "UNKNOWN"
+                    )
             })
 
         return {
@@ -419,10 +833,12 @@ async def map_search(q: str):
             "results": results
         }
 
-    except Exception:
+    except Exception as error:
+
         return {
             "success": False,
-            "results": []
+            "results": [],
+            "error": str(error)
         }
 
 
@@ -432,38 +848,57 @@ async def map_search(q: str):
 
 @app.post("/api/register")
 async def register(
+
     username: str = Form(...),
+
     email: str = Form(""),
+
     password: str = Form(...)
 ):
+
     username = username.strip()
-    email = clean_email(email)
+
+    email = clean_email(
+        email
+    )
 
     if len(username) < 3:
+
         raise HTTPException(
             status_code=400,
             detail="Username is too short"
         )
 
     if len(password) < 6:
+
         raise HTTPException(
             status_code=400,
-            detail="Password must contain at least 6 characters"
+            detail=(
+                "Password must contain "
+                "at least 6 characters"
+            )
         )
 
     conn = db()
 
     try:
+
         cur = conn.execute(
             """
             INSERT INTO users
-            (username,email,password_hash)
+            (
+                username,
+                email,
+                password_hash
+            )
             VALUES (?,?,?)
             """,
             (
                 username,
                 email or None,
-                hash_password(password)
+                hash_password(
+                    password
+                )
             )
         )
 
@@ -471,24 +906,33 @@ async def register(
 
         return {
             "success": True,
-            "user_id": cur.lastrowid
+            "user_id":
+                cur.lastrowid
         }
 
     except sqlite3.IntegrityError:
+
         raise HTTPException(
             status_code=409,
-            detail="Username or email already exists"
+            detail=(
+                "Username or email "
+                "already exists"
+            )
         )
 
     finally:
+
         conn.close()
 
 
 @app.post("/api/login")
 async def login(
+
     username: str = Form(...),
+
     password: str = Form(...)
 ):
+
     conn = db()
 
     user = conn.execute(
@@ -497,33 +941,53 @@ async def login(
         FROM users
         WHERE username=?
         """,
-        (username.strip(),)
+        (
+            username.strip(),
+        )
     ).fetchone()
 
     conn.close()
 
     if not user:
+
         raise HTTPException(
             status_code=401,
             detail="Invalid credentials"
         )
 
-    if user["password_hash"] != hash_password(password):
+    if (
+        user["password_hash"]
+        != hash_password(password)
+    ):
+
         raise HTTPException(
             status_code=401,
             detail="Invalid credentials"
         )
 
-    token = secrets.token_urlsafe(32)
+    token = secrets.token_urlsafe(
+        32
+    )
 
     return {
+
         "success": True,
+
         "token": token,
+
         "user": {
-            "id": user["id"],
-            "username": user["username"],
-            "email": user["email"],
-            "avatar": user["avatar"]
+
+            "id":
+                user["id"],
+
+            "username":
+                user["username"],
+
+            "email":
+                user["email"],
+
+            "avatar":
+                user["avatar"]
         }
     }
 
@@ -534,6 +998,7 @@ async def login(
 
 @app.get("/api/users/search")
 async def search_users(q: str):
+
     q = q.strip()
 
     if not q:
@@ -543,23 +1008,35 @@ async def search_users(q: str):
 
     users = conn.execute(
         """
-        SELECT id, username, avatar
+        SELECT
+            id,
+            username,
+            avatar
         FROM users
         WHERE username LIKE ?
         ORDER BY username
         LIMIT 30
         """,
-        (f"%{q}%",)
+        (
+            f"%{q}%",
+        )
     ).fetchall()
 
     conn.close()
 
     return [
+
         {
-            "id": user["id"],
-            "username": user["username"],
-            "avatar": user["avatar"]
+            "id":
+                user["id"],
+
+            "username":
+                user["username"],
+
+            "avatar":
+                user["avatar"]
         }
+
         for user in users
     ]
 
@@ -569,8 +1046,11 @@ async def search_users(q: str):
 # ============================================================
 
 class ProfileUpdate(BaseModel):
+
     username: str
+
     email: Optional[str] = ""
+
     avatar: Optional[str] = ""
 
 
@@ -578,12 +1058,21 @@ class ProfileUpdate(BaseModel):
 async def update_profile(
     data: ProfileUpdate
 ):
+
     return {
+
         "success": True,
+
         "profile": {
-            "username": data.username,
-            "email": data.email,
-            "avatar": data.avatar
+
+            "username":
+                data.username,
+
+            "email":
+                data.email,
+
+            "avatar":
+                data.avatar
         }
     }
 
@@ -593,10 +1082,11 @@ async def update_profile(
 # ============================================================
 
 if __name__ == "__main__":
+
     import uvicorn
 
     uvicorn.run(
         app,
         host="0.0.0.0",
         port=PORT
-    )
+        )
