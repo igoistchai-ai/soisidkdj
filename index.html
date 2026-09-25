@@ -2,47 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1,maximum-scale=1"
-/>
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>NZX OSINT TOOL</title>
 
 <style>
-
 *{
   box-sizing:border-box;
   margin:0;
   padding:0;
 }
 
-html,
-body{
+html,body{
   width:100%;
   height:100%;
   overflow:hidden;
   background:#050505;
   color:#f5f5f5;
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
-button,
-input,
-textarea{
-  font:inherit;
-}
-
-button{
-  cursor:pointer;
-}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
 
 :root{
   --bg:#050505;
@@ -56,6 +36,176 @@ button{
   --good:#d9ffd9;
   --warn:#ffe7a3;
   --bad:#ff9b9b;
+}
+
+
+/* ==========================================================
+   INTRO / ASCII BOOT
+========================================================== */
+
+#bootScreen{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  background:#000;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:
+    opacity .8s ease,
+    visibility .8s ease;
+}
+
+#bootScreen.hide{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+.boot-stage{
+  width:100%;
+  height:100%;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#asciiContainer{
+  width:min(1500px,96vw);
+  max-height:94vh;
+  overflow:hidden;
+  color:#f5f5f5;
+  font-family:
+    "Courier New",
+    Courier,
+    monospace;
+  font-size:
+    clamp(2px,0.48vw,7px);
+  line-height:1;
+  white-space:pre;
+  text-align:left;
+  transform:scale(1);
+  transform-origin:center;
+  opacity:.94;
+}
+
+.ascii-line{
+  display:block;
+  height:1em;
+  opacity:0;
+  transform:
+    translateY(
+      -100vh
+    )
+    translateX(
+      var(--random-x)
+    )
+    rotate(
+      var(--random-r)
+    );
+  filter:blur(4px);
+  animation:
+    asciiDrop
+    1.15s
+    cubic-bezier(.15,.75,.2,1)
+    forwards;
+  animation-delay:var(--delay);
+}
+
+@keyframes asciiDrop{
+  0%{
+    opacity:0;
+    transform:
+      translateY(-100vh)
+      translateX(var(--random-x))
+      rotate(var(--random-r));
+    filter:blur(5px);
+  }
+
+  35%{
+    opacity:.35;
+  }
+
+  72%{
+    opacity:.9;
+    filter:blur(0);
+  }
+
+  100%{
+    opacity:1;
+    transform:
+      translateY(0)
+      translateX(0)
+      rotate(0);
+    filter:blur(0);
+  }
+}
+
+.boot-noise{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 2px,
+      rgba(255,255,255,.012) 3px
+    );
+  mix-blend-mode:screen;
+}
+
+.boot-vignette{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 35%,
+      rgba(0,0,0,.55) 100%
+    );
+}
+
+.boot-status{
+  position:absolute;
+  left:50%;
+  bottom:34px;
+  transform:translateX(-50%);
+  color:#555;
+  font-family:
+    "Courier New",
+    monospace;
+  font-size:9px;
+  letter-spacing:.28em;
+  white-space:nowrap;
+  opacity:0;
+  animation:
+    statusIn .7s ease forwards;
+  animation-delay:1.15s;
+}
+
+.boot-status::after{
+  content:"";
+  display:inline-block;
+  width:5px;
+  height:10px;
+  margin-left:5px;
+  background:#777;
+  vertical-align:-1px;
+  animation:
+    cursorBlink .65s infinite;
+}
+
+@keyframes statusIn{
+  to{opacity:1}
+}
+
+@keyframes cursorBlink{
+  50%{opacity:0}
 }
 
 
@@ -153,23 +303,19 @@ button{
 
 .top-btn{
   height:34px;
-
   padding:0 13px;
 
   color:#bbb;
-
   background:#0c0c0c;
 
   border:1px solid var(--line2);
-
   border-radius:8px;
 
   font-size:9px;
   font-weight:800;
   letter-spacing:.1em;
 
-  transition:
-    .2s ease;
+  transition:.2s ease;
 }
 
 .top-btn:hover{
@@ -184,15 +330,12 @@ button{
   height:38px;
 
   border-radius:50%;
-
   border:1px solid #333;
 
   background:#111;
-
   overflow:hidden;
 
   margin-left:10px;
-
   padding:0;
 }
 
@@ -216,7 +359,6 @@ button{
   bottom:0;
 
   width:66px;
-
   z-index:90;
 
   display:flex;
@@ -225,8 +367,7 @@ button{
 
   padding-top:18px;
 
-  background:
-    rgba(6,6,6,.94);
+  background:rgba(6,6,6,.94);
 
   border-right:1px solid var(--line);
 
@@ -240,15 +381,12 @@ button{
   margin-bottom:8px;
 
   border:1px solid transparent;
-
   border-radius:10px;
 
   color:#555;
-
   background:transparent;
 
   font-size:19px;
-
   transition:.2s ease;
 }
 
@@ -311,16 +449,12 @@ button{
   padding:0 12px;
 
   border-radius:9px;
-
   border:1px solid var(--line2);
 
-  background:
-    rgba(10,10,10,.86);
-
+  background:rgba(10,10,10,.86);
   color:#fff;
 
   outline:none;
-
   font-size:11px;
 }
 
@@ -338,11 +472,9 @@ button{
   padding:0 13px;
 
   border-radius:9px;
-
   border:1px solid var(--line2);
 
   color:#aaa;
-
   background:#0c0c0c;
 
   font-size:10px;
@@ -377,7 +509,6 @@ button{
   height:100%;
 
   position:relative;
-
   overflow:hidden;
 
   background-color:#050505;
@@ -398,10 +529,9 @@ button{
 
 
 /*
-  ВАЖНО:
-  Теперь world — полноценная координатная плоскость.
-  SVG и nodes находятся в одной системе координат.
-  Поэтому линии больше не "пропадают".
+  FIX:
+  world теперь является полноценной плоскостью.
+  SVG и nodes находятся в одной координатной системе.
 */
 
 .world{
@@ -419,7 +549,7 @@ button{
 
   transform-origin:center;
 
-  z-index:5;
+  pointer-events:none;
 }
 
 .lines{
@@ -464,15 +594,14 @@ button{
     0 20px 60px rgba(0,0,0,.45);
 
   user-select:none;
-
   cursor:grab;
+
+  z-index:5;
+  pointer-events:auto;
 
   transition:
     border-color .2s,
-    box-shadow .2s,
-    transform .2s;
-
-  z-index:5;
+    box-shadow .2s;
 }
 
 .node:hover{
@@ -501,27 +630,19 @@ button{
 
 .node-type{
   color:#555;
-
   font-size:8px;
-
   font-weight:900;
-
   letter-spacing:.15em;
-
   margin-bottom:6px;
 }
 
 .node-title{
   color:#eee;
-
   font-size:11px;
-
   font-weight:800;
 
   white-space:nowrap;
-
   overflow:hidden;
-
   text-overflow:ellipsis;
 }
 
@@ -529,13 +650,10 @@ button{
   margin-top:5px;
 
   color:#777;
-
   font-size:9px;
-
   line-height:1.4;
 
   max-height:28px;
-
   overflow:hidden;
 
   word-break:break-word;
@@ -551,11 +669,9 @@ button{
   height:20px;
 
   border:0;
-
   border-radius:5px;
 
   color:#555;
-
   background:transparent;
 
   font-size:12px;
@@ -589,61 +705,29 @@ button{
 
 
 /* ==========================================================
-   CONNECTIONS
+   LINE ANIMATION
 ========================================================== */
 
 .graph-line{
-  fill:none;
-
-  stroke:
-    rgba(255,255,255,.24);
-
-  stroke-width:1.4;
-
-  stroke-linecap:round;
-
-  stroke-dasharray:
-    5 8;
-
-  filter:
-    drop-shadow(
-      0 0 3px rgba(255,255,255,.08)
-    );
+  opacity:0;
 
   animation:
-    graphDash 4s linear infinite;
+    lineAppear .45s ease forwards;
 }
 
-.graph-line-glow{
-  fill:none;
-
-  stroke:
-    rgba(255,255,255,.045);
-
-  stroke-width:5;
-
-  stroke-linecap:round;
-
-  pointer-events:none;
-}
-
-.connection-point{
-  fill:#fff;
-
-  opacity:.7;
-
-  filter:
-    drop-shadow(
-      0 0 5px rgba(255,255,255,.5)
-    );
-}
-
-@keyframes graphDash{
-
-  to{
-    stroke-dashoffset:-52;
+@keyframes lineAppear{
+  from{
+    opacity:0;
   }
 
+  to{
+    opacity:1;
+  }
+}
+
+.graph-line-flow{
+  animation:
+    dash 5s linear infinite;
 }
 
 
@@ -671,8 +755,6 @@ button{
     drop-shadow(
       0 0 35px rgba(255,255,255,.08)
     );
-
-  z-index:2;
 }
 
 #saturn{
@@ -726,7 +808,6 @@ button{
   width:min(600px,100%);
 
   border:1px solid var(--line);
-
   border-radius:18px;
 
   background:
@@ -753,11 +834,9 @@ button{
   height:84px;
 
   border-radius:50%;
-
   object-fit:cover;
 
   background:#111;
-
   border:1px solid #333;
 }
 
@@ -767,9 +846,7 @@ button{
 
 .profile-info p{
   color:#666;
-
   margin-top:5px;
-
   font-size:12px;
 }
 
@@ -786,11 +863,9 @@ button{
   padding:0 14px;
 
   border-radius:8px;
-
   border:1px solid #333;
 
   background:#111;
-
   color:#aaa;
 
   font-size:10px;
@@ -843,14 +918,11 @@ button{
 .node-modal-box{
   width:min(520px,100%);
 
-  max-height:
-    calc(100vh - 40px);
+  max-height:calc(100vh - 40px);
 
   overflow:auto;
 
-  border:
-    1px solid rgba(255,255,255,.14);
-
+  border:1px solid rgba(255,255,255,.14);
   border-radius:16px;
 
   background:
@@ -870,7 +942,6 @@ button{
   display:flex;
   align-items:center;
   justify-content:space-between;
-
   margin-bottom:10px;
 }
 
@@ -884,11 +955,9 @@ button{
   height:32px;
 
   border:0;
-
   border-radius:8px;
 
   background:#111;
-
   color:#777;
 
   font-size:20px;
@@ -902,7 +971,6 @@ button{
   color:#666;
 
   font-size:10px;
-
   line-height:1.5;
 
   margin-bottom:16px;
@@ -915,11 +983,9 @@ button{
   padding:0 13px;
 
   color:#fff;
-
   background:#080808;
 
   border:1px solid #2b2b2b;
-
   border-radius:9px;
 
   outline:none;
@@ -943,11 +1009,9 @@ button{
   padding:0 14px;
 
   border-radius:8px;
-
   border:1px solid #333;
 
   color:#aaa;
-
   background:#111;
 
   font-size:9px;
@@ -970,7 +1034,6 @@ button{
   flex-direction:column;
 
   gap:7px;
-
   margin-top:18px;
 }
 
@@ -978,7 +1041,6 @@ button{
   padding:11px 12px;
 
   border-radius:9px;
-
   border:1px solid #202020;
 
   background:#0c0c0c;
@@ -1003,27 +1065,22 @@ button{
   color:#ddd;
 
   font-size:11px;
-
   line-height:1.45;
 
   white-space:pre-wrap;
-
   word-break:break-word;
 }
 
 .result.good{
-  border-color:
-    rgba(170,255,170,.18);
+  border-color:rgba(170,255,170,.18);
 }
 
 .result.warn{
-  border-color:
-    rgba(255,220,100,.18);
+  border-color:rgba(255,220,100,.18);
 }
 
 .result.bad{
-  border-color:
-    rgba(255,100,100,.18);
+  border-color:rgba(255,100,100,.18);
 }
 
 .field{
@@ -1048,15 +1105,12 @@ button{
   width:100%;
 
   color:#fff;
-
   background:#080808;
 
   border:1px solid #292929;
-
   border-radius:8px;
 
   outline:none;
-
   padding:10px;
 
   font-size:11px;
@@ -1099,11 +1153,9 @@ button{
   padding:10px 15px;
 
   border:1px solid #333;
-
   border-radius:9px;
 
   background:#111;
-
   color:#ddd;
 
   font-size:10px;
@@ -1159,7 +1211,7 @@ button{
   }
 
   .top-btn:nth-child(2)::after{
-    content:"✉";
+    content:"⌖";
     font-size:14px;
   }
 
@@ -1195,6 +1247,14 @@ button{
     width:270px;
   }
 
+  #asciiContainer{
+    font-size:clamp(1.8px,.48vw,5px);
+  }
+
+  .boot-status{
+    bottom:20px;
+    font-size:7px;
+  }
 }
 
 </style>
@@ -1203,7 +1263,36 @@ button{
 
 <body>
 
+
+<!-- ========================================================
+     BOOT SCREEN
+========================================================= -->
+
+<div id="bootScreen">
+
+  <div class="boot-stage">
+
+    <div id="asciiContainer"></div>
+
+    <div class="boot-noise"></div>
+
+    <div class="boot-vignette"></div>
+
+    <div class="boot-status">
+      INITIALIZING NZX OSINT WORKSPACE
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ========================================================
+     APP
+========================================================= -->
+
 <div class="app">
+
 
 <header class="topbar">
 
@@ -1212,8 +1301,15 @@ button{
   </div>
 
   <div class="brand">
-    <b>NZX OSINT TOOL</b>
-    <small>INTELLIGENCE WORKSPACE</small>
+
+    <b>
+      NZX OSINT TOOL
+    </b>
+
+    <small>
+      INTELLIGENCE WORKSPACE
+    </small>
+
   </div>
 
   <div class="top-tools">
@@ -1238,7 +1334,12 @@ button{
     class="profile-mini"
     onclick="openProfile()"
   >
-    <img id="miniAvatar" alt="">
+
+    <img
+      id="miniAvatar"
+      alt=""
+    >
+
   </button>
 
 </header>
@@ -1325,7 +1426,6 @@ button{
           class="lines"
           id="lines"
           viewBox="0 0 10000 10000"
-          preserveAspectRatio="none"
         ></svg>
 
       </div>
@@ -1409,6 +1509,8 @@ button{
 </section>
 
 
+<!-- TOOL MODAL -->
+
 <div
   class="tool-modal"
   id="toolModal"
@@ -1435,19 +1537,16 @@ button{
 
     </div>
 
-
     <div
       class="modal-description"
       id="toolDescription"
     ></div>
-
 
     <input
       class="modal-input"
       id="toolInput"
       autocomplete="off"
     >
-
 
     <div class="modal-actions">
 
@@ -1465,7 +1564,6 @@ button{
 
     </div>
 
-
     <div
       class="results"
       id="toolResults"
@@ -1475,6 +1573,8 @@ button{
 
 </div>
 
+
+<!-- NODE MODAL -->
 
 <div id="nodeModal">
 
@@ -1564,13 +1664,173 @@ button{
 
 <script>
 
+
+/* ==========================================================
+   ASCII BOOT
+========================================================== */
+
+const ASCII_ART = String.raw`
+          *#++++*++***********++**#######*+++++++**********#*+++**********+++++++=****++++==++=-+******#**+==++++++=+++*++=+++++*+=--:..
+  .-=+++***++++*+*+*******##*++*#####**++++++++*****+**#**+****+=+******++++==++==**==+=*=-***********+**++++++=++++++=++**+++***+=++*=:                           
+:-+.  =*++**++***###**#####**+*####*****+****+***+#*#****===********+*+++++=-+*+=+*=--:+*-***##****+**++*+****++*****+*#**********#******++==-::
+:-:-++++**###*#*##*#####*##**+#######**+**++*+++*****+#*++===**####**+=++-==-=+*==*+-::-=+******#************#*#####**#*****#*#**+++++++++=+=.
+.:-+****#####*##++****##**#*++*###*******+**+=++****++#*+++=****#*#**=--+=-=+*+*=***+++***+****+++*******#####*#****+-. .:----:.    .::-:.
+ .=*#######*##*++******#**#*+****##*#*##+*#**+#******+*****+*******+=-:-+*******#*#**+*****##***++*+****#***#*##****+*+++++===-:.
+ .=########***++==++*####**#**##****###***##+*#***++*************##+-=+**#********#*#*##**#*******+***+*#*****##***************+=+=-:
+ .=*###****#++++**#*######**#**#######*********##**+************####+***********#******#**###*******+++*******##*#********#**##*****+--            
+ .-+*+****#+++++*****##################**+**##**##***+****###*###*#****#**###******#######********++++******###########*********###***+====-=====++++++++++++=---:.
+=+**++*++*###****######################***#####**+*****##************************#*####*#####**+++=++****#######################**#**= :---:-=-.  .-=-==++++**+*++:
+***+++*##**+++**###+***+***#####***###########*#***+++******#***#****####****#######*#*****#*#**++++++####*###############*######*****#*=-:.     ..   ..::=+*******
+***###*#####**#%##**##*******###*++**#########***++==-...:-=+*****+*##*#*****########***#*=*#**#**#***#**#######*##*##******#######*=-+*+**+=:      .....:--==+****
+*####*#####*+########***+**##*##****########**++-::....        .-=+*******#*************************##########%%#######***##########*++++*****+-.        ..:-==++*#
+**##########*#######****########*##########**+=-......            .=+***##***#*#***********#####*#*#####%###%############**########**#**+**+-. .:...   .....:-=+=++
+=+**#############%#######################***+=-...                  .=+************+********########**###%#%%##########*##**##**###*++*#**+=:.    .    :..:::-==+++
+   :***####*############################**+++-....                   .:-===+++++++++++++******####*##########%###+######*###########**#*****+=---:. ::..:::--==-=++
+    .=***#*#######################*******++-.......                    ::-==+=+++++++++******###*##########*##%#*#########****#######**#***##****+-.::::::---=-=---
+         :-=*###*#########*+=+***+++++++--...   ......:-:.              ..:-====+=+++++*+*****#################%%%###########*=-.:---:       .::...::-------------=
+           .- :**#########+-::--------=-:..      .......:====..         ....:-==-===++++*****#*#****##########%%%%%%########+=-:.........:::::::-----=-----========
+             .*###########*+::-=:....::...        .:---:::=++++=..       .....-=-==+++++****##*****####%########%%%%%%%#******+=::::::::::---===+ =+++++***+++
+             :+####*######+=-==-.........          ..-+***+++*+++++=   ......:--===++++++**##*****%#############%#####%####%#*++==--=-=+=++++*******####%%#####*###
+             .-*#*###*+-   ::........                ...=*##********+=......::====+++++++***####%#%##############%%##%%%%###*******+****#########*#*##########%###%
+              .:*++-+      .:.....                      -+-.=*##%###*#*+-:---=====++++++**####%#%#*%%%#%%*++=+#******+**#*###%#%#%#%%%%@%%#####***###*##******#*###
+               :-.         .::....                      ..:   =**+**####**++++++++*******##%#%#*%%%#%%#%%*++=+#******+**#*###%#%#%#%%%%###****###*##*******++***#* 
+                           ::...:..                      .:+:  :.==+#####*****+=+**#*###%#%**#*%%%%##*#%##+=----:::=+****###%%#%#%#%%%%###****###*##*******++***#* 
+                          .::........                     ..-++-:-=*###+*+-:::-=+*#*###%#**++**%%#%######%#=-:-:-=++*##*###########*##*****#*###******++**+++++=+: 
+.:-==+++++++++==--:.     .:.:....:....                     ..:+*****#+.. -. ..-=+*####*++****++#####--++++=::-==++++***#**####*#**+++++-++======-==--==-=---=======
+===============+==+=+==-=====-:..::....                   ....:-+**+.       ..-++###*+*##****====*##+.:.: :::=+*++***+*#*+========+========---==---==============++
+=========--------:------==-=--------....                  .......            .:+*#*=******++==---=--=+::-=+=+***+*==-:....:::::::------=-=====================+++++
+=-------::-:::::::::::..:.:::::-:::--:-:..             . .........           .-*#******+***==----===-:-===++++=-............::..::::::::::-=---====-===========++=+
+------::::...........................:::::-..          ............. .... ...:::-======+*+=---::-=====++++==:...  ....:..:..:.....:.:::::::-:---=---==-=-=====+++**
+--:::::::...................................:::.. .........           .... ..........::::-=====-===+===++..   ......::............:-----:------:---===========+****
+::::::................................................                    ............................::............................:::-------:-:---====+++++******
+:........................... .....................                             .......................                   ............::-----=---=---==++++******++*
+................ ......       . .............                                                . .....                             ....:-===+==========++++**********
+...............  ...              .......                                                                                         ...:--===+++++++=+++++***********
+................ ..             .......                                                                                         ..:--==+++++++++++**************
+.......................      ....                                                                                            ....::-====++++++****####*********
+:...................................                                                                                             ....:--==+++++****######*******###
+:::::::............................                                                                                        ....  ....::-=+=+****######**####*######
+--:::.::.........................                                                                                     ..............::-==++**######################
+----:.::..........................                                                                                  ................:-=+++*########################
+-::::::......................                                                                               ......................::-==+**#####%%%%%%%####%%######%
+-:::::::::...................                                                                             ......................:--==++**######%#%%%%%%%%#######%%%
+--::::::.:....................                                                                       .......................::--==++*##########%%%%%%%#%#####%%%%%%
+---::::.:.........................        .                                            ..    .............................:-===+++*######%#%%%###%%%%%#####%%%%##%%
+---:::::...............................  .....                                        ... .... ........................::--=+++***#############%#%%%############%#%
+=---:--:::::...................................   .                         .     .  ................................:--===+++****#%%%%%%%#########################
+===-----:::::::.............................................................................::::::::-----====+++++***%%%%%%#%###########****#******#***+-
+`;
+
+
+function initBoot(){
+
+  const container =
+    document.getElementById(
+      "asciiContainer"
+    );
+
+  const lines =
+    ASCII_ART
+      .replace(/\r/g,"")
+      .split("\n")
+      .filter(
+        line =>
+          line.trim().length > 0
+      );
+
+  container.innerHTML = "";
+
+  lines.forEach(
+    (line,index)=>{
+
+      const span =
+        document.createElement(
+          "span"
+        );
+
+      span.className =
+        "ascii-line";
+
+      span.textContent =
+        line;
+
+      const randomX =
+        (
+          Math.random() * 80 -
+          40
+        ).toFixed(1);
+
+      const randomR =
+        (
+          Math.random() * 4 -
+          2
+        ).toFixed(2);
+
+      const delay =
+        (
+          index * .018 +
+          Math.random() * .12
+        ).toFixed(3);
+
+      span.style.setProperty(
+        "--random-x",
+        randomX + "px"
+      );
+
+      span.style.setProperty(
+        "--random-r",
+        randomR + "deg"
+      );
+
+      span.style.setProperty(
+        "--delay",
+        delay + "s"
+      );
+
+      container.appendChild(
+        span
+      );
+    }
+  );
+
+
+  const total =
+    Math.max(
+      2300,
+      lines.length * 18 + 900
+    );
+
+  setTimeout(
+    ()=>{
+
+      const screen =
+        document.getElementById(
+          "bootScreen"
+        );
+
+      screen.classList.add(
+        "hide"
+      );
+
+      setTimeout(
+        ()=>{
+          screen.remove();
+        },
+        900
+      );
+
+    },
+    total
+  );
+}
+
+
 /* ==========================================================
    STORAGE
 ========================================================== */
 
 const STORAGE_KEY =
   "nzx-osint-real-v4";
-
 
 let db = {
 
@@ -1579,11 +1839,8 @@ let db = {
   links:[],
 
   profile:{
-
     name:"NZX User",
-
     username:"nzx_user",
-
     avatar:""
   },
 
@@ -1606,14 +1863,15 @@ try{
     db = {
 
       ...db,
-
       ...parsed,
 
       nodes:
         parsed.nodes || {},
 
       links:
-        Array.isArray(parsed.links)
+        Array.isArray(
+          parsed.links
+        )
           ? parsed.links
           : [],
 
@@ -1621,7 +1879,6 @@ try{
         ...db.profile,
         ...(parsed.profile || {})
       }
-
     };
   }
 
@@ -1658,7 +1915,6 @@ function saveDB(){
 
 
 function $(id){
-
   return document.getElementById(id);
 }
 
@@ -1678,9 +1934,10 @@ function escapeHTML(value){
 
 function objectToText(value){
 
-  if(value === null ||
-     value === undefined){
-
+  if(
+    value === null ||
+    value === undefined
+  ){
     return "UNKNOWN";
   }
 
@@ -1689,7 +1946,6 @@ function objectToText(value){
     typeof value === "number" ||
     typeof value === "boolean"
   ){
-
     return String(value);
   }
 
@@ -1717,49 +1973,6 @@ function uid(){
     Math.random()
       .toString(36)
       .slice(2,8)
-  );
-}
-
-
-function hasLink(a,b){
-
-  return db.links.some(
-    link =>
-      (
-        link.a === a &&
-        link.b === b
-      ) ||
-      (
-        link.a === b &&
-        link.b === a
-      )
-  );
-}
-
-
-function addLink(a,b){
-
-  if(!a || !b || a === b)
-    return;
-
-  if(hasLink(a,b))
-    return;
-
-  db.links.push({
-    a,
-    b
-  });
-}
-
-
-function normalizePhone(value){
-
-  return String(
-    value || ""
-  )
-  .replace(
-    /[^\d+]/g,
-    ""
   );
 }
 
@@ -1837,9 +2050,7 @@ function showPage(page){
 
 function openProfile(){
 
-  showPage(
-    "profile"
-  );
+  showPage("profile");
 
   updateProfileUI();
 }
@@ -1912,6 +2123,12 @@ function updateProfileUI(){
 }
 
 
+function chooseAvatar(){
+
+  $("avatarFile").click();
+}
+
+
 $("avatarFile")
 .addEventListener(
   "change",
@@ -1948,12 +2165,6 @@ $("avatarFile")
 );
 
 
-function chooseAvatar(){
-
-  $("avatarFile").click();
-}
-
-
 function editProfileName(){
 
   const name =
@@ -1962,9 +2173,7 @@ function editProfileName(){
       db.profile.name
     );
 
-  if(
-    name === null
-  )
+  if(name === null)
     return;
 
   const cleaned =
@@ -1993,24 +2202,18 @@ function editProfileName(){
 const toolConfig = {
 
   phone:{
+    title:"CHECK NUMBER",
 
-    title:
-      "CHECK NUMBER",
-
-    placeholder:
-      "+374 XX XXX XXX",
+    placeholder:"+374 XX XXX XXX",
 
     description:
       "Проверка номера через PhoneValidation API. Показываются только данные, которые реально вернул провайдер."
   },
 
   address:{
+    title:"CHECK ADDRESS",
 
-    title:
-      "CHECK ADDRESS",
-
-    placeholder:
-      "Yerevan, Armenia",
+    placeholder:"Yerevan, Armenia",
 
     description:
       "Поиск адреса через OpenStreetMap Nominatim."
@@ -2019,8 +2222,7 @@ const toolConfig = {
 };
 
 
-let currentTool =
-  null;
+let currentTool=null;
 
 
 function openTool(type){
@@ -2050,9 +2252,7 @@ function openTool(type){
     "";
 
   $("toolModal")
-    .classList.add(
-      "open"
-    );
+    .classList.add("open");
 
   setTimeout(
     ()=>{
@@ -2066,9 +2266,7 @@ function openTool(type){
 function closeTool(){
 
   $("toolModal")
-    .classList.remove(
-      "open"
-    );
+    .classList.remove("open");
 
   currentTool =
     null;
@@ -2081,7 +2279,6 @@ function outsideToolModal(event){
     event.target ===
     $("toolModal")
   ){
-
     closeTool();
   }
 }
@@ -2092,9 +2289,7 @@ $("toolInput")
   "keydown",
   event=>{
 
-    if(
-      event.key === "Enter"
-    ){
+    if(event.key === "Enter"){
 
       event.preventDefault();
 
@@ -2129,15 +2324,12 @@ async function runTool(){
   $("toolRun").textContent =
     "CHECKING...";
 
-  $("toolResults")
-    .innerHTML =
-      "";
+  $("toolResults").innerHTML =
+    "";
 
   try{
 
-    if(
-      currentTool === "phone"
-    ){
+    if(currentTool === "phone"){
 
       await checkPhoneReal(
         value
@@ -2164,7 +2356,7 @@ async function runTool(){
 
 
 /* ==========================================================
-   RESULT UI
+   RESULTS
 ========================================================== */
 
 function addResult(
@@ -2217,9 +2409,7 @@ function addResult(
   `;
 
   $("toolResults")
-    .appendChild(
-      box
-    );
+    .appendChild(box);
 }
 
 
@@ -2227,9 +2417,7 @@ function addResult(
    PHONE
 ========================================================== */
 
-async function checkPhoneReal(
-  value
-){
+async function checkPhoneReal(value){
 
   addResult(
     "REQUEST",
@@ -2283,10 +2471,9 @@ async function checkPhoneReal(
 
       addResult(
         "BACKEND ERROR",
-        data || (
-          "HTTP " +
-          response.status
-        ),
+        data ||
+          ("HTTP " +
+           response.status),
         "ERROR",
         "!"
       );
@@ -2335,14 +2522,11 @@ async function checkPhoneReal(
 }
 
 
-function renderPhoneResult(
-  data
-){
+function renderPhoneResult(data){
 
   addResult(
     "PHONE",
-    data.phone ||
-      "UNKNOWN",
+    data.phone || "UNKNOWN",
     "OK",
     "☎"
   );
@@ -2373,16 +2557,13 @@ function renderPhoneResult(
         : "NO",
     data.possible === true
       ? "OK"
-      : data.possible === false
-        ? "WARNING"
-        : "WARNING",
+      : "WARNING",
     "?"
   );
 
   addResult(
     "CONFIDENCE",
-    data.confidence ||
-      "UNKNOWN",
+    data.confidence || "UNKNOWN",
     data.confidence === "verified"
       ? "OK"
       : "WARNING",
@@ -2404,48 +2585,42 @@ function renderPhoneResult(
 
   addResult(
     "COUNTRY",
-    data.country ||
-      "UNKNOWN",
+    data.country || "UNKNOWN",
     "INFO",
     "◎"
   );
 
   addResult(
     "COUNTRY CODE",
-    data.country_code ||
-      "UNKNOWN",
+    data.country_code || "UNKNOWN",
     "INFO",
     "+"
   );
 
   addResult(
     "REGION",
-    data.region ||
-      "UNKNOWN",
+    data.region || "UNKNOWN",
     "INFO",
     "⌖"
   );
 
   addResult(
     "CARRIER",
-    data.carrier ||
-      "UNKNOWN",
+    data.carrier || "UNKNOWN",
     "INFO",
     "◉"
   );
 
   addResult(
     "LINE TYPE",
-    data.line_type ||
-      "UNKNOWN",
+    data.line_type || "UNKNOWN",
     "INFO",
     "▣"
   );
 
   addResult(
     "DISPOSABLE / VOIP",
-    data.disposable ||
-      "UNKNOWN",
+    data.disposable || "UNKNOWN",
     data.disposable === "YES"
       ? "WARNING"
       : "INFO",
@@ -2454,32 +2629,28 @@ function renderPhoneResult(
 
   addResult(
     "NATIONAL",
-    data.national ||
-      "UNKNOWN",
+    data.national || "UNKNOWN",
     "INFO",
     "N"
   );
 
   addResult(
     "INTERNATIONAL",
-    data.international ||
-      "UNKNOWN",
+    data.international || "UNKNOWN",
     "INFO",
     "I"
   );
 
   addResult(
     "E.164",
-    data.e164 ||
-      "UNKNOWN",
+    data.e164 || "UNKNOWN",
     "INFO",
     "E"
   );
 
   addResult(
     "PROVIDER",
-    data.source ||
-      "UNKNOWN",
+    data.source || "UNKNOWN",
     "INFO",
     "S"
   );
@@ -2491,11 +2662,13 @@ function renderPhoneResult(
   const providerStatusType =
     providerStatus === "OK"
       ? "OK"
-      : providerStatus === "API_KEY_REJECTED"
-        ? "ERROR"
-        : providerStatus === "QUOTA_EXCEEDED"
-          ? "WARNING"
-          : "INFO";
+      : providerStatus === "NO_API_KEY"
+        ? "WARNING"
+        : providerStatus === "API_KEY_REJECTED"
+          ? "ERROR"
+          : providerStatus === "QUOTA_EXCEEDED"
+            ? "WARNING"
+            : "INFO";
 
   addResult(
     "PROVIDER STATUS",
@@ -2507,10 +2680,8 @@ function renderPhoneResult(
   );
 
   if(
-    data.credits_remaining !==
-      null &&
-    data.credits_remaining !==
-      undefined
+    data.credits_remaining !== null &&
+    data.credits_remaining !== undefined
   ){
 
     addResult(
@@ -2521,9 +2692,7 @@ function renderPhoneResult(
     );
   }
 
-  if(
-    data.provider_error
-  ){
+  if(data.provider_error){
 
     addResult(
       "PROVIDER RESPONSE",
@@ -2564,7 +2733,7 @@ function renderPhoneResult(
 
 
 /* ==========================================================
-   GRAPH NODE CREATION
+   NODE CREATION
 ========================================================== */
 
 function createNode(
@@ -2601,130 +2770,11 @@ function createNode(
 
 
 /* ==========================================================
-   PHONE GRAPH LAYOUT
+   PHONE GRAPH
+   LEFT -> RIGHT
 ========================================================== */
 
-/*
-   Схема:
-
-   PHONE
-      │
-      ├── COUNTRY
-      ├── REGION
-      ├── CARRIER
-      ├── LINE TYPE
-      ├── VALID
-      │
-      ├──────────────>
-      │
-      ├── CONFIDENCE
-      ├── POSSIBLE
-      ├── DISPOSABLE
-      ├── COUNTRY CODE
-      ├── SCORE
-      │
-      └──────────────>
-
-   То есть граф идет слева направо,
-   а внутри каждой колонки ноды стоят
-   сверху / по центру / снизу.
-*/
-
-
-const PHONE_COLUMN_GAP =
-  430;
-
-const PHONE_ROW_GAP =
-  125;
-
-const PHONE_MAX_ROWS =
-  5;
-
-
-function arrangeColumn(
-  nodes,
-  x,
-  centerY
-){
-
-  if(!nodes.length)
-    return;
-
-  const totalHeight =
-    (
-      nodes.length - 1
-    ) *
-    PHONE_ROW_GAP;
-
-  const startY =
-    centerY -
-    totalHeight / 2;
-
-  nodes.forEach(
-    (node,index)=>{
-
-      node.x =
-        x;
-
-      node.y =
-        startY +
-        index *
-        PHONE_ROW_GAP;
-    }
-  );
-}
-
-
-function nearestNode(
-  source,
-  nodes
-){
-
-  if(!nodes.length)
-    return null;
-
-  let best =
-    null;
-
-  let bestDistance =
-    Infinity;
-
-  nodes.forEach(
-    node=>{
-
-      const dx =
-        node.x -
-        source.x;
-
-      const dy =
-        node.y -
-        source.y;
-
-      const distance =
-        dx*dx +
-        dy*dy;
-
-      if(
-        distance <
-        bestDistance
-      ){
-
-        bestDistance =
-          distance;
-
-        best =
-          node;
-      }
-    }
-  );
-
-  return best;
-}
-
-
-function createPhoneGraph(
-  data
-){
+function createPhoneGraph(data){
 
   const phone =
     data.e164 ||
@@ -2733,57 +2783,66 @@ function createPhoneGraph(
   if(!phone)
     return;
 
-  const normalized =
-    normalizePhone(phone);
 
-  let phoneNode =
-    Object.values(
-      db.nodes
-    ).find(
-      n =>
-        n.type === "PHONE" &&
-        (
-          normalizePhone(
-            n.content
-          ) === normalized
-        )
+  /*
+    Удаляем старую автоматически
+    созданную ветку этого телефона.
+  */
+
+  const phoneKey =
+    "phone:" +
+    String(phone)
+      .trim()
+      .toLowerCase();
+
+
+  Object.keys(db.nodes)
+    .forEach(
+      id=>{
+
+        const node =
+          db.nodes[id];
+
+        if(
+          node.group ===
+          phoneKey
+        ){
+
+          delete db.nodes[id];
+
+          db.links =
+            db.links.filter(
+              link =>
+                link.a !== id &&
+                link.b !== id
+            );
+        }
+      }
     );
 
-  if(!phoneNode){
 
-    const center =
-      getGraphCenter();
-
-    const id =
-      createNode(
-        "Phone Number",
-        "PHONE",
-        phone,
-        center.x,
-        center.y,
-        {
-          group:
-            "phone:" +
-            normalized
-        }
-      );
-
-    phoneNode =
-      db.nodes[id];
-
-  }else{
-
-    phoneNode.group =
-      "phone:" +
-      normalized;
-  }
+  const center =
+    getGraphCenter();
 
 
   /*
-    Все реальные поля, которые может вернуть backend.
+    ROOT
   */
 
-  const rawValues = [
+  const phoneId =
+    createNode(
+      "Phone Number",
+      "PHONE",
+      phone,
+      center.x,
+      center.y,
+      {
+        group:phoneKey
+      }
+    );
+
+
+  const values = [
 
     [
       "Country",
@@ -2824,25 +2883,27 @@ function createPhoneGraph(
     [
       "Valid",
       "VALID",
-      data.valid
+      data.valid === true
+        ? "YES"
+        : data.valid === false
+          ? "NO"
+          : data.valid
     ],
 
     [
       "Possible",
       "POSSIBLE",
-      data.possible
+      data.possible === true
+        ? "YES"
+        : data.possible === false
+          ? "NO"
+          : data.possible
     ],
 
     [
       "Disposable",
       "DISPOSABLE",
       data.disposable
-    ],
-
-    [
-      "Score",
-      "SCORE",
-      data.score
     ],
 
     [
@@ -2859,313 +2920,239 @@ function createPhoneGraph(
 
     [
       "E.164",
-      "E164",
+      "E.164",
       data.e164
     ],
 
     [
-      "Provider",
-      "PROVIDER",
-      data.source
-    ],
-
-    [
-      "Provider Status",
-      "PROVIDER STATUS",
-      data.provider_status
+      "Score",
+      "SCORE",
+      data.score
     ]
 
   ];
 
 
-  /*
-    Оставляем только реальные значения.
-  */
-
-  const values =
-    rawValues.filter(
+  const cleanValues =
+    values.filter(
       item=>{
 
         const value =
           item[2];
 
-        return !(
+        if(
           value === null ||
           value === undefined ||
           value === "" ||
           value === "UNKNOWN"
-        );
+        ){
+          return false;
+        }
 
+        return true;
       }
     );
 
 
   /*
-    Разбиваем на колонки.
+    5 элементов на колонку.
+
+    root
+       |
+       +-- A
+       +-- B
+       +-- C
+       +-- D
+       +-- E
+
+             +-- F
+             +-- G
+             ...
+
+    Получается аккуратный
+    горизонтальный граф.
   */
+
+  const PER_COLUMN = 5;
+
+  const COLUMN_GAP = 400;
+
+  const ROW_GAP = 125;
+
 
   const columns=[];
 
+
   for(
     let i=0;
-    i<values.length;
-    i+=PHONE_MAX_ROWS
+    i<cleanValues.length;
+    i+=PER_COLUMN
   ){
 
     columns.push(
-      values.slice(
+      cleanValues.slice(
         i,
-        i + PHONE_MAX_ROWS
+        i+PER_COLUMN
       )
     );
   }
 
 
-  const group =
-    "phone:" +
-    normalized;
+  const createdColumns=[];
 
-
-  /*
-    Собираем старые ноды этой телефонной цепочки.
-  */
-
-  const existingGroupNodes =
-    Object.values(
-      db.nodes
-    ).filter(
-      n =>
-        n.group === group
-    );
-
-
-  const columnNodes=[];
-
-
-  /*
-    PHONE — первая колонка.
-  */
-
-  phoneNode.x =
-    phoneNode.x;
-
-  phoneNode.y =
-    phoneNode.y;
-
-  columnNodes.push([
-    phoneNode
-  ]);
-
-
-  /*
-    Создаем / переиспользуем
-    остальные ноды.
-  */
 
   columns.forEach(
-    (column,index)=>{
+    (column,columnIndex)=>{
 
-      const nodes=[];
+      const columnNodes=[];
+
+      const total =
+        column.length;
+
+      const startY =
+        center.y -
+        (
+          (total-1) *
+          ROW_GAP /
+          2
+        );
+
 
       column.forEach(
-        item=>{
+        (item,rowIndex)=>{
 
-          const title =
-            item[0];
+          const x =
+            center.x +
+            COLUMN_GAP *
+            (
+              columnIndex + 1
+            );
 
-          const type =
-            item[1];
-
-          const raw =
-            item[2];
-
-          const content =
-            typeof raw === "boolean"
-              ? (
-                  raw
-                    ? "YES"
-                    : "NO"
-                )
-              : String(raw);
+          const y =
+            startY +
+            rowIndex *
+            ROW_GAP;
 
 
-          let target =
-            existingGroupNodes.find(
-              n =>
-                n.id !== phoneNode.id &&
-                n.type === type &&
-                String(
-                  n.content
-                ) === content
+          const id =
+            createNode(
+              item[0],
+              item[1],
+              typeof item[2] ===
+                "boolean"
+                  ? (
+                      item[2]
+                        ? "YES"
+                        : "NO"
+                    )
+                  : String(item[2]),
+              x,
+              y,
+              {
+                group:phoneKey,
+                column:columnIndex,
+                row:rowIndex
+              }
             );
 
 
-          if(!target){
+          columnNodes.push(
+            db.nodes[id]
+          );
 
-            const id =
-              createNode(
-                title,
-                type,
-                content,
-                0,
-                0,
-                {
-                  group
-                }
-              );
 
-            target =
-              db.nodes[id];
+          /*
+            Первая колонка
+            соединяется с телефоном.
+          */
+
+          if(columnIndex === 0){
+
+            db.links.push({
+              a:phoneId,
+              b:id
+            });
 
           }
 
-
-          target.group =
-            group;
-
-          target.title =
-            title;
-
-          target.type =
-            type;
-
-          target.content =
-            content;
-
-          nodes.push(
-            target
-          );
         }
       );
 
-      columnNodes.push(
-        nodes
+
+      createdColumns.push(
+        columnNodes
       );
     }
   );
 
 
   /*
-    Расставляем PHONE.
-  */
+    Следующие колонки соединяются
+    с ближайшей нодой предыдущей
+    колонки.
 
-  const rootX =
-    phoneNode.x;
-
-  const rootY =
-    phoneNode.y;
-
-
-  /*
-    Каждая следующая колонка
-    находится справа.
-  */
-
-  columnNodes
-    .slice(1)
-    .forEach(
-      (nodes,index)=>{
-
-        arrangeColumn(
-          nodes,
-          rootX +
-            PHONE_COLUMN_GAP *
-            (index + 1),
-          rootY
-        );
-      }
-    );
-
-
-  /*
-    Старые связи этой телефонной цепочки
-    удаляем, чтобы при повторной проверке
-    не появлялись кривые старые соединения.
-  */
-
-  const groupIds =
-    new Set(
-      Object.values(
-        db.nodes
-      )
-      .filter(
-        n =>
-          n.group === group
-      )
-      .map(
-        n =>
-          n.id
-      )
-    );
-
-
-  db.links =
-    db.links.filter(
-      link =>
-        !(
-          groupIds.has(link.a) &&
-          groupIds.has(link.b)
-        )
-    );
-
-
-  /*
-    ROOT -> первая колонка.
-  */
-
-  const firstColumn =
-    columnNodes[1] ||
-    [];
-
-  firstColumn.forEach(
-    node=>{
-
-      addLink(
-        phoneNode.id,
-        node.id
-      );
-    }
-  );
-
-
-  /*
-    Каждая следующая колонка
-    соединяется с ближайшей
-    нодой предыдущей колонки.
+    Это делает граф визуально
+    похожим на цепочку.
   */
 
   for(
-    let columnIndex=2;
+    let columnIndex=1;
     columnIndex<
-      columnNodes.length;
+      createdColumns.length;
     columnIndex++
   ){
 
     const previous =
-      columnNodes[
-        columnIndex - 1
-      ] || [];
+      createdColumns[
+        columnIndex-1
+      ];
 
     const current =
-      columnNodes[
+      createdColumns[
         columnIndex
-      ] || [];
+      ];
+
 
     current.forEach(
       node=>{
 
-        const parent =
-          nearestNode(
-            node,
-            previous
-          );
+        let nearest =
+          previous[0];
 
-        if(parent){
+        let best =
+          Infinity;
 
-          addLink(
-            parent.id,
-            node.id
-          );
+
+        previous.forEach(
+          prev=>{
+
+            const distance =
+              Math.abs(
+                prev.y -
+                node.y
+              );
+
+            if(
+              distance < best
+            ){
+
+              best =
+                distance;
+
+              nearest =
+                prev;
+            }
+          }
+        );
+
+
+        if(nearest){
+
+          db.links.push({
+            a:nearest.id,
+            b:node.id
+          });
+
         }
 
       }
@@ -3179,14 +3166,8 @@ function createPhoneGraph(
 
   renderLines();
 
-  /*
-    Плавно показываем созданную
-    телефонную цепочку.
-  */
-
-  focusGraphNode(
-    phoneNode,
-    1
+  animateNewGraph(
+    phoneId
   );
 }
 
@@ -3195,9 +3176,7 @@ function createPhoneGraph(
    ADDRESS
 ========================================================== */
 
-async function checkAddressReal(
-  value
-){
+async function checkAddressReal(value){
 
   addResult(
     "SEARCH",
@@ -3338,9 +3317,7 @@ async function checkAddressReal(
 }
 
 
-function createAddressGraph(
-  data
-){
+function createAddressGraph(data){
 
   if(!data)
     return;
@@ -3366,22 +3343,11 @@ function createAddressGraph(
         "ADDRESS",
         data.display_name,
         center.x,
-        center.y,
-        {
-          group:
-            "address:" +
-            data.display_name
-        }
+        center.y
       );
 
     addressNode =
       db.nodes[id];
-
-  }else{
-
-    addressNode.group =
-      "address:" +
-      data.display_name;
   }
 
 
@@ -3429,212 +3395,60 @@ function createAddressGraph(
       data.house_number
     ]
 
-  ];
-
-
-  const valid =
-    values.filter(
-      item =>
-        item[2] &&
-        item[2] !==
-          "UNKNOWN"
-    );
-
-
-  const columns=[];
-
-  for(
-    let i=0;
-    i<valid.length;
-    i+=4
-  ){
-
-    columns.push(
-      valid.slice(
-        i,
-        i+4
-      )
-    );
-  }
-
-
-  const group =
-    "address:" +
-    data.display_name;
-
-
-  const groupNodes =
-    Object.values(
-      db.nodes
-    ).filter(
-      n =>
-        n.group === group
-    );
-
-
-  const allColumns=[
-    [addressNode]
-  ];
-
-
-  columns.forEach(
-    (column,columnIndex)=>{
-
-      const nodes=[];
-
-      column.forEach(
-        item=>{
-
-          const title =
-            item[0];
-
-          const type =
-            item[1];
-
-          const content =
-            String(item[2]);
-
-
-          let target =
-            groupNodes.find(
-              n =>
-                n.type === type &&
-                String(
-                  n.content
-                ) === content
-            );
-
-
-          if(!target){
-
-            const id =
-              createNode(
-                title,
-                type,
-                content,
-                0,
-                0,
-                {
-                  group
-                }
-              );
-
-            target =
-              db.nodes[id];
-          }
-
-
-          target.group =
-            group;
-
-          target.title =
-            title;
-
-          target.type =
-            type;
-
-          target.content =
-            content;
-
-          nodes.push(
-            target
-          );
-        }
-      );
-
-      allColumns.push(
-        nodes
-      );
-    }
+  ].filter(
+    item =>
+      item[2] &&
+      item[2] !== "UNKNOWN"
   );
 
 
-  allColumns
-    .slice(1)
-    .forEach(
-      (nodes,index)=>{
+  const ROW_GAP=125;
+  const COLUMN_GAP=400;
 
-        arrangeColumn(
-          nodes,
-          addressNode.x +
-            PHONE_COLUMN_GAP *
-            (index+1),
-          addressNode.y
+  values.forEach(
+    (item,index)=>{
+
+      const column =
+        Math.floor(
+          index / 5
         );
-      }
-    );
 
+      const row =
+        index % 5;
 
-  const groupIds =
-    new Set(
-      Object.values(
-        db.nodes
-      )
-      .filter(
-        n =>
-          n.group === group
-      )
-      .map(
-        n =>
-          n.id
-      )
-    );
+      const total =
+        Math.min(
+          5,
+          values.length -
+          column*5
+        );
 
+      const startY =
+        addressNode.y -
+        (
+          (total-1) *
+          ROW_GAP /
+          2
+        );
 
-  db.links =
-    db.links.filter(
-      link =>
-        !(
-          groupIds.has(link.a) &&
-          groupIds.has(link.b)
-        )
-    );
+      const id =
+        createNode(
+          item[0],
+          item[1],
+          item[2],
+          addressNode.x +
+            COLUMN_GAP *
+            (column+1),
+          startY +
+            row*ROW_GAP
+        );
 
-
-  const first =
-    allColumns[1] || [];
-
-  first.forEach(
-    node=>{
-      addLink(
-        addressNode.id,
-        node.id
-      );
+      db.links.push({
+        a:addressNode.id,
+        b:id
+      });
     }
   );
-
-
-  for(
-    let i=2;
-    i<allColumns.length;
-    i++
-  ){
-
-    const previous =
-      allColumns[i-1] || [];
-
-    const current =
-      allColumns[i] || [];
-
-    current.forEach(
-      node=>{
-
-        const parent =
-          nearestNode(
-            node,
-            previous
-          );
-
-        if(parent){
-
-          addLink(
-            parent.id,
-            node.id
-          );
-        }
-      }
-    );
-  }
 
 
   saveDB();
@@ -3642,11 +3456,6 @@ function createAddressGraph(
   renderNodes();
 
   renderLines();
-
-  focusGraphNode(
-    addressNode,
-    1
-  );
 }
 
 
@@ -3654,13 +3463,10 @@ function createAddressGraph(
    NODE MODAL
 ========================================================== */
 
-let editingNode =
-  null;
+let editingNode=null;
 
 
-function openNodeModal(
-  nodeId=null
-){
+function openNodeModal(nodeId=null){
 
   editingNode =
     nodeId;
@@ -3670,6 +3476,7 @@ function openNodeModal(
       nodeId
         ? "Edit Node"
         : "New Node";
+
 
   if(nodeId){
 
@@ -3701,21 +3508,16 @@ function openNodeModal(
   }
 
   $("nodeModal")
-    .classList.add(
-      "open"
-    );
+    .classList.add("open");
 }
 
 
 function closeNodeModal(){
 
   $("nodeModal")
-    .classList.remove(
-      "open"
-    );
+    .classList.remove("open");
 
-  editingNode =
-    null;
+  editingNode=null;
 }
 
 
@@ -3736,6 +3538,7 @@ function saveNode(){
     $("nodeContent")
       .value
       .trim();
+
 
   if(!title){
 
@@ -3772,7 +3575,13 @@ function saveNode(){
     const center =
       getGraphCenter();
 
-    const id =
+    const existing =
+      Object.values(
+        db.nodes
+      );
+
+
+    const newId =
       createNode(
 
         title,
@@ -3784,71 +3593,79 @@ function saveNode(){
 
         center.x +
           (
-            Math.random() -
-            .5
-          ) * 260,
+            Math.random()-.5
+          )*260,
 
         center.y +
           (
-            Math.random() -
-            .5
-          ) * 180
-    );
+            Math.random()-.5
+          )*180
+      );
 
 
     /*
-      Если это вторая нода,
-      автоматически соединяем
-      её с ближайшей существующей.
+      Автоматическая связь.
+
+      Если это первая нода —
+      просто создаём.
+
+      Если уже есть ноды —
+      соединяем новую с ближайшей.
     */
 
-    const newNode =
-      db.nodes[id];
-
-    const others =
-      Object.values(
-        db.nodes
-      ).filter(
-        n =>
-          n.id !== id
+    const candidates =
+      existing.filter(
+        node =>
+          node.id !==
+          newId
       );
 
-    if(others.length === 1){
 
-      addLink(
-        others[0].id,
-        newNode.id
-      );
+    if(candidates.length){
 
-    }else if(others.length > 1){
+      const newNode =
+        db.nodes[newId];
 
-      const nearest =
-        nearestNode(
-          newNode,
-          others
-        );
+      let nearest =
+        candidates[0];
 
-      if(nearest){
+      let best =
+        Infinity;
 
-        const distance =
-          Math.hypot(
-            nearest.x -
-              newNode.x,
-            nearest.y -
-              newNode.y
-          );
 
-        if(
-          distance <
-          700
-        ){
+      candidates.forEach(
+        node=>{
 
-          addLink(
-            nearest.id,
-            newNode.id
-          );
+          const dx =
+            node.x -
+            newNode.x;
+
+          const dy =
+            node.y -
+            newNode.y;
+
+          const distance =
+            Math.sqrt(
+              dx*dx +
+              dy*dy
+            );
+
+          if(distance < best){
+
+            best =
+              distance;
+
+            nearest =
+              node;
+          }
         }
-      }
+      );
+
+
+      db.links.push({
+        a:nearest.id,
+        b:newId
+      });
     }
   }
 
@@ -3877,40 +3694,23 @@ const graph =
 const world =
   $("world");
 
-let zoom =
-  1;
+let zoom=1;
 
-let panX =
-  0;
+let panX=0;
+let panY=0;
 
-let panY =
-  0;
+let draggingNode=null;
 
-let draggingNode =
-  null;
+let dragOffsetX=0;
+let dragOffsetY=0;
 
-let dragOffsetX =
-  0;
+let panning=false;
 
-let dragOffsetY =
-  0;
+let panStartX=0;
+let panStartY=0;
 
-let panning =
-  false;
+let linkSource=null;
 
-let panStartX =
-  0;
-
-let panStartY =
-  0;
-
-let linkSource =
-  null;
-
-
-/* ==========================================================
-   WORLD
-========================================================== */
 
 function applyWorld(){
 
@@ -3922,8 +3722,6 @@ function applyWorld(){
       )
       scale(${zoom})
     `;
-
-  renderLines();
 }
 
 
@@ -3940,32 +3738,6 @@ function getGraphCenter(){
 }
 
 
-/*
-  Перевод из нашей системы:
-  
-  0,0 = центр world
-  
-  в SVG:
-  
-  5000,5000 = центр SVG
-*/
-
-function worldToSVG(
-  x,
-  y
-){
-
-  return {
-
-    x:
-      5000 + x,
-
-    y:
-      5000 + y
-  };
-}
-
-
 /* ==========================================================
    RENDER NODES
 ========================================================== */
@@ -3977,8 +3749,7 @@ function renderNodes(){
       ".node"
     )
     .forEach(
-      el =>
-        el.remove()
+      el=>el.remove()
     );
 
 
@@ -3998,24 +3769,15 @@ function renderNodes(){
       el.dataset.id =
         node.id;
 
-      /*
-        Node coordinates остаются
-        относительно центра world.
-      */
-
       el.style.left =
         (
-          5000 +
-          Number(node.x || 0)
-        ) +
-        "px";
+          node.x + 5000
+        ) + "px";
 
       el.style.top =
         (
-          5000 +
-          Number(node.y || 0)
-        ) +
-        "px";
+          node.y + 5000
+        ) + "px";
 
 
       el.innerHTML = `
@@ -4064,7 +3826,6 @@ function renderNodes(){
           ".node-delete"
         );
 
-
       deleteBtn.onclick =
         event=>{
 
@@ -4080,7 +3841,6 @@ function renderNodes(){
         el.querySelector(
           ".node-dot"
         );
-
 
       dot.onclick =
         event=>{
@@ -4134,7 +3894,6 @@ function renderNodes(){
           );
         }
       );
-
     }
   );
 
@@ -4169,7 +3928,7 @@ function startNodeDrag(
     (
       event.clientX -
       rect.left -
-      rect.width / 2 -
+      rect.width/2 -
       panX
     ) / zoom;
 
@@ -4178,7 +3937,7 @@ function startNodeDrag(
     (
       event.clientY -
       rect.top -
-      rect.height / 2 -
+      rect.height/2 -
       panY
     ) / zoom;
 
@@ -4197,7 +3956,6 @@ function startNodeDrag(
       `[data-id="${node.id}"]`
     );
 
-
   if(el)
     el.classList.add(
       "dragging"
@@ -4209,7 +3967,6 @@ function startNodeDrag(
     moveNode
   );
 
-
   window.addEventListener(
     "pointerup",
     stopNodeDrag,
@@ -4220,9 +3977,7 @@ function startNodeDrag(
 }
 
 
-function moveNode(
-  event
-){
+function moveNode(event){
 
   if(!draggingNode)
     return;
@@ -4236,7 +3991,7 @@ function moveNode(
     (
       event.clientX -
       rect.left -
-      rect.width / 2 -
+      rect.width/2 -
       panX
     ) / zoom;
 
@@ -4245,7 +4000,7 @@ function moveNode(
     (
       event.clientY -
       rect.top -
-      rect.height / 2 -
+      rect.height/2 -
       panY
     ) / zoom;
 
@@ -4269,25 +4024,17 @@ function moveNode(
 
     el.style.left =
       (
-        5000 +
-        draggingNode.x
-      ) +
-      "px";
+        draggingNode.x +
+        5000
+      ) + "px";
 
     el.style.top =
       (
-        5000 +
-        draggingNode.y
-      ) +
-      "px";
+        draggingNode.y +
+        5000
+      ) + "px";
   }
 
-
-  /*
-    Самое главное:
-    линии обновляются непосредственно
-    во время движения.
-  */
 
   renderLines();
 }
@@ -4314,8 +4061,7 @@ function stopNodeDrag(){
   draggingNode._dragging =
     false;
 
-  draggingNode =
-    null;
+  draggingNode=null;
 
 
   window.removeEventListener(
@@ -4331,12 +4077,10 @@ function stopNodeDrag(){
 
 
 /* ==========================================================
-   DELETE
+   DELETE NODE
 ========================================================== */
 
-function deleteNode(
-  id
-){
+function deleteNode(id){
 
   const node =
     db.nodes[id];
@@ -4380,9 +4124,7 @@ function deleteNode(
    LINKING
 ========================================================== */
 
-function handleLinkDot(
-  id
-){
+function handleLinkDot(id){
 
   if(!linkSource){
 
@@ -4401,12 +4143,9 @@ function handleLinkDot(
   }
 
 
-  if(
-    linkSource === id
-  ){
+  if(linkSource === id){
 
-    linkSource =
-      null;
+    linkSource=null;
 
     clearHighlights();
 
@@ -4415,18 +4154,33 @@ function handleLinkDot(
 
 
   const exists =
-    hasLink(
-      linkSource,
-      id
+    db.links.some(
+      link =>
+        (
+          link.a ===
+            linkSource &&
+          link.b ===
+            id
+        ) ||
+        (
+          link.a ===
+            id &&
+          link.b ===
+            linkSource
+        )
     );
 
 
   if(!exists){
 
-    addLink(
-      linkSource,
-      id
-    );
+    db.links.push({
+
+      a:
+        linkSource,
+
+      b:
+        id
+    });
 
     saveDB();
 
@@ -4438,25 +4192,20 @@ function handleLinkDot(
   }
 
 
-  linkSource =
-    null;
+  linkSource=null;
 
   clearHighlights();
 }
 
 
-function highlightNode(
-  id
-){
+function highlightNode(id){
 
   clearHighlights();
-
 
   const el =
     world.querySelector(
       `[data-id="${id}"]`
     );
-
 
   if(el)
     el.classList.add(
@@ -4481,7 +4230,7 @@ function clearHighlights(){
 
 
 /* ==========================================================
-   GRAPH LINES — FIXED
+   GRAPH LINES
 ========================================================== */
 
 function renderLines(){
@@ -4493,16 +4242,12 @@ function renderLines(){
     return;
 
 
-  /*
-    Полностью очищаем старые линии.
-  */
-
   svg.innerHTML =
     "";
 
 
   db.links.forEach(
-    link=>{
+    (link,index)=>{
 
       const a =
         db.nodes[
@@ -4520,44 +4265,46 @@ function renderLines(){
 
 
       /*
-        Координаты SVG.
+        Переводим координаты
+        node -> SVG.
+
+        node coordinates:
+          -5000 ... +5000
+
+        SVG:
+           0 ... 10000
       */
 
-      const A =
-        worldToSVG(
-          Number(a.x || 0),
-          Number(a.y || 0)
-        );
+      const ax =
+        a.x + 5000;
 
+      const ay =
+        a.y + 5000;
 
-      const B =
-        worldToSVG(
-          Number(b.x || 0),
-          Number(b.y || 0)
-        );
+      const bx =
+        b.x + 5000;
+
+      const by =
+        b.y + 5000;
 
 
       const dx =
-        B.x - A.x;
+        bx - ax;
 
       const dy =
-        B.y - A.y;
+        by - ay;
 
 
       const length =
         Math.sqrt(
-          dx * dx +
-          dy * dy
+          dx*dx +
+          dy*dy
         );
 
 
       if(!length)
         return;
 
-
-      /*
-        Красивый изгиб линии.
-      */
 
       const nx =
         -dy / length;
@@ -4568,83 +4315,33 @@ function renderLines(){
 
       const bend =
         Math.min(
-          70,
+          55,
           Math.max(
-            30,
-            length * .10
+            20,
+            length*.10
           )
         );
 
 
       const mx =
-        (
-          A.x +
-          B.x
-        ) / 2;
-
+        (ax+bx)/2;
 
       const my =
-        (
-          A.y +
-          B.y
-        ) / 2;
+        (ay+by)/2;
 
 
       const cx =
         mx +
-        nx *
-        bend;
-
+        nx*bend;
 
       const cy =
         my +
-        ny *
-        bend;
+        ny*bend;
 
-
-      const ns =
-        "http://www.w3.org/2000/svg";
-
-
-      /*
-        Glow.
-      */
-
-      const glow =
-        document.createElementNS(
-          ns,
-          "path"
-        );
-
-
-      glow.setAttribute(
-        "d",
-        `
-          M ${A.x} ${A.y}
-          Q ${cx} ${cy}
-            ${B.x} ${B.y}
-        `
-      );
-
-
-      glow.setAttribute(
-        "class",
-        "graph-line-glow"
-      );
-
-
-      svg.appendChild(
-        glow
-      );
-
-
-      /*
-        Основная линия.
-      */
 
       const path =
         document.createElementNS(
-          ns,
+          "http://www.w3.org/2000/svg",
           "path"
         );
 
@@ -4652,132 +4349,114 @@ function renderLines(){
       path.setAttribute(
         "d",
         `
-          M ${A.x} ${A.y}
+          M ${ax} ${ay}
           Q ${cx} ${cy}
-            ${B.x} ${B.y}
+            ${bx} ${by}
         `
       );
 
 
       path.setAttribute(
-        "class",
-        "graph-line"
+        "fill",
+        "none"
       );
+
+
+      path.setAttribute(
+        "stroke",
+        "rgba(255,255,255,.30)"
+      );
+
+
+      path.setAttribute(
+        "stroke-width",
+        "1.5"
+      );
+
+
+      path.setAttribute(
+        "stroke-dasharray",
+        "5 7"
+      );
+
+
+      path.classList.add(
+        "graph-line",
+        "graph-line-flow"
+      );
+
+
+      path.style.animationDelay =
+        (
+          index * .035
+        ) + "s";
 
 
       svg.appendChild(
         path
       );
-
-
-      /*
-        Маленькие точки на концах.
-      */
-
-      const pointA =
-        document.createElementNS(
-          ns,
-          "circle"
-        );
-
-      pointA.setAttribute(
-        "cx",
-        A.x
-      );
-
-      pointA.setAttribute(
-        "cy",
-        A.y
-      );
-
-      pointA.setAttribute(
-        "r",
-        "2"
-      );
-
-      pointA.setAttribute(
-        "class",
-        "connection-point"
-      );
-
-
-      const pointB =
-        document.createElementNS(
-          ns,
-          "circle"
-        );
-
-      pointB.setAttribute(
-        "cx",
-        B.x
-      );
-
-      pointB.setAttribute(
-        "cy",
-        B.y
-      );
-
-      pointB.setAttribute(
-        "r",
-        "2"
-      );
-
-      pointB.setAttribute(
-        "class",
-        "connection-point"
-      );
-
-
-      svg.appendChild(
-        pointA
-      );
-
-      svg.appendChild(
-        pointB
-      );
-
     }
   );
 }
 
 
 /* ==========================================================
-   FOCUS NODE
+   GRAPH APPEAR
 ========================================================== */
 
-function focusGraphNode(
-  node,
-  targetZoom=1
+function animateNewGraph(
+  rootId
 ){
 
-  if(!node)
-    return;
+  const nodes =
+    Array.from(
+      world.querySelectorAll(
+        ".node"
+      )
+    );
 
 
-  /*
-    Центрируем выбранный node
-    в центре экрана.
-  */
+  nodes.forEach(
+    (el,index)=>{
 
-  zoom =
-    targetZoom;
+      el.style.opacity =
+        "0";
 
+      el.style.transform =
+        "translate(-50%,-50%) scale(.82)";
 
-  panX =
-    -node.x *
-    zoom;
-
-  panY =
-    -node.y *
-    zoom;
+      el.style.transition =
+        `
+          opacity .45s ease,
+          transform .55s cubic-bezier(.2,.8,.2,1)
+        `;
 
 
-  applyWorld();
+      setTimeout(
+        ()=>{
+
+          el.style.opacity =
+            "1";
+
+          el.style.transform =
+            "translate(-50%,-50%) scale(1)";
+
+        },
+        80 + index*45
+      );
+    }
+  );
+
+
+  setTimeout(
+    renderLines,
+    300
+  );
 }
 
 
 /* ==========================================================
-   PAN
+   PAN / ZOOM
 ========================================================== */
 
 graph.addEventListener(
@@ -4792,14 +4471,12 @@ graph.addEventListener(
       return;
 
 
-    panning =
-      true;
+    panning=true;
 
 
     panStartX =
       event.clientX -
       panX;
-
 
     panStartY =
       event.clientY -
@@ -4825,13 +4502,14 @@ graph.addEventListener(
       event.clientX -
       panStartX;
 
-
     panY =
       event.clientY -
       panStartY;
 
 
     applyWorld();
+
+    renderLines();
   }
 );
 
@@ -4839,26 +4517,12 @@ graph.addEventListener(
 graph.addEventListener(
   "pointerup",
   ()=>{
-    panning =
-      false;
+    panning=false;
 
     saveDB();
   }
 );
 
-
-graph.addEventListener(
-  "pointercancel",
-  ()=>{
-    panning =
-      false;
-  }
-);
-
-
-/* ==========================================================
-   ZOOM
-========================================================== */
 
 graph.addEventListener(
   "wheel",
@@ -4887,11 +4551,11 @@ graph.addEventListener(
       );
 
 
-    if(
-      oldZoom !== zoom
-    ){
+    if(oldZoom !== zoom){
 
       applyWorld();
+
+      renderLines();
     }
 
   },
@@ -4903,16 +4567,15 @@ graph.addEventListener(
 
 function centerGraph(){
 
-  zoom =
-    1;
+  zoom=1;
 
-  panX =
-    0;
+  panX=0;
 
-  panY =
-    0;
+  panY=0;
 
   applyWorld();
+
+  renderLines();
 
   toast(
     "Graph centered"
@@ -4972,11 +4635,8 @@ $("chainSearch")
 
           el.classList.toggle(
             "highlight",
-            text.includes(
-              query
-            )
+            text.includes(query)
           );
-
         }
       );
   }
@@ -4991,9 +4651,7 @@ const canvas =
   $("saturn");
 
 const ctx =
-  canvas.getContext(
-    "2d"
-  );
+  canvas.getContext("2d");
 
 let particles=[];
 
@@ -5042,8 +4700,7 @@ function createParticles(
   particles=[];
 
 
-  const count =
-    1100;
+  const count=1100;
 
 
   const radius =
@@ -5062,7 +4719,6 @@ function createParticles(
     const u =
       Math.random()*2-1;
 
-
     const angle =
       Math.random()*
       Math.PI*2;
@@ -5078,10 +4734,7 @@ function createParticles(
       r*
       Math.cos(angle);
 
-
-    const y =
-      u;
-
+    const y=u;
 
     const z =
       r*
@@ -5101,6 +4754,7 @@ function createParticles(
       alpha:
         .15 +
         Math.random()*.65
+
     });
   }
 }
@@ -5150,7 +4804,6 @@ function drawSaturn(){
         rotation
       );
 
-
     const s =
       Math.sin(
         rotation
@@ -5160,7 +4813,6 @@ function drawSaturn(){
     const x =
       p.x*c -
       p.z*s;
-
 
     const z =
       p.x*s +
@@ -5217,7 +4869,6 @@ function drawSaturn(){
 
 
     ctx.fill();
-
   }
 
 
@@ -5248,10 +4899,8 @@ function animateRing(){
 
   const degrees =
     (
-      ringTime*
-      .75
-    ) %
-    360;
+      ringTime*.75
+    ) % 360;
 
 
   $("saturnRing")
@@ -5269,6 +4918,33 @@ function animateRing(){
     animateRing
   );
 }
+
+
+/* ==========================================================
+   ANIMATION STYLE
+========================================================== */
+
+const style =
+  document.createElement(
+    "style"
+  );
+
+
+style.textContent = `
+
+@keyframes dash{
+
+  to{
+    stroke-dashoffset:-60;
+  }
+
+}
+`;
+
+
+document.head.appendChild(
+  style
+);
 
 
 /* ==========================================================
@@ -5290,6 +4966,8 @@ function init(){
   drawSaturn();
 
   animateRing();
+
+  initBoot();
 }
 
 
@@ -5298,4 +4976,4 @@ init();
 </script>
 
 </body>
-    </html>
+  </html>
