@@ -2,3110 +2,3304 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>NZX OSINT TOOL</title>
 
 <style>
 *{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
 html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#050505;
-    color:#f4f4f4;
-    font-family:Inter,Arial,Helvetica,sans-serif;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#050505;
+  color:#f5f5f5;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
-button,input,textarea{
-    font:inherit;
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+
+:root{
+  --bg:#050505;
+  --panel:rgba(10,10,10,.92);
+  --text:#f5f5f5;
+  --muted:#777;
+  --line:rgba(255,255,255,.10);
+  --line2:rgba(255,255,255,.22);
 }
 
-button{
-    color:inherit;
+/* APP */
+.app{
+  width:100%;
+  height:100%;
+  position:relative;
+  background:
+    radial-gradient(circle at 50% 40%,rgba(255,255,255,.025),transparent 45%),
+    #050505;
 }
 
-#bootScreen{
-    position:fixed;
-    inset:0;
-    z-index:99999;
-    background:#000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-}
-
-.boot-image{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    opacity:.14;
-    filter:grayscale(1) contrast(1.25);
-}
-
-.boot-content{
-    position:relative;
-    z-index:2;
-    text-align:center;
-}
-
-.boot-title{
-    font-size:clamp(35px,7vw,85px);
-    font-weight:900;
-    letter-spacing:-4px;
-    text-transform:uppercase;
-    animation:bootTitle 1.2s ease forwards;
-}
-
-.boot-sub{
-    margin-top:14px;
-    font-size:12px;
-    letter-spacing:5px;
-    color:#888;
-    opacity:0;
-    animation:fadeUp .8s 1s forwards;
-}
-
-.boot-line{
-    width:0;
-    height:1px;
-    background:#fff;
-    margin:25px auto 0;
-    animation:bootLine 1.3s 1.2s forwards;
-}
-
-@keyframes bootTitle{
-    0%{opacity:0;transform:translateY(35px);filter:blur(12px)}
-    100%{opacity:1;transform:none;filter:none}
-}
-
-@keyframes bootLine{
-    to{width:min(420px,70vw)}
-}
-
-@keyframes fadeUp{
-    to{opacity:1;transform:none}
-}
-
-#app{
-    width:100%;
-    height:100%;
-    opacity:0;
-    visibility:hidden;
-}
-
-#app.app-ready{
-    visibility:visible;
-    animation:appAppear .8s ease-out forwards;
-}
-
-@keyframes appAppear{
-    from{
-        opacity:0;
-        transform:scale(.985);
-        filter:blur(8px);
-    }
-    to{
-        opacity:1;
-        transform:none;
-        filter:none;
-    }
-}
-
+/* TOPBAR */
 .topbar{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    height:62px;
-    z-index:500;
-    background:rgba(5,5,5,.92);
-    backdrop-filter:blur(18px);
-    border-bottom:1px solid #1d1d1d;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:0 14px;
+  position:fixed;
+  z-index:100;
+  top:0;
+  left:0;
+  right:0;
+  height:72px;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  background:linear-gradient(180deg,rgba(8,8,8,.98),rgba(8,8,8,.88));
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(18px);
 }
 
 .logo{
-    min-width:180px;
-    height:38px;
-    display:flex;
-    align-items:center;
-    padding:0 14px;
-    border:1px solid #282828;
-    border-radius:10px;
-    font-size:13px;
-    font-weight:900;
-    letter-spacing:2px;
-    background:#0a0a0a;
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #fff;
+  border-radius:11px;
+  font-size:19px;
+  font-weight:900;
+  margin-right:12px;
+  box-shadow:0 0 25px rgba(255,255,255,.08);
 }
 
-.top-spacer{
-    flex:1;
+.brand{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:210px;
 }
 
-.top-btn,
-.btn{
-    min-height:36px;
-    padding:0 13px;
-    border:1px solid #292929;
-    background:#0c0c0c;
-    border-radius:10px;
-    cursor:pointer;
-    font-size:11px;
-    font-weight:800;
-    letter-spacing:.8px;
-    transition:.18s;
+.brand b{
+  font-size:14px;
+  letter-spacing:.15em;
 }
 
-.top-btn:hover,
-.btn:hover{
-    background:#171717;
-    border-color:#555;
-    transform:translateY(-1px);
+.brand small{
+  color:#666;
+  font-size:8px;
+  letter-spacing:.24em;
 }
 
-.top-btn:active,
-.btn:active{
-    transform:scale(.97);
+.top-tools{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-left:auto;
 }
 
-.btn.danger{
-    border-color:#572323;
-    color:#ff8585;
+.top-btn{
+  height:34px;
+  padding:0 13px;
+  color:#bbb;
+  background:#0c0c0c;
+  border:1px solid var(--line2);
+  border-radius:8px;
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:.1em;
+  transition:.2s ease;
 }
 
-.btn.danger:hover{
-    background:#1d0b0b;
-    border-color:#9d3838;
-}
-
-.btn:disabled{
-    opacity:.35;
-    cursor:not-allowed;
-    transform:none;
+.top-btn:hover{
+  color:#fff;
+  background:#161616;
+  border-color:#666;
+  transform:translateY(-1px);
 }
 
 .profile-mini{
-    height:38px;
-    padding:0 12px;
-    border:1px solid #292929;
-    border-radius:10px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    background:#0a0a0a;
-    cursor:pointer;
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  border:1px solid #333;
+  background:#111;
+  overflow:hidden;
+  margin-left:10px;
+  padding:0;
 }
 
-.profile-dot{
-    width:8px;
-    height:8px;
-    border-radius:50%;
-    background:#fff;
+.profile-mini img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
 }
 
-.layout{
-    position:absolute;
-    inset:62px 0 0;
-    display:flex;
-}
-
+/* SIDEBAR */
 .sidebar{
-    width:220px;
-    flex-shrink:0;
-    border-right:1px solid #1d1d1d;
-    background:#070707;
-    padding:14px;
-    display:flex;
-    flex-direction:column;
-    gap:7px;
-    z-index:300;
-}
-
-.side-title{
-    color:#555;
-    font-size:9px;
-    letter-spacing:2px;
-    margin:6px 5px 8px;
+  position:fixed;
+  left:0;
+  top:72px;
+  bottom:0;
+  width:66px;
+  z-index:90;
+  display:flex;
+  align-items:center;
+  flex-direction:column;
+  padding-top:18px;
+  background:rgba(6,6,6,.94);
+  border-right:1px solid var(--line);
+  backdrop-filter:blur(18px);
 }
 
 .side-btn{
-    height:42px;
-    border:1px solid transparent;
-    border-radius:10px;
-    background:transparent;
-    text-align:left;
-    padding:0 12px;
-    color:#888;
-    cursor:pointer;
-    font-size:11px;
-    font-weight:800;
-    transition:.18s;
+  width:42px;
+  height:42px;
+  margin-bottom:8px;
+  border:1px solid transparent;
+  border-radius:10px;
+  color:#555;
+  background:transparent;
+  font-size:19px;
+  transition:.2s ease;
 }
 
-.side-btn:hover{
-    color:#fff;
-    background:#101010;
-}
-
+.side-btn:hover,
 .side-btn.active{
-    color:#fff;
-    border-color:#292929;
-    background:#111;
+  color:#fff;
+  background:#111;
+  border-color:#292929;
 }
 
-.main{
-    position:relative;
-    flex:1;
-    min-width:0;
-    overflow:hidden;
-    background:#050505;
-}
-
+/* PAGES */
 .page{
-    position:absolute;
-    inset:0;
-    display:none;
+  display:none;
+  position:absolute;
+  top:72px;
+  left:66px;
+  right:0;
+  bottom:0;
 }
 
-.page.active{
-    display:block;
+.page.active{display:block}
+
+/* CHAIN */
+.chain-page{
+  width:100%;
+  height:100%;
+  position:relative;
 }
 
-#graphPage{
-    overflow:hidden;
-}
-
-.graph-toolbar{
-    position:absolute;
-    left:16px;
-    right:16px;
-    top:16px;
-    height:48px;
-    z-index:200;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    pointer-events:none;
-}
-
-.graph-toolbar>*{
-    pointer-events:auto;
+.chain-toolbar{
+  position:absolute;
+  top:17px;
+  left:18px;
+  right:18px;
+  z-index:30;
+  display:flex;
+  gap:8px;
+  align-items:center;
 }
 
 .chain-search{
-    width:220px;
-    height:38px;
-    border:1px solid #292929;
-    background:#0b0b0b;
-    border-radius:10px;
-    color:#fff;
-    padding:0 12px;
-    outline:none;
+  width:240px;
+  height:37px;
+  padding:0 12px;
+  border-radius:9px;
+  border:1px solid var(--line2);
+  background:rgba(10,10,10,.86);
+  color:#fff;
+  outline:none;
+  font-size:11px;
 }
 
-.chain-search:focus{
-    border-color:#666;
+.chain-search:focus{border-color:#666}
+.chain-search::placeholder{color:#555}
+
+.btn{
+  height:37px;
+  padding:0 13px;
+  border-radius:9px;
+  border:1px solid var(--line2);
+  color:#aaa;
+  background:#0c0c0c;
+  font-size:10px;
+  font-weight:800;
+  transition:.2s ease;
 }
 
-.toolbar-space{
-    flex:1;
+.btn:hover{
+  color:#fff;
+  background:#151515;
+  border-color:#777;
 }
 
-#graph{
-    position:absolute;
-    inset:0;
-    overflow:hidden;
-    cursor:grab;
-    background:
-        radial-gradient(circle at 50% 50%,rgba(255,255,255,.025),transparent 38%),
-        #050505;
-    touch-action:none;
+.btn.primary{
+  color:#050505;
+  background:#fff;
+  border-color:#fff;
 }
 
-#graph.dragging{
-    cursor:grabbing;
+.btn.primary:hover{background:#ddd}
+
+.btn:disabled{
+  opacity:.35;
+  cursor:not-allowed;
 }
 
-#graphGrid{
-    position:absolute;
-    width:100%;
-    height:100%;
-    opacity:.32;
-    background-image:
-        linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
-    background-size:40px 40px;
-    pointer-events:none;
+/* GRAPH */
+.graph{
+  width:100%;
+  height:100%;
+  position:relative;
+  overflow:hidden;
+  touch-action:none;
+  background-color:#050505;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:40px 40px;
 }
 
-#edges{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    pointer-events:none;
-    overflow:visible;
+.world{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:1px;
+  height:1px;
+  transform:translate(-50%,-50%) scale(1);
+  transform-origin:center;
 }
 
-.edge{
-    stroke:#777;
-    stroke-width:1.2;
-    opacity:.7;
-    fill:none;
-    stroke-dasharray:7 7;
-    animation:edgeMove 1.8s linear infinite;
+.lines{
+  position:absolute;
+  left:-5000px;
+  top:-5000px;
+  width:10000px;
+  height:10000px;
+  overflow:visible;
+  pointer-events:none;
 }
 
-@keyframes edgeMove{
-    to{stroke-dashoffset:-28}
-}
-
+/* BEAUTIFUL NODES */
 .node{
-    position:absolute;
-    min-width:155px;
-    max-width:240px;
-    min-height:68px;
-    padding:11px 34px 11px 12px;
-    border:1px solid #333;
-    border-radius:12px;
-    background:rgba(12,12,12,.96);
-    box-shadow:0 12px 40px rgba(0,0,0,.45);
-    cursor:grab;
-    user-select:none;
-    touch-action:none;
-    transition:border-color .15s,box-shadow .15s;
-    z-index:20;
+  position:absolute;
+  width:170px;
+  min-height:72px;
+  transform:translate(-50%,-50%);
+  padding:12px 13px;
+  border:1px solid rgba(255,255,255,.13);
+  background:linear-gradient(145deg,rgba(20,20,20,.97),rgba(9,9,9,.97));
+  border-radius:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+  user-select:none;
+  cursor:grab;
+  touch-action:none;
+  transition:border-color .2s,box-shadow .2s;
+  z-index:5;
 }
 
 .node:hover{
-    border-color:#666;
+  border-color:#555;
+  box-shadow:0 25px 70px rgba(0,0,0,.6);
 }
 
 .node.dragging{
-    cursor:grabbing;
-    border-color:#fff;
-    box-shadow:0 18px 55px rgba(0,0,0,.7);
-    z-index:1000;
+  cursor:grabbing;
+  border-color:#888;
+  box-shadow:0 30px 90px rgba(0,0,0,.8);
+  z-index:20;
 }
 
-.node.selected{
-    border-color:#fff;
-    box-shadow:0 0 0 1px #fff,0 15px 55px rgba(0,0,0,.65);
+.node.highlight{
+  border-color:#fff;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.2),
+    0 0 40px rgba(255,255,255,.1);
+}
+
+/* X BUTTON */
+.node-delete{
+  position:absolute;
+  right:7px;
+  top:6px;
+  width:21px;
+  height:21px;
+  border:1px solid transparent;
+  border-radius:6px;
+  color:#666;
+  background:transparent;
+  font-size:15px;
+  line-height:19px;
+  padding:0;
+  z-index:20;
+  transition:.15s;
+}
+
+.node-delete:hover{
+  color:#fff;
+  background:#252525;
+  border-color:#444;
 }
 
 .node-type{
-    font-size:8px;
-    color:#666;
-    letter-spacing:1.5px;
-    font-weight:900;
-    margin-bottom:7px;
+  color:#555;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.15em;
+  margin-bottom:6px;
+  padding-right:18px;
 }
 
-.node-value{
-    font-size:12px;
-    font-weight:800;
-    line-height:1.35;
-    word-break:break-word;
+.node-title{
+  color:#eee;
+  font-size:11px;
+  font-weight:800;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  padding-right:16px;
 }
 
-.node-remove{
-    position:absolute;
-    top:6px;
-    right:6px;
-    width:22px;
-    height:22px;
-    border:1px solid #333;
-    border-radius:7px;
-    background:#111;
-    color:#777;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    font-size:15px;
-    line-height:1;
-    z-index:5;
-    transition:.15s;
+.node-content{
+  margin-top:5px;
+  color:#777;
+  font-size:9px;
+  line-height:1.4;
+  max-height:28px;
+  overflow:hidden;
+  word-break:break-word;
 }
 
-.node-remove:hover{
-    background:#260c0c;
-    color:#ff8b8b;
-    border-color:#7d3535;
+.node-dot{
+  position:absolute;
+  width:10px;
+  height:10px;
+  right:-5px;
+  top:50%;
+  transform:translateY(-50%);
+  border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 14px rgba(255,255,255,.45);
+  cursor:crosshair;
 }
 
-.node-meta{
-    margin-top:7px;
-    font-size:9px;
-    color:#777;
-    line-height:1.4;
-}
-
-.saturn-wrap{
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:470px;
-    height:470px;
-    transform:translate(-50%,-50%);
-    pointer-events:none;
-    opacity:.4;
-}
-
+/* SATURN */
 .saturn{
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:125px;
-    height:125px;
-    transform:translate(-50%,-50%);
-    border-radius:50%;
-    background:
-        radial-gradient(circle at 35% 30%,#777,#333 40%,#090909 78%);
-    box-shadow:
-        0 0 50px rgba(255,255,255,.06),
-        inset -20px -15px 30px #000;
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:470px;
+  height:470px;
+  transform:translate(-50%,-50%);
+  opacity:.62;
+  pointer-events:none;
+  filter:drop-shadow(0 0 35px rgba(255,255,255,.08));
+}
+
+#saturn{
+  width:100%;
+  height:100%;
 }
 
 .saturn-ring{
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:390px;
-    height:110px;
-    border:1px dotted rgba(255,255,255,.5);
-    border-radius:50%;
-    transform:translate(-50%,-50%) rotate(-18deg);
-    animation:ringRotate 16s linear infinite;
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:360px;
+  height:105px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 0 20px rgba(255,255,255,.05);
+  transform:translate(-50%,-50%) rotateX(67deg);
+  transform-style:preserve-3d;
+  opacity:.65;
 }
 
-.saturn-ring:before,
-.saturn-ring:after{
-    content:"";
-    position:absolute;
-    inset:14px 35px;
-    border:1px dotted rgba(255,255,255,.25);
-    border-radius:50%;
-}
-
-.saturn-points{
-    position:absolute;
-    inset:0;
-    border-radius:50%;
-    background-image:
-        radial-gradient(circle,#fff 1px,transparent 1px);
-    background-size:27px 27px;
-    opacity:.15;
-    animation:starsMove 30s linear infinite;
-}
-
-@keyframes ringRotate{
-    from{transform:translate(-50%,-50%) rotate(-18deg)}
-    to{transform:translate(-50%,-50%) rotate(342deg)}
-}
-
-@keyframes starsMove{
-    from{transform:rotate(0)}
-    to{transform:rotate(360deg)}
-}
-
-.empty-state{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    text-align:center;
-    pointer-events:none;
-    color:#444;
-    z-index:10;
-}
-
-.empty-state b{
-    display:block;
-    color:#777;
-    font-size:13px;
-    letter-spacing:2px;
-    margin-bottom:8px;
-}
-
-.empty-state span{
-    font-size:10px;
-}
-
-.profile-page{
-    overflow:auto;
-    padding:35px;
+/* PROFILE */
+.profile{
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:30px;
 }
 
 .profile-card{
-    max-width:700px;
-    border:1px solid #252525;
-    border-radius:14px;
-    background:#090909;
-    padding:25px;
+  width:min(600px,100%);
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:linear-gradient(145deg,rgba(20,20,20,.95),rgba(7,7,7,.96));
+  box-shadow:0 30px 100px rgba(0,0,0,.5);
+  padding:28px;
 }
 
-.profile-title{
-    font-size:25px;
-    font-weight:900;
-    margin-bottom:8px;
+.profile-head{
+  display:flex;
+  align-items:center;
+  gap:18px;
 }
 
-.profile-sub{
-    color:#666;
-    font-size:11px;
-    margin-bottom:25px;
+.profile-avatar{
+  width:84px;
+  height:84px;
+  border-radius:50%;
+  object-fit:cover;
+  background:#111;
+  border:1px solid #333;
 }
 
-.info-box{
-    border:1px solid #222;
-    border-radius:10px;
-    padding:15px;
-    background:#070707;
-    margin-top:10px;
+.profile-info h1{font-size:24px}
+
+.profile-info p{
+  color:#666;
+  margin-top:5px;
+  font-size:12px;
 }
 
-.info-row{
-    display:flex;
-    justify-content:space-between;
-    gap:20px;
-    padding:9px 0;
-    border-bottom:1px solid #181818;
-    font-size:11px;
+.profile-actions{
+  display:flex;
+  gap:8px;
+  margin-top:25px;
+  flex-wrap:wrap;
 }
 
-.info-row:last-child{
-    border-bottom:0;
+.profile-button{
+  height:38px;
+  padding:0 14px;
+  border-radius:8px;
+  border:1px solid #333;
+  background:#111;
+  color:#aaa;
+  font-size:10px;
+  font-weight:800;
 }
 
-.info-row span:first-child{
-    color:#666;
+.profile-button:hover{
+  color:#fff;
+  border-color:#666;
 }
 
-.info-row span:last-child{
-    text-align:right;
-    font-weight:800;
+.profile-button.primary{
+  color:#000;
+  background:#fff;
+  border-color:#fff;
 }
 
-.modal-bg{
-    position:fixed;
-    inset:0;
-    z-index:9000;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    background:rgba(0,0,0,.72);
-    backdrop-filter:blur(12px);
+/* MODALS */
+.tool-modal,
+#nodeModal{
+  position:fixed;
+  inset:0;
+  z-index:500;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(12px);
 }
 
-.modal-bg.open{
-    display:flex;
+.tool-modal.open,
+#nodeModal.open{
+  display:flex;
 }
 
-.modal{
-    width:min(540px,100%);
-    border:1px solid #303030;
-    border-radius:16px;
-    background:#090909;
-    box-shadow:0 30px 100px rgba(0,0,0,.8);
-    overflow:hidden;
-    animation:modalIn .2s ease;
+.modal-box,
+.node-modal-box{
+  width:min(520px,100%);
+  max-height:calc(100vh - 40px);
+  overflow:auto;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:16px;
+  background:linear-gradient(145deg,#151515,#090909);
+  box-shadow:0 40px 120px rgba(0,0,0,.75);
+  padding:22px;
 }
 
-@keyframes modalIn{
-    from{opacity:0;transform:translateY(12px) scale(.98)}
-    to{opacity:1;transform:none}
+.modal-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
 }
 
-.modal-head{
-    height:58px;
-    display:flex;
-    align-items:center;
-    padding:0 16px;
-    border-bottom:1px solid #202020;
+.modal-top h2{
+  font-size:17px;
+  letter-spacing:.04em;
 }
 
-.modal-title{
-    flex:1;
-    font-size:12px;
-    font-weight:900;
-    letter-spacing:1px;
+.close{
+  width:32px;
+  height:32px;
+  border:0;
+  border-radius:8px;
+  background:#111;
+  color:#777;
+  font-size:20px;
 }
 
-.close-btn{
-    width:32px;
-    height:32px;
-    border:1px solid #2c2c2c;
-    border-radius:9px;
-    background:#0c0c0c;
-    color:#888;
-    cursor:pointer;
-    font-size:18px;
+.close:hover{color:#fff}
+
+.modal-description{
+  color:#666;
+  font-size:10px;
+  line-height:1.5;
+  margin-bottom:16px;
 }
 
-.close-btn:hover{
-    color:#fff;
+.modal-input{
+  width:100%;
+  height:45px;
+  padding:0 13px;
+  color:#fff;
+  background:#080808;
+  border:1px solid #2b2b2b;
+  border-radius:9px;
+  outline:none;
 }
 
-.modal-body{
-    padding:18px;
-}
-
-.form-label{
-    display:block;
-    font-size:9px;
-    letter-spacing:1.5px;
-    color:#666;
-    margin:0 0 7px;
-}
-
-.form-input,
-.form-textarea{
-    width:100%;
-    border:1px solid #292929;
-    border-radius:10px;
-    background:#050505;
-    color:#fff;
-    outline:none;
-    padding:12px;
-    margin-bottom:14px;
-}
-
-.form-input:focus,
-.form-textarea:focus{
-    border-color:#666;
-}
-
-.form-textarea{
-    min-height:110px;
-    resize:vertical;
-}
+.modal-input:focus{border-color:#777}
 
 .modal-actions{
-    display:flex;
-    gap:8px;
-    justify-content:flex-end;
-    margin-top:5px;
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:12px;
 }
 
-.tool-result{
-    max-height:310px;
-    overflow:auto;
-    border:1px solid #252525;
-    border-radius:10px;
-    background:#050505;
-    padding:13px;
-    margin-top:14px;
+.modal-actions button{
+  height:36px;
+  padding:0 14px;
+  border-radius:8px;
+  border:1px solid #333;
+  color:#aaa;
+  background:#111;
+  font-size:9px;
+  font-weight:900;
 }
 
-.result-row{
-    display:grid;
-    grid-template-columns:115px 1fr;
-    gap:12px;
-    padding:9px 0;
-    border-bottom:1px solid #171717;
-    font-size:11px;
+.modal-actions button:hover{
+  color:#fff;
+  border-color:#777;
 }
 
-.result-row:last-child{
-    border-bottom:0;
+.modal-actions button.primary{
+  background:#fff;
+  color:#000;
+  border-color:#fff;
 }
 
-.result-key{
-    color:#666;
-    font-size:9px;
-    letter-spacing:1.2px;
+.results{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin-top:18px;
+}
+
+.result{
+  padding:11px 12px;
+  border-radius:9px;
+  border:1px solid #202020;
+  background:#0c0c0c;
+}
+
+.result-head{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  color:#777;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.12em;
 }
 
 .result-value{
-    color:#eee;
-    font-weight:800;
-    word-break:break-word;
+  margin-top:5px;
+  color:#ddd;
+  font-size:11px;
+  line-height:1.45;
+  white-space:pre-wrap;
+  word-break:break-word;
 }
 
-.result-empty{
-    color:#555;
-    font-size:10px;
+.result.good{border-color:rgba(170,255,170,.18)}
+.result.warn{border-color:rgba(255,220,100,.18)}
+.result.bad{border-color:rgba(255,100,100,.18)}
+
+.field{margin-bottom:13px}
+
+.field label{
+  display:block;
+  color:#555;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.13em;
+  margin-bottom:6px;
 }
 
-#toast{
-    position:fixed;
-    right:18px;
-    bottom:18px;
-    z-index:99999;
-    border:1px solid #303030;
-    border-radius:10px;
-    background:#0b0b0b;
-    color:#fff;
-    padding:11px 14px;
-    font-size:11px;
-    box-shadow:0 15px 50px #000;
-    opacity:0;
-    transform:translateY(10px);
-    pointer-events:none;
-    transition:.2s;
+.field input,
+.field textarea{
+  width:100%;
+  color:#fff;
+  background:#080808;
+  border:1px solid #292929;
+  border-radius:8px;
+  outline:none;
+  padding:10px;
+  font-size:11px;
 }
 
-#toast.show{
-    opacity:1;
-    transform:none;
+.field input{height:40px}
+.field textarea{min-height:100px;resize:vertical}
+
+.field input:focus,
+.field textarea:focus{
+  border-color:#666;
 }
 
-.projects-list{
-    max-height:300px;
-    overflow:auto;
-    margin-top:12px;
+/* GEOSINT UPLOAD */
+.geo-upload{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:14px;
+  padding:11px;
+  border:1px dashed #303030;
+  border-radius:10px;
+  background:#090909;
 }
 
-.project-item{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    padding:10px;
-    border:1px solid #222;
-    border-radius:9px;
-    margin-bottom:7px;
-    background:#070707;
+.geo-upload-preview{
+  width:58px;
+  height:58px;
+  border-radius:8px;
+  object-fit:cover;
+  display:none;
+  border:1px solid #333;
 }
 
-.project-name{
-    flex:1;
-    font-size:11px;
-    font-weight:800;
+.geo-upload-info{
+  min-width:0;
+  flex:1;
 }
 
-.zoom-box{
-    position:absolute;
-    right:18px;
-    bottom:18px;
-    z-index:200;
-    display:flex;
-    gap:5px;
+.geo-upload-title{
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.1em;
 }
 
-.zoom-box button{
+.geo-upload-name{
+  color:#666;
+  font-size:9px;
+  margin-top:4px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.geo-upload-btn{
+  height:31px;
+  padding:0 10px;
+  border-radius:7px;
+  border:1px solid #333;
+  color:#aaa;
+  background:#111;
+  font-size:8px;
+  font-weight:900;
+}
+
+.geo-upload-btn:hover{
+  color:#fff;
+  border-color:#666;
+}
+
+/* TOAST */
+.toast{
+  position:fixed;
+  z-index:900;
+  left:50%;
+  bottom:22px;
+  transform:translate(-50%,20px);
+  opacity:0;
+  pointer-events:none;
+  padding:10px 15px;
+  border:1px solid #333;
+  border-radius:9px;
+  background:#111;
+  color:#ddd;
+  font-size:10px;
+  transition:.25s ease;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+@keyframes dash{
+  to{stroke-dashoffset:-60}
+}
+
+/* MOBILE */
+@media(max-width:760px){
+  .topbar{
+    height:62px;
+    padding:0 10px;
+  }
+
+  .brand{min-width:0}
+
+  .brand b{font-size:11px}
+  .brand small{display:none}
+
+  .top-tools{
+    margin-left:auto;
+  }
+
+  .top-btn{
     width:35px;
-    height:35px;
-    border:1px solid #292929;
-    border-radius:9px;
-    background:#0b0b0b;
-    cursor:pointer;
-}
+    padding:0;
+    overflow:hidden;
+    font-size:0;
+  }
 
-.zoom-box button:hover{
-    background:#181818;
-}
+  .top-btn:first-child::after{
+    content:"☎";
+    font-size:14px;
+  }
 
-@media(max-width:800px){
-    .sidebar{
-        width:65px;
-        padding:8px;
-    }
+  .top-btn:nth-child(2)::after{
+    content:"⌖";
+    font-size:14px;
+  }
 
-    .side-title{
-        display:none;
-    }
+  .top-btn:nth-child(3)::after{
+    content:"◎";
+    font-size:14px;
+  }
 
-    .side-btn{
-        font-size:0;
-        text-align:center;
-        padding:0;
-    }
+  .sidebar{
+    top:62px;
+    width:54px;
+  }
 
-    .side-btn:before{
-        content:"•";
-        font-size:18px;
-    }
+  .page{
+    top:62px;
+    left:54px;
+  }
 
-    .logo{
-        min-width:auto;
-        width:auto;
-        font-size:10px;
-    }
+  .chain-toolbar{
+    left:10px;
+    right:10px;
+  }
 
-    .chain-search{
-        width:145px;
-    }
+  .chain-search{
+    width:100%;
+  }
 
-    .graph-toolbar{
-        left:8px;
-        right:8px;
-    }
+  .node{width:150px}
 
-    .profile-page{
-        padding:18px;
-    }
+  .saturn{
+    width:330px;
+    height:330px;
+  }
+
+  .saturn-ring{width:270px}
 }
 </style>
 </head>
 
 <body>
 
-<div id="bootScreen">
-    <img class="boot-image" src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=2000&q=80">
-    <div class="boot-content">
-        <div class="boot-title">NZX OSINT TOOL</div>
-        <div class="boot-sub">INTELLIGENCE GRAPH SYSTEM</div>
-        <div class="boot-line"></div>
-    </div>
-</div>
-
-<div id="app">
+<div class="app">
 
 <header class="topbar">
-    <div class="logo">NZX / OSINT TOOL</div>
 
-    <button class="top-btn" onclick="openTool('phone')">PHONE SCAN</button>
-    <button class="top-btn" onclick="openTool('address')">ADDRESS</button>
+  <div class="logo">N</div>
 
-    <div class="top-spacer"></div>
+  <div class="brand">
+    <b>NZX OSINT TOOL</b>
+    <small>INTELLIGENCE WORKSPACE</small>
+  </div>
 
-    <button class="top-btn" onclick="createProject()">＋ PROJECT</button>
-    <button class="top-btn" onclick="showProjects()">PROJECTS</button>
+  <div class="top-tools">
 
-    <div class="profile-mini" onclick="showPage('profile')">
-        <span class="profile-dot"></span>
-        <span>PROFILE</span>
-    </div>
+    <button class="top-btn" onclick="openTool('phone')">
+      CHECK NUMBER
+    </button>
+
+    <button class="top-btn" onclick="openTool('address')">
+      CHECK ADDRESS
+    </button>
+
+    <button class="top-btn" onclick="openTool('geosint')">
+      GEOSINT
+    </button>
+
+  </div>
+
+  <button class="profile-mini" onclick="openProfile()">
+    <img id="miniAvatar" alt="">
+  </button>
+
 </header>
 
-<div class="layout">
-
 <aside class="sidebar">
-    <div class="side-title">WORKSPACE</div>
 
-    <button class="side-btn active" id="graphNav" onclick="showPage('graph')">
-        GRAPH
-    </button>
+  <button class="side-btn active" data-page="chain" onclick="showPage('chain')">
+    ⌘
+  </button>
 
-    <button class="side-btn" onclick="openTool('phone')">
-        PHONE
-    </button>
+  <button class="side-btn" data-page="profile" onclick="openProfile()">
+    ◎
+  </button>
 
-    <button class="side-btn" onclick="openTool('address')">
-        ADDRESS
-    </button>
-
-    <button class="side-btn" onclick="showPage('profile')">
-        PROFILE
-    </button>
-
-    <div style="flex:1"></div>
-
-    <button class="side-btn" onclick="deleteAllNodes()">
-        CLEAR GRAPH
-    </button>
 </aside>
 
-<main class="main">
+<section class="page active" id="page-chain">
 
-<section class="page active" id="graphPage">
+  <div class="chain-page">
 
-    <div class="graph-toolbar">
+    <div class="chain-toolbar">
 
-        <input
-            id="graphSearch"
-            class="chain-search"
-            placeholder="Search nodes..."
-            autocomplete="off"
-        >
+      <input
+        class="chain-search"
+        id="chainSearch"
+        placeholder="Search chain or node..."
+      >
 
-        <div class="toolbar-space"></div>
+      <button class="btn" onclick="openNodeModal()">
+        ＋ Node
+      </button>
 
-        <button class="btn" onclick="openNodeModal()">
-            ＋ NODE
-        </button>
-
-        <button
-            class="btn danger"
-            id="deleteNodeBtn"
-            onclick="deleteSelectedNode()"
-            disabled
-        >
-            DELETE NODE
-        </button>
-
-        <button class="btn" onclick="saveCurrentProject()">
-            SAVE
-        </button>
-    </div>
-
-    <div id="graph">
-
-        <div id="graphGrid"></div>
-
-        <div class="saturn-wrap">
-            <div class="saturn-points"></div>
-            <div class="saturn-ring"></div>
-            <div class="saturn"></div>
-        </div>
-
-        <svg id="edges"></svg>
-
-        <div class="empty-state" id="emptyState">
-            <b>NO NODES</b>
-            <span>Create a node or run a scan.</span>
-        </div>
+      <button class="btn" onclick="centerGraph()">
+        ⌂
+      </button>
 
     </div>
 
-    <div class="zoom-box">
-        <button onclick="zoomGraph(1.12)">+</button>
-        <button onclick="zoomGraph(.89)">−</button>
-        <button onclick="resetView()">R</button>
+    <div class="graph" id="graph">
+
+      <div class="saturn">
+        <canvas id="saturn"></canvas>
+        <div class="saturn-ring" id="saturnRing"></div>
+      </div>
+
+      <div class="world" id="world">
+
+        <svg
+          class="lines"
+          id="lines"
+          viewBox="-5000 -5000 10000 10000"
+        ></svg>
+
+      </div>
+
     </div>
+
+  </div>
 
 </section>
 
-<section class="page profile-page" id="profilePage">
+<section class="page" id="page-profile">
+
+  <div class="profile">
 
     <div class="profile-card">
 
-        <div class="profile-title">NZX PROFILE</div>
-        <div class="profile-sub">
-            LOCAL WORKSPACE / GRAPH SESSION
-        </div>
+      <div class="profile-head">
 
-        <div class="info-box">
+        <img
+          class="profile-avatar"
+          id="profileAvatar"
+          alt=""
+        >
 
-            <div class="info-row">
-                <span>ENGINE</span>
-                <span>NZX OSINT</span>
-            </div>
+        <div class="profile-info">
 
-            <div class="info-row">
-                <span>NODES</span>
-                <span id="profileNodes">0</span>
-            </div>
+          <h1 id="profileName">NZX User</h1>
 
-            <div class="info-row">
-                <span>EDGES</span>
-                <span id="profileEdges">0</span>
-            </div>
-
-            <div class="info-row">
-                <span>ZOOM</span>
-                <span id="profileZoom">100%</span>
-            </div>
+          <p id="profileUsername">@nzx_user</p>
 
         </div>
+
+      </div>
+
+      <div class="profile-actions">
+
+        <button
+          class="profile-button primary"
+          onclick="chooseAvatar()"
+        >
+          Choose avatar
+        </button>
+
+        <button
+          class="profile-button"
+          onclick="editProfileName()"
+        >
+          Edit name
+        </button>
+
+        <button
+          class="profile-button"
+          onclick="showPage('chain')"
+        >
+          Back to Chain
+        </button>
+
+      </div>
+
+      <input
+        id="avatarFile"
+        type="file"
+        accept="image/*"
+        style="display:none"
+      >
 
     </div>
+
+  </div>
 
 </section>
 
-</main>
-</div>
+<!-- TOOL MODAL -->
+<div
+  class="tool-modal"
+  id="toolModal"
+  onclick="outsideToolModal(event)"
+>
+
+  <div
+    class="modal-box"
+    onclick="event.stopPropagation()"
+  >
+
+    <div class="modal-top">
+
+      <h2 id="toolTitle">Check</h2>
+
+      <button class="close" onclick="closeTool()">
+        ×
+      </button>
+
+    </div>
+
+    <div
+      class="modal-description"
+      id="toolDescription"
+    ></div>
+
+    <input
+      class="modal-input"
+      id="toolInput"
+      autocomplete="off"
+    >
+
+    <!-- GEOSINT PHOTO -->
+    <div
+      class="geo-upload"
+      id="geoUpload"
+      style="display:none"
+    >
+
+      <img
+        class="geo-upload-preview"
+        id="geoPreview"
+        alt=""
+      >
+
+      <div class="geo-upload-info">
+
+        <div class="geo-upload-title">
+          IMAGE FOR GEOSINT
+        </div>
+
+        <div
+          class="geo-upload-name"
+          id="geoFileName"
+        >
+          Фото не выбрано
+        </div>
+
+      </div>
+
+      <button
+        class="geo-upload-btn"
+        onclick="chooseGeoPhoto()"
+      >
+        ATTACH
+      </button>
+
+    </div>
+
+    <input
+      id="geoPhoto"
+      type="file"
+      accept="image/*"
+      style="display:none"
+    >
+
+    <div class="modal-actions">
+
+      <button onclick="closeTool()">
+        CLOSE
+      </button>
+
+      <button
+        class="primary"
+        id="toolRun"
+        onclick="runTool()"
+      >
+        CHECK
+      </button>
+
+    </div>
+
+    <div
+      class="results"
+      id="toolResults"
+    ></div>
+
+  </div>
+
 </div>
 
 <!-- NODE MODAL -->
-<div class="modal-bg" id="nodeModal">
+<div id="nodeModal">
 
-    <div class="modal">
+  <div class="node-modal-box">
 
-        <div class="modal-head">
-            <div class="modal-title">CREATE NODE</div>
-            <button class="close-btn" onclick="closeModal('nodeModal')">×</button>
-        </div>
+    <h2 id="nodeModalTitle" style="margin:0 0 18px">
+      New Node
+    </h2>
 
-        <div class="modal-body">
+    <div class="field">
 
-            <label class="form-label">TYPE</label>
+      <label>NAME</label>
 
-            <select class="form-input" id="nodeType">
-                <option value="PERSON">PERSON</option>
-                <option value="PHONE">PHONE</option>
-                <option value="ADDRESS">ADDRESS</option>
-                <option value="EMAIL">EMAIL</option>
-                <option value="USERNAME">USERNAME</option>
-                <option value="COMPANY">COMPANY</option>
-                <option value="CUSTOM">CUSTOM</option>
-            </select>
-
-            <label class="form-label">VALUE</label>
-
-            <input
-                class="form-input"
-                id="nodeValue"
-                placeholder="Enter value..."
-                autocomplete="off"
-            >
-
-            <div class="modal-actions">
-                <button class="btn" onclick="closeModal('nodeModal')">
-                    CANCEL
-                </button>
-
-                <button class="btn" onclick="createNodeFromModal()">
-                    CREATE
-                </button>
-            </div>
-
-        </div>
+      <input
+        id="nodeTitle"
+        placeholder="Username"
+      >
 
     </div>
 
-</div>
+    <div class="field">
 
-<!-- TOOL MODAL -->
-<div class="modal-bg" id="toolModal">
+      <label>TYPE</label>
 
-    <div class="modal">
-
-        <div class="modal-head">
-
-            <div class="modal-title" id="toolTitle">
-                PHONE SCAN
-            </div>
-
-            <button class="close-btn" onclick="closeModal('toolModal')">
-                ×
-            </button>
-
-        </div>
-
-        <div class="modal-body">
-
-            <label class="form-label" id="toolLabel">
-                PHONE NUMBER
-            </label>
-
-            <input
-                class="form-input"
-                id="toolInput"
-                placeholder="+374..."
-                autocomplete="off"
-            >
-
-            <div class="modal-actions">
-
-                <button class="btn" onclick="closeModal('toolModal')">
-                    CANCEL
-                </button>
-
-                <button class="btn" id="toolRunBtn" onclick="runTool()">
-                    SCAN
-                </button>
-
-            </div>
-
-            <div class="tool-result" id="toolResult" style="display:none"></div>
-
-        </div>
+      <input
+        id="nodeType"
+        placeholder="PHONE / USERNAME / LOCATION"
+      >
 
     </div>
 
-</div>
+    <div class="field">
 
-<!-- PROJECTS MODAL -->
-<div class="modal-bg" id="projectsModal">
+      <label>CONTENT</label>
 
-    <div class="modal">
-
-        <div class="modal-head">
-            <div class="modal-title">PROJECTS</div>
-            <button class="close-btn" onclick="closeModal('projectsModal')">
-                ×
-            </button>
-        </div>
-
-        <div class="modal-body">
-
-            <button class="btn" onclick="createProject()">
-                ＋ NEW PROJECT
-            </button>
-
-            <div class="projects-list" id="projectsList"></div>
-
-        </div>
+      <textarea
+        id="nodeContent"
+        placeholder="Information..."
+      ></textarea>
 
     </div>
 
+    <div style="display:flex;gap:8px;margin-top:17px">
+
+      <button
+        class="btn"
+        style="margin-left:auto"
+        onclick="closeNodeModal()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="btn primary"
+        onclick="saveNode()"
+      >
+        Save
+      </button>
+
+    </div>
+
+  </div>
+
 </div>
 
-<div id="toast"></div>
+<div class="toast" id="toast"></div>
+
+</div>
 
 <script>
-"use strict";
-
-/* =========================================================
-   HELPERS
-========================================================= */
-
-const $ = id => document.getElementById(id);
-
-function toast(message){
-    const el = $("toast");
-
-    el.textContent = message;
-    el.classList.add("show");
-
-    clearTimeout(window.__toastTimer);
-
-    window.__toastTimer = setTimeout(()=>{
-        el.classList.remove("show");
-    },2200);
-}
-
-function closeModal(id){
-    $(id)?.classList.remove("open");
-}
-
-function openModal(id){
-    $(id)?.classList.add("open");
-}
-
-function showPage(page){
-
-    document.querySelectorAll(".page").forEach(x=>{
-        x.classList.remove("active");
-    });
-
-    document.querySelectorAll(".side-btn").forEach(x=>{
-        x.classList.remove("active");
-    });
-
-    if(page==="graph"){
-        $("graphPage").classList.add("active");
-        $("graphNav").classList.add("active");
-    }
-
-    if(page==="profile"){
-        $("profilePage").classList.add("active");
-        updateProfileUI();
-    }
-}
-
-/* =========================================================
-   LOCAL PHONE METADATA DATABASE
-========================================================= */
-
-/*
-   Это не база владельцев номеров.
-   Здесь находятся международные коды и известные
-   телефонные префиксы/регионы.
-
-   Она работает локально, без API.
-*/
-
-const PHONE_DB = [
-
-    {
-        country:"Armenia",
-        iso:"AM",
-        code:"374",
-        timezone:"UTC+04:00",
-        regions:[
-            {prefix:"10",city:"Yerevan"},
-            {prefix:"11",city:"Yerevan"},
-            {prefix:"12",city:"Yerevan"},
-            {prefix:"33",city:"Yerevan"},
-            {prefix:"41",city:"Yerevan"},
-            {prefix:"43",city:"Yerevan"},
-            {prefix:"44",city:"Yerevan"},
-            {prefix:"55",city:"Yerevan / Mobile"},
-            {prefix:"77",city:"Yerevan / Mobile"},
-            {prefix:"91",city:"Armenia / Mobile"},
-            {prefix:"93",city:"Armenia / Mobile"},
-            {prefix:"94",city:"Armenia / Mobile"},
-            {prefix:"95",city:"Armenia / Mobile"},
-            {prefix:"96",city:"Armenia / Mobile"},
-            {prefix:"97",city:"Armenia / Mobile"},
-            {prefix:"98",city:"Armenia / Mobile"},
-            {prefix:"99",city:"Armenia / Mobile"}
-        ]
-    },
-
-    {
-        country:"Georgia",
-        iso:"GE",
-        code:"995",
-        timezone:"UTC+04:00",
-        regions:[
-            {prefix:"32",city:"Tbilisi"},
-            {prefix:"322",city:"Tbilisi"},
-            {prefix:"341",city:"Kutaisi"},
-            {prefix:"422",city:"Batumi"},
-            {prefix:"431",city:"Kutaisi"},
-            {prefix:"44",city:"Georgia / Mobile"},
-            {prefix:"51",city:"Georgia / Mobile"},
-            {prefix:"55",city:"Georgia / Mobile"},
-            {prefix:"57",city:"Georgia / Mobile"},
-            {prefix:"59",city:"Georgia / Mobile"}
-        ]
-    },
-
-    {
-        country:"Russia",
-        iso:"RU",
-        code:"7",
-        timezone:"UTC+02:00 — UTC+12:00",
-        regions:[
-            {prefix:"495",city:"Moscow"},
-            {prefix:"499",city:"Moscow"},
-            {prefix:"812",city:"Saint Petersburg"},
-            {prefix:"383",city:"Novosibirsk"},
-            {prefix:"343",city:"Yekaterinburg"},
-            {prefix:"831",city:"Nizhny Novgorod"},
-            {prefix:"846",city:"Samara"},
-            {prefix:"863",city:"Rostov-on-Don"},
-            {prefix:"861",city:"Krasnodar"},
-            {prefix:"421",city:"Khabarovsk"},
-            {prefix:"395",city:"Irkutsk"},
-            {prefix:"423",city:"Vladivostok"},
-            {prefix:"351",city:"Chelyabinsk"},
-            {prefix:"381",city:"Omsk"},
-            {prefix:"385",city:"Barnaul"}
-        ]
-    },
-
-    {
-        country:"United States",
-        iso:"US",
-        code:"1",
-        timezone:"UTC-10:00 — UTC-05:00",
-        regions:[
-            {prefix:"201",city:"New Jersey"},
-            {prefix:"202",city:"Washington, DC"},
-            {prefix:"212",city:"New York"},
-            {prefix:"213",city:"Los Angeles"},
-            {prefix:"305",city:"Miami"},
-            {prefix:"312",city:"Chicago"},
-            {prefix:"415",city:"San Francisco"},
-            {prefix:"617",city:"Boston"},
-            {prefix:"702",city:"Las Vegas"},
-            {prefix:"713",city:"Houston"},
-            {prefix:"718",city:"New York"},
-            {prefix:"786",city:"Miami"},
-            {prefix:"808",city:"Hawaii"},
-            {prefix:"818",city:"Los Angeles"},
-            {prefix:"917",city:"New York"},
-            {prefix:"929",city:"New York"}
-        ]
-    },
-
-    {
-        country:"Canada",
-        iso:"CA",
-        code:"1",
-        timezone:"UTC-08:00 — UTC-03:30",
-        regions:[
-            {prefix:"204",city:"Manitoba"},
-            {prefix:"236",city:"British Columbia"},
-            {prefix:"249",city:"Ontario"},
-            {prefix:"289",city:"Ontario"},
-            {prefix:"306",city:"Saskatchewan"},
-            {prefix:"343",city:"Ontario"},
-            {prefix:"403",city:"Alberta"},
-            {prefix:"416",city:"Toronto"},
-            {prefix:"418",city:"Quebec"},
-            {prefix:"514",city:"Montreal"},
-            {prefix:"604",city:"Vancouver"},
-            {prefix:"613",city:"Ontario"},
-            {prefix:"647",city:"Toronto"},
-            {prefix:"705",city:"Ontario"},
-            {prefix:"709",city:"Newfoundland and Labrador"},
-            {prefix:"780",city:"Alberta"},
-            {prefix:"807",city:"Ontario"},
-            {prefix:"819",city:"Quebec"},
-            {prefix:"867",city:"Northern Canada"},
-            {prefix:"905",city:"Ontario"}
-        ]
-    },
-
-    {
-        country:"United Kingdom",
-        iso:"GB",
-        code:"44",
-        timezone:"UTC+00:00",
-        regions:[
-            {prefix:"20",city:"London"},
-            {prefix:"121",city:"Birmingham"},
-            {prefix:"131",city:"Edinburgh"},
-            {prefix:"141",city:"Glasgow"},
-            {prefix:"151",city:"Liverpool"},
-            {prefix:"161",city:"Manchester"},
-            {prefix:"191",city:"Newcastle"},
-            {prefix:"113",city:"Leeds"},
-            {prefix:"117",city:"Bristol"},
-            {prefix:"114",city:"Sheffield"}
-        ]
-    },
-
-    {
-        country:"Germany",
-        iso:"DE",
-        code:"49",
-        timezone:"UTC+01:00",
-        regions:[
-            {prefix:"30",city:"Berlin"},
-            {prefix:"40",city:"Hamburg"},
-            {prefix:"69",city:"Frankfurt"},
-            {prefix:"89",city:"Munich"},
-            {prefix:"211",city:"Düsseldorf"},
-            {prefix:"221",city:"Cologne"},
-            {prefix:"351",city:"Dresden"},
-            {prefix:"711",city:"Stuttgart"}
-        ]
-    },
-
-    {
-        country:"France",
-        iso:"FR",
-        code:"33",
-        timezone:"UTC+01:00",
-        regions:[
-            {prefix:"1",city:"Paris / Île-de-France"},
-            {prefix:"2",city:"North-West France"},
-            {prefix:"3",city:"North-East France"},
-            {prefix:"4",city:"South-East France"},
-            {prefix:"5",city:"South-West France"}
-        ]
-    },
-
-    {
-        country:"Italy",
-        iso:"IT",
-        code:"39",
-        timezone:"UTC+01:00",
-        regions:[
-            {prefix:"02",city:"Milan"},
-            {prefix:"06",city:"Rome"},
-            {prefix:"010",city:"Genoa"},
-            {prefix:"011",city:"Turin"},
-            {prefix:"041",city:"Venice"},
-            {prefix:"051",city:"Bologna"},
-            {prefix:"055",city:"Florence"},
-            {prefix:"081",city:"Naples"}
-        ]
-    },
-
-    {
-        country:"Spain",
-        iso:"ES",
-        code:"34",
-        timezone:"UTC+01:00",
-        regions:[
-            {prefix:"91",city:"Madrid"},
-            {prefix:"93",city:"Barcelona"},
-            {prefix:"95",city:"Andalusia"},
-            {prefix:"96",city:"Valencia"},
-            {prefix:"94",city:"Basque Country"}
-        ]
-    },
-
-    {
-        country:"Turkey",
-        iso:"TR",
-        code:"90",
-        timezone:"UTC+03:00",
-        regions:[
-            {prefix:"212",city:"Istanbul"},
-            {prefix:"216",city:"Istanbul"},
-            {prefix:"312",city:"Ankara"},
-            {prefix:"232",city:"Izmir"},
-            {prefix:"224",city:"Bursa"},
-            {prefix:"242",city:"Antalya"},
-            {prefix:"322",city:"Adana"},
-            {prefix:"342",city:"Gaziantep"}
-        ]
-    },
-
-    {
-        country:"Ukraine",
-        iso:"UA",
-        code:"380",
-        timezone:"UTC+02:00",
-        regions:[
-            {prefix:"44",city:"Kyiv"},
-            {prefix:"32",city:"Lviv"},
-            {prefix:"48",city:"Odesa"},
-            {prefix:"56",city:"Dnipro"},
-            {prefix:"57",city:"Kharkiv"},
-            {prefix:"61",city:"Zaporizhzhia"},
-            {prefix:"46",city:"Chernihiv"},
-            {prefix:"43",city:"Vinnytsia"}
-        ]
-    },
-
-    {
-        country:"Kazakhstan",
-        iso:"KZ",
-        code:"7",
-        timezone:"UTC+05:00 — UTC+06:00",
-        regions:[
-            {prefix:"7172",city:"Astana"},
-            {prefix:"727",city:"Almaty"},
-            {prefix:"7212",city:"Karaganda"},
-            {prefix:"7252",city:"Shymkent"},
-            {prefix:"7182",city:"Pavlodar"}
-        ]
-    },
-
-    {
-        country:"Azerbaijan",
-        iso:"AZ",
-        code:"994",
-        timezone:"UTC+04:00",
-        regions:[
-            {prefix:"12",city:"Baku"},
-            {prefix:"18",city:"Sumqayit"},
-            {prefix:"20",city:"Ganja"},
-            {prefix:"21",city:"Azerbaijan"},
-            {prefix:"22",city:"Azerbaijan"},
-            {prefix:"50",city:"Azerbaijan / Mobile"},
-            {prefix:"51",city:"Azerbaijan / Mobile"},
-            {prefix:"55",city:"Azerbaijan / Mobile"},
-            {prefix:"70",city:"Azerbaijan / Mobile"},
-            {prefix:"77",city:"Azerbaijan / Mobile"}
-        ]
-    },
-
-    {
-        country:"Israel",
-        iso:"IL",
-        code:"972",
-        timezone:"UTC+02:00",
-        regions:[
-            {prefix:"2",city:"Jerusalem"},
-            {prefix:"3",city:"Tel Aviv"},
-            {prefix:"4",city:"Haifa / North"},
-            {prefix:"8",city:"South Israel"},
-            {prefix:"9",city:"Central Israel"}
-        ]
-    },
-
-    {
-        country:"United Arab Emirates",
-        iso:"AE",
-        code:"971",
-        timezone:"UTC+04:00",
-        regions:[
-            {prefix:"2",city:"Abu Dhabi"},
-            {prefix:"3",city:"Al Ain"},
-            {prefix:"4",city:"Dubai"},
-            {prefix:"6",city:"Sharjah / Ajman"},
-            {prefix:"7",city:"Ras Al Khaimah / Fujairah"}
-        ]
-    },
-
-    {
-        country:"India",
-        iso:"IN",
-        code:"91",
-        timezone:"UTC+05:30",
-        regions:[
-            {prefix:"11",city:"Delhi"},
-            {prefix:"22",city:"Mumbai"},
-            {prefix:"33",city:"Kolkata"},
-            {prefix:"40",city:"Hyderabad"},
-            {prefix:"44",city:"Chennai"},
-            {prefix:"80",city:"Bangalore"},
-            {prefix:"79",city:"Ahmedabad"},
-            {prefix:"20",city:"Pune"}
-        ]
-    },
-
-    {
-        country:"China",
-        iso:"CN",
-        code:"86",
-        timezone:"UTC+08:00",
-        regions:[
-            {prefix:"10",city:"Beijing"},
-            {prefix:"20",city:"Guangzhou"},
-            {prefix:"21",city:"Shanghai"},
-            {prefix:"23",city:"Chongqing"},
-            {prefix:"24",city:"Shenyang"},
-            {prefix:"25",city:"Nanjing"},
-            {prefix:"28",city:"Chengdu"}
-        ]
-    },
-
-    {
-        country:"Japan",
-        iso:"JP",
-        code:"81",
-        timezone:"UTC+09:00",
-        regions:[
-            {prefix:"3",city:"Tokyo"},
-            {prefix:"6",city:"Osaka"},
-            {prefix:"52",city:"Nagoya"},
-            {prefix:"11",city:"Sapporo"},
-            {prefix:"75",city:"Kyoto"},
-            {prefix:"92",city:"Fukuoka"}
-        ]
-    },
-
-    {
-        country:"South Korea",
-        iso:"KR",
-        code:"82",
-        timezone:"UTC+09:00",
-        regions:[
-            {prefix:"2",city:"Seoul"},
-            {prefix:"51",city:"Busan"},
-            {prefix:"53",city:"Daegu"},
-            {prefix:"62",city:"Gwangju"},
-            {prefix:"42",city:"Daejeon"},
-            {prefix:"64",city:"Jeju"}
-        ]
-    },
-
-    {
-        country:"Australia",
-        iso:"AU",
-        code:"61",
-        timezone:"UTC+08:00 — UTC+11:00",
-        regions:[
-            {prefix:"2",city:"Sydney / NSW"},
-            {prefix:"3",city:"Melbourne / Victoria"},
-            {prefix:"7",city:"Brisbane / Queensland"},
-            {prefix:"8",city:"Perth / Western Australia"}
-        ]
-    },
-
-    {
-        country:"Brazil",
-        iso:"BR",
-        code:"55",
-        timezone:"UTC-05:00 — UTC-02:00",
-        regions:[
-            {prefix:"11",city:"São Paulo"},
-            {prefix:"21",city:"Rio de Janeiro"},
-            {prefix:"31",city:"Belo Horizonte"},
-            {prefix:"41",city:"Curitiba"},
-            {prefix:"51",city:"Porto Alegre"},
-            {prefix:"61",city:"Brasília"},
-            {prefix:"71",city:"Salvador"},
-            {prefix:"81",city:"Recife"}
-        ]
-    },
-
-    {
-        country:"Mexico",
-        iso:"MX",
-        code:"52",
-        timezone:"UTC-08:00 — UTC-05:00",
-        regions:[
-            {prefix:"55",city:"Mexico City"},
-            {prefix:"33",city:"Guadalajara"},
-            {prefix:"81",city:"Monterrey"},
-            {prefix:"664",city:"Tijuana"},
-            {prefix:"998",city:"Cancún"}
-        ]
-    }
-];
-
-/* =========================================================
-   PHONE NORMALIZATION
-========================================================= */
-
-function normalizePhone(value){
-    return String(value || "")
-        .replace(/[^\d+]/g,"")
-        .replace(/^00/,"+");
-}
-
-function digitsOnly(value){
-    return normalizePhone(value).replace(/\D/g,"");
-}
-
-function findPhoneCountry(number){
-
-    const digits = digitsOnly(number);
-
-    let best = null;
-
-    for(const item of PHONE_DB){
-
-        if(digits.startsWith(item.code)){
-
-            if(!best || item.code.length > best.code.length){
-                best = item;
-            }
-        }
-    }
-
-    return best;
-}
-
-function findPhoneRegion(country,digits){
-
-    if(!country || !country.regions) return null;
-
-    const local = digits.startsWith(country.code)
-        ? digits.slice(country.code.length)
-        : digits;
-
-    let best = null;
-
-    for(const region of country.regions){
-
-        if(local.startsWith(region.prefix)){
-
-            if(!best || region.prefix.length > best.prefix.length){
-                best = region;
-            }
-        }
-    }
-
-    return best;
-}
-
-function localPhoneLookup(number){
-
-    const normalized = normalizePhone(number);
-    const digits = digitsOnly(number);
-
-    const country = findPhoneCountry(number);
-
-    if(!country){
-
-        return {
-            region:"Unknown",
-            country:"Unknown",
-            timeCode:"Unknown",
-            number:normalized || number,
-            city:"Unknown"
-        };
-    }
-
-    const region = findPhoneRegion(country,digits);
-
-    return {
-        region:region?.city || "Unknown",
-        country:country.country,
-        timeCode:country.timezone,
-        number:normalized,
-        city:region?.city || "Unknown",
-        iso:country.iso,
-        callingCode:"+"+country.code,
-        prefix:region?.prefix || ""
+/* ==========================================================
+   DATABASE
+========================================================== */
+
+const STORAGE_KEY="nzx-osint-real-v5";
+
+let db={
+  nodes:{},
+  links:[],
+  profile:{
+    name:"NZX User",
+    username:"nzx_user",
+    avatar:""
+  },
+  searches:0
+};
+
+try{
+  const saved=localStorage.getItem(STORAGE_KEY);
+
+  if(saved){
+    const parsed=JSON.parse(saved);
+
+    db={
+      ...db,
+      ...parsed,
+      nodes:parsed.nodes||{},
+      links:Array.isArray(parsed.links)?parsed.links:[],
+      profile:{
+        ...db.profile,
+        ...(parsed.profile||{})
+      }
     };
-}
-
-/* =========================================================
-   GRAPH DATABASE
-========================================================= */
-
-let DB = {
-    nodes:[],
-    edges:[],
-    project:"default"
-};
-
-let selectedNode = null;
-let currentTool = null;
-
-let view = {
-    x:0,
-    y:0,
-    zoom:1
-};
-
-let nodeDrag = null;
-let graphPan = null;
-
-function loadDB(){
-
-    try{
-
-        const saved = localStorage.getItem("nzx_osint_db");
-
-        if(saved){
-
-            const parsed = JSON.parse(saved);
-
-            if(parsed && Array.isArray(parsed.nodes)){
-                DB = parsed;
-            }
-        }
-
-    }catch(e){
-        console.error(e);
-    }
-
-    if(!Array.isArray(DB.nodes)) DB.nodes=[];
-    if(!Array.isArray(DB.edges)) DB.edges=[];
+  }
+}catch(e){
+  console.warn("Storage error",e);
 }
 
 function saveDB(){
-
-    try{
-        localStorage.setItem(
-            "nzx_osint_db",
-            JSON.stringify(DB)
-        );
-    }catch(e){
-        console.error(e);
-    }
-
-    updateProfileUI();
-}
-
-function makeId(){
-    return "node_" +
-        Date.now().toString(36) +
-        "_" +
-        Math.random().toString(36).slice(2,8);
-}
-
-function getNode(id){
-    return DB.nodes.find(n=>n.id===id);
-}
-
-function createNode(type,value,x,y){
-
-    value = String(value || "").trim();
-
-    if(!value){
-        toast("Enter node value.");
-        return null;
-    }
-
-    const node = {
-        id:makeId(),
-        type:type || "CUSTOM",
-        value:value,
-        x:Number.isFinite(x) ? x : 500 - view.x,
-        y:Number.isFinite(y) ? y : 350 - view.y,
-        createdAt:Date.now()
-    };
-
-    DB.nodes.push(node);
-
-    renderNodes();
-    saveDB();
-
-    return node;
-}
-
-function removeNode(id){
-
-    DB.nodes = DB.nodes.filter(n=>n.id!==id);
-
-    DB.edges = DB.edges.filter(
-        e=>e.from!==id && e.to!==id
-    );
-
-    if(selectedNode===id){
-        selectedNode=null;
-    }
-
-    renderNodes();
-    saveDB();
-
-    toast("Node deleted.");
-}
-
-function deleteSelectedNode(){
-
-    if(!selectedNode){
-        toast("Select a node first.");
-        return;
-    }
-
-    const node = getNode(selectedNode);
-
-    if(!node){
-        selectedNode=null;
-        renderNodes();
-        return;
-    }
-
-    removeNode(node.id);
-}
-
-function deleteAllNodes(){
-
-    if(!DB.nodes.length){
-        toast("Graph is already empty.");
-        return;
-    }
-
-    if(!confirm("Delete all nodes and connections?")){
-        return;
-    }
-
-    DB.nodes=[];
-    DB.edges=[];
-    selectedNode=null;
-
-    renderNodes();
-    saveDB();
-
-    toast("Graph cleared.");
-}
-
-/* =========================================================
-   EDGES
-========================================================= */
-
-function addLink(a,b){
-
-    if(!a || !b || a===b) return;
-
-    const exists = DB.edges.some(e=>
-        (e.from===a && e.to===b) ||
-        (e.from===b && e.to===a)
-    );
-
-    if(exists) return;
-
-    DB.edges.push({
-        id:makeId(),
-        from:a,
-        to:b
-    });
-
-    saveDB();
-    renderEdges();
-}
-
-function removeLink(id){
-
-    DB.edges = DB.edges.filter(e=>e.id!==id);
-
-    saveDB();
-    renderEdges();
-}
-
-/* =========================================================
-   NODE UI
-========================================================= */
-
-function renderNodes(){
-
-    document.querySelectorAll(".node").forEach(n=>n.remove());
-
-    const graph = $("graph");
-
-    DB.nodes.forEach(node=>{
-
-        const el = document.createElement("div");
-
-        el.className =
-            "node" +
-            (selectedNode===node.id ? " selected" : "");
-
-        el.dataset.id=node.id;
-
-        el.style.left=node.x+"px";
-        el.style.top=node.y+"px";
-
-        const remove = document.createElement("button");
-
-        remove.className="node-remove";
-        remove.type="button";
-        remove.textContent="×";
-        remove.title="Delete node";
-
-        remove.addEventListener("pointerdown",e=>{
-            e.stopPropagation();
-        });
-
-        remove.addEventListener("click",e=>{
-            e.stopPropagation();
-
-            removeNode(node.id);
-        });
-
-        const type = document.createElement("div");
-        type.className="node-type";
-        type.textContent=node.type;
-
-        const value = document.createElement("div");
-        value.className="node-value";
-        value.textContent=node.value;
-
-        el.appendChild(remove);
-        el.appendChild(type);
-        el.appendChild(value);
-
-        if(node.meta){
-
-            const meta = document.createElement("div");
-
-            meta.className="node-meta";
-
-            meta.textContent=node.meta;
-
-            el.appendChild(meta);
-        }
-
-        /*
-           ВАЖНО:
-           Drag теперь начинается именно на самой ноде.
-        */
-
-        el.addEventListener("pointerdown",e=>{
-
-            if(e.button!==0) return;
-
-            if(e.target===remove) return;
-
-            e.stopPropagation();
-
-            selectedNode=node.id;
-
-            document.querySelectorAll(".node")
-                .forEach(n=>n.classList.remove("selected"));
-
-            el.classList.add("selected");
-
-            updateDeleteButton();
-
-            const graphRect=graph.getBoundingClientRect();
-
-            nodeDrag={
-                id:node.id,
-                pointerId:e.pointerId,
-                startX:e.clientX,
-                startY:e.clientY,
-                nodeX:node.x,
-                nodeY:node.y
-            };
-
-            el.classList.add("dragging");
-
-            try{
-                el.setPointerCapture(e.pointerId);
-            }catch(_){}
-
-        });
-
-        el.addEventListener("pointermove",e=>{
-
-            if(!nodeDrag) return;
-
-            if(nodeDrag.pointerId!==e.pointerId) return;
-
-            const n=getNode(nodeDrag.id);
-
-            if(!n) return;
-
-            const dx=(e.clientX-nodeDrag.startX)/view.zoom;
-            const dy=(e.clientY-nodeDrag.startY)/view.zoom;
-
-            n.x=nodeDrag.nodeX+dx;
-            n.y=nodeDrag.nodeY+dy;
-
-            el.style.left=n.x+"px";
-            el.style.top=n.y+"px";
-
-            renderEdges();
-        });
-
-        const finishDrag=()=>{
-
-            if(!nodeDrag) return;
-
-            el.classList.remove("dragging");
-
-            nodeDrag=null;
-
-            saveDB();
-        };
-
-        el.addEventListener("pointerup",finishDrag);
-        el.addEventListener("pointercancel",finishDrag);
-
-        el.addEventListener("dblclick",e=>{
-
-            e.stopPropagation();
-
-            const n=getNode(node.id);
-
-            if(!n) return;
-
-            const newValue=prompt(
-                "Edit node value:",
-                n.value
-            );
-
-            if(newValue!==null){
-
-                const clean=newValue.trim();
-
-                if(clean){
-                    n.value=clean;
-                    renderNodes();
-                    saveDB();
-                }
-            }
-        });
-
-        graph.appendChild(el);
-    });
-
-    $("emptyState").style.display =
-        DB.nodes.length ? "none" : "block";
-
-    updateDeleteButton();
-    renderEdges();
-    updateProfileUI();
-}
-
-function updateDeleteButton(){
-
-    const btn=$("deleteNodeBtn");
-
-    if(!btn) return;
-
-    btn.disabled=!selectedNode;
-}
-
-/* =========================================================
-   EDGES
-========================================================= */
-
-function renderEdges(){
-
-    const svg=$("edges");
-
-    while(svg.firstChild){
-        svg.removeChild(svg.firstChild);
-    }
-
-    for(const edge of DB.edges){
-
-        const a=getNode(edge.from);
-        const b=getNode(edge.to);
-
-        if(!a || !b) continue;
-
-        const line=document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "line"
-        );
-
-        line.classList.add("edge");
-
-        const aw=getNodeWidth(a.id);
-        const ah=getNodeHeight(a.id);
-
-        const bw=getNodeWidth(b.id);
-        const bh=getNodeHeight(b.id);
-
-        line.setAttribute(
-            "x1",
-            a.x+aw/2
-        );
-
-        line.setAttribute(
-            "y1",
-            a.y+ah/2
-        );
-
-        line.setAttribute(
-            "x2",
-            b.x+bw/2
-        );
-
-        line.setAttribute(
-            "y2",
-            b.y+bh/2
-        );
-
-        svg.appendChild(line);
-    }
-}
-
-function getNodeWidth(id){
-
-    const el=document.querySelector(
-        `.node[data-id="${CSS.escape(id)}"]`
-    );
-
-    return el?.offsetWidth || 180;
-}
-
-function getNodeHeight(id){
-
-    const el=document.querySelector(
-        `.node[data-id="${CSS.escape(id)}"]`
-    );
-
-    return el?.offsetHeight || 70;
-}
-
-/* =========================================================
-   NODE MODAL
-========================================================= */
-
-function openNodeModal(){
-
-    $("nodeType").value="PERSON";
-    $("nodeValue").value="";
-
-    openModal("nodeModal");
-
-    setTimeout(()=>{
-        $("nodeValue").focus();
-    },100);
-}
-
-function createNodeFromModal(){
-
-    const type=$("nodeType").value;
-    const value=$("nodeValue").value.trim();
-
-    if(!value){
-        toast("Enter value.");
-        return;
-    }
-
-    const graph=$("graph");
-    const rect=graph.getBoundingClientRect();
-
-    const x=
-        (rect.width/2-view.x)/view.zoom
-        - 80
-        + (Math.random()*80-40);
-
-    const y=
-        (rect.height/2-view.y)/view.zoom
-        - 35
-        + (Math.random()*80-40);
-
-    createNode(type,value,x,y);
-
-    closeModal("nodeModal");
-}
-
-/* =========================================================
-   PHONE RESULT
-========================================================= */
-
-function findDeepValue(obj,keys){
-
-    if(!obj || typeof obj!=="object"){
-        return "";
-    }
-
-    const wanted=new Set(
-        keys.map(k=>String(k).toLowerCase())
-    );
-
-    let result="";
-
-    function walk(value){
-
-        if(result) return;
-
-        if(!value || typeof value!=="object"){
-            return;
-        }
-
-        for(const [key,val] of Object.entries(value)){
-
-            const normalizedKey=
-                String(key).toLowerCase();
-
-            if(
-                wanted.has(normalizedKey) &&
-                val!==null &&
-                val!==undefined &&
-                typeof val!=="object"
-            ){
-
-                const str=String(val).trim();
-
-                if(str){
-                    result=str;
-                    return;
-                }
-            }
-
-            if(val && typeof val==="object"){
-                walk(val);
-            }
-        }
-    }
-
-    walk(obj);
-
-    return result;
-}
-
-function makePhoneSummary(phone,data){
-
-    const local=localPhoneLookup(phone);
-
-    const region=
-        findDeepValue(data,[
-            "region",
-            "state",
-            "province",
-            "area",
-            "region_name",
-            "state_name"
-        ]) ||
-        local.region;
-
-    const country=
-        findDeepValue(data,[
-            "country",
-            "country_name",
-            "countryName",
-            "countryname"
-        ]) ||
-        local.country;
-
-    const timeCode=
-        findDeepValue(data,[
-            "time_code",
-            "timezone",
-            "time_zone",
-            "timeZone",
-            "utc",
-            "utc_offset",
-            "utcOffset"
-        ]) ||
-        local.timeCode;
-
-    const number=
-        findDeepValue(data,[
-            "number",
-            "phone",
-            "phone_number",
-            "international",
-            "international_number",
-            "formatted",
-            "international_format"
-        ]) ||
-        local.number;
-
-    const city=
-        findDeepValue(data,[
-            "city",
-            "town",
-            "locality",
-            "city_name",
-            "cityName"
-        ]) ||
-        local.city;
-
-    const fullName=
-        findDeepValue(data,[
-            "full_name",
-            "fullName",
-            "fullname",
-            "owner_name",
-            "owner",
-            "person_name"
-        ]);
-
-    return {
-        region,
-        country,
-        timeCode,
-        number,
-        city,
-        fullName
-    };
-}
-
-function showPhoneSummary(summary){
-
-    const result=$("toolResult");
-
-    result.innerHTML="";
-
-    const rows=[
-        ["REGION",summary.region],
-        ["COUNTRY",summary.country],
-        ["TIME CODE",summary.timeCode],
-        ["NUMBER",summary.number],
-        ["CITY",summary.city]
-    ];
-
-    if(summary.fullName){
-        rows.push(["FULL NAME",summary.fullName]);
-    }
-
-    for(const [key,value] of rows){
-
-        const row=document.createElement("div");
-        row.className="result-row";
-
-        const k=document.createElement("div");
-        k.className="result-key";
-        k.textContent=key;
-
-        const v=document.createElement("div");
-        v.className="result-value";
-        v.textContent=value || "Unknown";
-
-        row.appendChild(k);
-        row.appendChild(v);
-
-        result.appendChild(row);
-    }
-
-    result.style.display="block";
-}
-
-/* =========================================================
-   ADD PHONE SUMMARY TO GRAPH
-========================================================= */
-
-function addPhoneResultToGraph(phone,data){
-
-    const summary=makePhoneSummary(phone,data);
-
-    const centerX=420-view.x;
-    const centerY=330-view.y;
-
-    const main=createNode(
-        "PHONE",
-        summary.number || phone,
-        centerX,
-        centerY
-    );
-
-    if(!main) return;
-
-    const fields=[
-        ["REGION",summary.region],
-        ["COUNTRY",summary.country],
-        ["TIME CODE",summary.timeCode],
-        ["CITY",summary.city]
-    ];
-
-    if(summary.fullName){
-        fields.push(["FULL NAME",summary.fullName]);
-    }
-
-    const radius=240;
-
-    fields.forEach((item,index)=>{
-
-        if(
-            !item[1] ||
-            String(item[1]).toLowerCase()==="unknown"
-        ){
-            return;
-        }
-
-        const angle=
-            (-Math.PI/2) +
-            (index/(Math.max(fields.length-1,1))) *
-            Math.PI*2;
-
-        const x=
-            centerX +
-            Math.cos(angle)*radius;
-
-        const y=
-            centerY +
-            Math.sin(angle)*radius;
-
-        const n=createNode(
-            item[0],
-            item[1],
-            x,
-            y
-        );
-
-        if(n){
-            addLink(main.id,n.id);
-        }
-    });
-
-    renderNodes();
-    saveDB();
-}
-
-/* =========================================================
-   TOOL MODAL
-========================================================= */
-
-function openTool(type){
-
-    currentTool=type;
-
-    $("toolResult").style.display="none";
-    $("toolResult").innerHTML="";
-    $("toolInput").value="";
-
-    if(type==="phone"){
-
-        $("toolTitle").textContent="PHONE SCAN";
-        $("toolLabel").textContent="PHONE NUMBER";
-        $("toolInput").placeholder="+374...";
-        $("toolRunBtn").textContent="SCAN";
-
-    }else{
-
-        $("toolTitle").textContent="ADDRESS SEARCH";
-        $("toolLabel").textContent="ADDRESS";
-        $("toolInput").placeholder="Yerevan, Armenia...";
-        $("toolRunBtn").textContent="SEARCH";
-    }
-
-    openModal("toolModal");
-
-    setTimeout(()=>{
-        $("toolInput").focus();
-    },100);
-}
-
-async function runTool(){
-
-    const input=$("toolInput").value.trim();
-
-    if(!input){
-        toast("Enter a value.");
-        return;
-    }
-
-    const result=$("toolResult");
-
-    result.style.display="block";
-
-    result.innerHTML=
-        `<div class="result-empty">Scanning...</div>`;
-
-    if(currentTool==="phone"){
-
-        const local=localPhoneLookup(input);
-
-        /*
-           Сначала показываем локальный результат.
-           Поэтому страна/код определяются даже если API
-           временно недоступен.
-        */
-
-        showPhoneSummary(local);
-
-        let apiData={};
-
-        try{
-
-            const response=await fetch(
-                "/api/osint/phone",
-                {
-                    method:"POST",
-                    headers:{
-                        "Content-Type":
-                            "application/x-www-form-urlencoded"
-                    },
-                    body:
-                        "phone="+
-                        encodeURIComponent(input)
-                }
-            );
-
-            if(response.ok){
-
-                apiData=await response.json();
-
-                const summary=
-                    makePhoneSummary(input,apiData);
-
-                showPhoneSummary(summary);
-
-                addPhoneResultToGraph(
-                    input,
-                    apiData
-                );
-
-                toast("Phone scan complete.");
-
-            }else{
-
-                /*
-                   Даже без backend API локальная база
-                   продолжает работать.
-                */
-
-                addPhoneResultToGraph(
-                    input,
-                    local
-                );
-
-                toast("Local phone database used.");
-            }
-
-        }catch(error){
-
-            console.warn(error);
-
-            addPhoneResultToGraph(
-                input,
-                local
-            );
-
-            toast("API unavailable — local database used.");
-        }
-
-        return;
-    }
-
-    /* ADDRESS */
-
-    try{
-
-        const response=await fetch(
-            "/api/map/search?q="+
-            encodeURIComponent(input)
-        );
-
-        if(!response.ok){
-            throw new Error("HTTP "+response.status);
-        }
-
-        const data=await response.json();
-
-        result.innerHTML="";
-
-        let display=data;
-
-        if(Array.isArray(data)){
-            display=data.slice(0,8);
-        }
-
-        const pre=document.createElement("pre");
-
-        pre.style.whiteSpace="pre-wrap";
-        pre.style.wordBreak="break-word";
-        pre.style.fontSize="10px";
-        pre.style.color="#aaa";
-
-        pre.textContent=
-            JSON.stringify(display,null,2);
-
-        result.appendChild(pre);
-
-        addAddressResultToGraph(input,data);
-
-        toast("Address search complete.");
-
-    }catch(error){
-
-        result.innerHTML=
-            `<div class="result-empty">
-                Address search failed.
-             </div>`;
-
-        toast("Address API unavailable.");
-    }
-}
-
-/* =========================================================
-   ADDRESS GRAPH
-========================================================= */
-
-function addAddressResultToGraph(address,data){
-
-    const main=createNode(
-        "ADDRESS",
-        address,
-        420-view.x,
-        330-view.y
-    );
-
-    if(!main) return;
-
-    let items=[];
-
-    if(Array.isArray(data)){
-        items=data.slice(0,6);
-    }else if(data && typeof data==="object"){
-        items=Object.entries(data).slice(0,6);
-    }
-
-    items.forEach((item,index)=>{
-
-        let value;
-
-        if(Array.isArray(data)){
-            value=
-                typeof item==="object"
-                ? JSON.stringify(item)
-                : String(item);
-        }else{
-            value=String(item[1]);
-        }
-
-        const n=createNode(
-            "LOCATION",
-            value,
-            main.x+220,
-            main.y+(index-2)*90
-        );
-
-        if(n){
-            addLink(main.id,n.id);
-        }
-    });
-
-    renderNodes();
-    saveDB();
-}
-
-/* =========================================================
-   GRAPH PAN
-========================================================= */
-
-function setupGraphPan(){
-
-    const graph=$("graph");
-
-    graph.addEventListener("pointerdown",e=>{
-
-        /*
-           Если нажали на node — nodeDrag уже обрабатывает
-           событие и останавливает его.
-        */
-
-        if(e.target.closest(".node")){
-            return;
-        }
-
-        graphPan={
-            pointerId:e.pointerId,
-            startX:e.clientX,
-            startY:e.clientY,
-            x:view.x,
-            y:view.y
-        };
-
-        graph.classList.add("dragging");
-
-        try{
-            graph.setPointerCapture(e.pointerId);
-        }catch(_){}
-    });
-
-    graph.addEventListener("pointermove",e=>{
-
-        if(!graphPan) return;
-
-        if(graphPan.pointerId!==e.pointerId) return;
-
-        view.x=
-            graphPan.x +
-            (e.clientX-graphPan.startX);
-
-        view.y=
-            graphPan.y +
-            (e.clientY-graphPan.startY);
-
-        applyView();
-    });
-
-    const finish=()=>{
-
-        if(!graphPan) return;
-
-        graphPan=null;
-
-        graph.classList.remove("dragging");
-    };
-
-    graph.addEventListener("pointerup",finish);
-    graph.addEventListener("pointercancel",finish);
-
-    graph.addEventListener(
-        "wheel",
-        e=>{
-            e.preventDefault();
-
-            zoomGraph(
-                e.deltaY<0 ? 1.08 : .92
-            );
-        },
-        {passive:false}
-    );
-}
-
-function applyView(){
-
-    /*
-       Ноды хранят реальные координаты.
-       Пан/zoom применяется к графическому контейнеру
-       через transform.
-    */
-
-    document.querySelectorAll(".node").forEach(el=>{
-
-        const node=getNode(el.dataset.id);
-
-        if(!node) return;
-
-        el.style.transform=
-            `translate(${view.x}px,${view.y}px) scale(${view.zoom})`;
-        el.style.transformOrigin="top left";
-    });
-
-    $("edges").style.transform=
-        `translate(${view.x}px,${view.y}px) scale(${view.zoom})`;
-
-    $("graphGrid").style.transform=
-        `translate(${view.x}px,${view.y}px)`;
-
-    $("saturn-wrap")?.style;
-    renderEdges();
-    updateProfileUI();
-}
-
-function zoomGraph(multiplier){
-
-    const old=view.zoom;
-
-    view.zoom*=multiplier;
-
-    view.zoom=Math.max(
-        .35,
-        Math.min(2.5,view.zoom)
-    );
-
-    if(old!==view.zoom){
-        applyView();
-    }
-}
-
-function resetView(){
-
-    view.x=0;
-    view.y=0;
-    view.zoom=1;
-
-    document.querySelectorAll(".node").forEach(el=>{
-        el.style.transform="none";
-    });
-
-    $("edges").style.transform="none";
-
-    applyView();
-
-    toast("View reset.");
-}
-
-/* =========================================================
-   SEARCH
-========================================================= */
-
-function setupSearch(){
-
-    $("graphSearch").addEventListener(
-        "input",
-        e=>{
-
-            const q=e.target.value
-                .trim()
-                .toLowerCase();
-
-            document.querySelectorAll(".node")
-                .forEach(el=>{
-
-                    const node=getNode(el.dataset.id);
-
-                    if(!node) return;
-
-                    const match=
-                        !q ||
-                        node.value.toLowerCase().includes(q) ||
-                        node.type.toLowerCase().includes(q);
-
-                    el.style.opacity=
-                        match ? "1" : ".18";
-                });
-        }
-    );
-}
-
-/* =========================================================
-   PROJECTS
-========================================================= */
-
-function getProjects(){
-
-    try{
-
-        return JSON.parse(
-            localStorage.getItem("nzx_projects") ||
-            "[]"
-        );
-
-    }catch(e){
-
-        return [];
-    }
-}
-
-function saveProjects(projects){
-
+  try{
     localStorage.setItem(
-        "nzx_projects",
-        JSON.stringify(projects)
+      STORAGE_KEY,
+      JSON.stringify(db)
     );
+  }catch(e){
+    console.warn("Could not save database",e);
+  }
 }
 
-function saveCurrentProject(){
-
-    const projects=getProjects();
-
-    const name=
-        DB.project ||
-        "default";
-
-    const existing=
-        projects.findIndex(p=>p.name===name);
-
-    const item={
-        name,
-        db:JSON.parse(JSON.stringify(DB)),
-        savedAt:Date.now()
-    };
-
-    if(existing>=0){
-        projects[existing]=item;
-    }else{
-        projects.push(item);
-    }
-
-    saveProjects(projects);
-    saveDB();
-
-    toast("Project saved.");
+function $(id){
+  return document.getElementById(id);
 }
 
-function createProject(){
-
-    const name=prompt(
-        "Project name:",
-        "project-"+(getProjects().length+1)
-    );
-
-    if(!name) return;
-
-    DB={
-        nodes:[],
-        edges:[],
-        project:name.trim()
-    };
-
-    selectedNode=null;
-
-    renderNodes();
-    saveDB();
-    saveCurrentProject();
-
-    closeModal("projectsModal");
-
-    toast("Project created.");
+function escapeHTML(value){
+  return String(value??"")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
-function showProjects(){
+function uid(){
+  return "node_"+Date.now()+"_"+Math.random()
+    .toString(36)
+    .slice(2,8);
+}
 
-    const list=$("projectsList");
+let toastTimer=null;
 
-    list.innerHTML="";
+function toast(message){
 
-    const projects=getProjects();
+  const el=$("toast");
 
-    if(!projects.length){
+  el.textContent=message;
 
-        list.innerHTML=
-            `<div class="result-empty">
-                No saved projects.
-             </div>`;
+  el.classList.add("show");
 
-        openModal("projectsModal");
+  clearTimeout(toastTimer);
 
-        return;
-    }
+  toastTimer=setTimeout(()=>{
+    el.classList.remove("show");
+  },2200);
+}
 
-    projects.forEach((project,index)=>{
+/* ==========================================================
+   PAGES
+========================================================== */
 
-        const item=document.createElement("div");
-        item.className="project-item";
+function showPage(page){
 
-        const name=document.createElement("div");
-        name.className="project-name";
-        name.textContent=project.name;
+  document.querySelectorAll(".page")
+    .forEach(el=>el.classList.remove("active"));
 
-        const open=document.createElement("button");
-        open.className="btn";
-        open.textContent="OPEN";
+  const target=$("page-"+page);
 
-        open.onclick=()=>{
+  if(target)
+    target.classList.add("active");
 
-            DB=JSON.parse(
-                JSON.stringify(project.db)
-            );
-
-            selectedNode=null;
-
-            renderNodes();
-            saveDB();
-
-            closeModal("projectsModal");
-
-            toast("Project opened.");
-        };
-
-        const del=document.createElement("button");
-        del.className="btn danger";
-        del.textContent="×";
-
-        del.onclick=()=>{
-
-            if(!confirm(
-                "Delete project '"+project.name+"'?"
-            )){
-                return;
-            }
-
-            projects.splice(index,1);
-            saveProjects(projects);
-
-            showProjects();
-        };
-
-        item.appendChild(name);
-        item.appendChild(open);
-        item.appendChild(del);
-
-        list.appendChild(item);
+  document.querySelectorAll(".side-btn")
+    .forEach(button=>{
+      button.classList.toggle(
+        "active",
+        button.dataset.page===page
+      );
     });
-
-    openModal("projectsModal");
 }
 
-/* =========================================================
+function openProfile(){
+  showPage("profile");
+  updateProfileUI();
+}
+
+/* ==========================================================
    PROFILE
-========================================================= */
+========================================================== */
+
+function avatarFallback(){
+
+  return "data:image/svg+xml,"+
+    encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="200"
+           height="200">
+        <rect width="200" height="200" fill="#111"/>
+        <circle cx="100" cy="78" r="38" fill="#333"/>
+        <path d="M35 190c7-49 36-69 65-69s58 20 65 69"
+              fill="#333"/>
+        <text x="100" y="30"
+              fill="#777"
+              text-anchor="middle"
+              font-size="13"
+              font-family="Arial">
+          NZX
+        </text>
+      </svg>
+    `);
+}
 
 function updateProfileUI(){
 
-    $("profileNodes").textContent=
-        DB.nodes.length;
+  const avatar=db.profile.avatar||avatarFallback();
 
-    $("profileEdges").textContent=
-        DB.edges.length;
-
-    $("profileZoom").textContent=
-        Math.round(view.zoom*100)+"%";
-
-    updateDeleteButton();
+  $("miniAvatar").src=avatar;
+  $("profileAvatar").src=avatar;
+  $("profileName").textContent=db.profile.name;
+  $("profileUsername").textContent="@"+db.profile.username;
 }
 
-/* =========================================================
-   KEYBOARD
-========================================================= */
+function chooseAvatar(){
+  $("avatarFile").click();
+}
 
-document.addEventListener("keydown",e=>{
+$("avatarFile").addEventListener("change",event=>{
 
-    if(e.key==="Escape"){
+  const file=event.target.files?.[0];
 
-        document
-            .querySelectorAll(".modal-bg.open")
-            .forEach(m=>m.classList.remove("open"));
-    }
+  if(!file)return;
 
-    if(
-        e.key==="Delete" &&
-        selectedNode &&
-        !["INPUT","TEXTAREA","SELECT"].includes(
-            document.activeElement?.tagName
-        )
-    ){
+  const reader=new FileReader();
 
-        removeNode(selectedNode);
-    }
-
-    if(
-        e.key==="Enter" &&
-        $("nodeModal").classList.contains("open")
-    ){
-
-        createNodeFromModal();
-    }
-});
-
-/* =========================================================
-   MODAL OUTSIDE CLICK
-========================================================= */
-
-document.querySelectorAll(".modal-bg")
-.forEach(bg=>{
-
-    bg.addEventListener("pointerdown",e=>{
-
-        if(e.target===bg){
-            bg.classList.remove("open");
-        }
-    });
-});
-
-/* =========================================================
-   AUTOSAVE
-========================================================= */
-
-setInterval(()=>{
+  reader.onload=()=>{
+    db.profile.avatar=reader.result;
     saveDB();
-},15000);
+    updateProfileUI();
+    toast("Avatar updated");
+  };
 
-/* =========================================================
-   INIT
-========================================================= */
+  reader.readAsDataURL(file);
+});
 
-function startIntro(){
+function editProfileName(){
 
-    setTimeout(()=>{
+  const name=prompt(
+    "Enter profile name:",
+    db.profile.name
+  );
 
-        $("bootScreen").style.transition=
-            "opacity .6s ease";
+  if(name===null)return;
 
-        $("bootScreen").style.opacity="0";
+  const cleaned=name.trim();
 
-        setTimeout(()=>{
+  if(!cleaned)return;
 
-            $("bootScreen").style.display="none";
+  db.profile.name=cleaned;
 
-            $("app").classList.add("app-ready");
+  saveDB();
+  updateProfileUI();
 
-        },600);
-
-    },3000);
+  toast("Profile updated");
 }
+
+/* ==========================================================
+   TOOLS
+========================================================== */
+
+const toolConfig={
+
+  phone:{
+    title:"CHECK NUMBER",
+    placeholder:"+374 XX XXX XXX",
+    description:
+      "Проверка номера. Отображаются только основные данные, которые реально вернул backend."
+  },
+
+  address:{
+    title:"CHECK ADDRESS",
+    placeholder:"Yerevan, Armenia",
+    description:
+      "Поиск адреса через карту."
+  },
+
+  geosint:{
+    title:"GEOSINT IMAGE",
+    placeholder:"Optional description...",
+    description:
+      "AI анализирует визуальные признаки изображения и оценивает примерный регион. Результат является предположением, а не подтверждённым адресом."
+  }
+
+};
+
+let currentTool=null;
+let geoSelectedFile=null;
+
+function openTool(type){
+
+  const config=toolConfig[type];
+
+  if(!config)return;
+
+  currentTool=type;
+
+  $("toolTitle").textContent=config.title;
+  $("toolDescription").textContent=config.description;
+  $("toolInput").placeholder=config.placeholder;
+  $("toolInput").value="";
+  $("toolResults").innerHTML="";
+
+  const upload=$("geoUpload");
+
+  if(type==="geosint"){
+    upload.style.display="flex";
+    $("toolRun").textContent="ANALYZE";
+  }else{
+    upload.style.display="none";
+    $("toolRun").textContent="CHECK";
+  }
+
+  $("toolModal").classList.add("open");
+
+  setTimeout(()=>{
+    $("toolInput").focus();
+  },50);
+}
+
+function closeTool(){
+
+  $("toolModal").classList.remove("open");
+
+  currentTool=null;
+}
+
+function outsideToolModal(event){
+
+  if(event.target===$("toolModal"))
+    closeTool();
+}
+
+$("toolInput").addEventListener("keydown",event=>{
+
+  if(event.key==="Enter"){
+    event.preventDefault();
+    runTool();
+  }
+
+});
+
+/* ==========================================================
+   GEOSINT PHOTO
+========================================================== */
+
+function chooseGeoPhoto(){
+  $("geoPhoto").click();
+}
+
+$("geoPhoto").addEventListener("change",event=>{
+
+  const file=event.target.files?.[0];
+
+  if(!file){
+    geoSelectedFile=null;
+    return;
+  }
+
+  if(!file.type.startsWith("image/")){
+    toast("Select an image");
+    return;
+  }
+
+  geoSelectedFile=file;
+
+  $("geoFileName").textContent=file.name;
+
+  const reader=new FileReader();
+
+  reader.onload=()=>{
+    $("geoPreview").src=reader.result;
+    $("geoPreview").style.display="block";
+  };
+
+  reader.readAsDataURL(file);
+});
+
+/* ==========================================================
+   RUN TOOL
+========================================================== */
+
+async function runTool(){
+
+  if(!currentTool)return;
+
+  if(currentTool==="geosint"){
+    await runGeoSINT();
+    return;
+  }
+
+  const value=$("toolInput").value.trim();
+
+  if(!value){
+    toast("Введите значение");
+    return;
+  }
+
+  $("toolRun").disabled=true;
+  $("toolRun").textContent="CHECKING...";
+  $("toolResults").innerHTML="";
+
+  try{
+
+    if(currentTool==="phone"){
+      await checkPhoneReal(value);
+    }
+
+    if(currentTool==="address"){
+      await checkAddressReal(value);
+    }
+
+  }finally{
+
+    $("toolRun").disabled=false;
+    $("toolRun").textContent="CHECK";
+  }
+}
+
+/* ==========================================================
+   RESULT UI
+========================================================== */
+
+function addResult(title,value,status="INFO",icon="•"){
+
+  const box=document.createElement("div");
+
+  let cls="result";
+
+  if(status==="OK")cls+=" good";
+  if(status==="WARNING")cls+=" warn";
+  if(status==="ERROR")cls+=" bad";
+
+  box.className=cls;
+
+  box.innerHTML=`
+    <div class="result-head">
+      <span>${escapeHTML(icon)}</span>
+      <span>${escapeHTML(title)}</span>
+    </div>
+    <div class="result-value">
+      ${escapeHTML(value??"UNKNOWN")}
+    </div>
+  `;
+
+  $("toolResults").appendChild(box);
+}
+
+/* ==========================================================
+   PHONE
+========================================================== */
+
+async function checkPhoneReal(value){
+
+  addResult(
+    "REQUEST",
+    "Проверка номера...",
+    "INFO",
+    "•"
+  );
+
+  try{
+
+    const form=new URLSearchParams();
+
+    form.append("phone",value);
+
+    const response=await fetch(
+      "/api/osint/phone",
+      {
+        method:"POST",
+        headers:{
+          "Accept":"application/json"
+        },
+        body:form
+      }
+    );
+
+    let data=null;
+
+    try{
+      data=await response.json();
+    }catch{
+      data=null;
+    }
+
+    $("toolResults").innerHTML="";
+
+    if(!response.ok){
+
+      addResult(
+        "BACKEND ERROR",
+        data?.error||
+        ("HTTP "+response.status),
+        "ERROR",
+        "!"
+      );
+
+      return;
+    }
+
+    if(!data){
+
+      addResult(
+        "RESPONSE",
+        "Backend не вернул JSON.",
+        "ERROR",
+        "!"
+      );
+
+      return;
+    }
+
+    renderPhoneResult(data);
+
+    createPhoneGraph(data);
+
+    db.searches++;
+
+    saveDB();
+
+  }catch(error){
+
+    $("toolResults").innerHTML="";
+
+    addResult(
+      "CONNECTION",
+      error?.message||
+      "Не удалось связаться с backend.",
+      "ERROR",
+      "!"
+    );
+  }
+}
+
+/*
+  Backend может возвращать разные названия полей.
+  Поэтому ищем только нужные значения.
+*/
+
+function findDeep(obj,keys){
+
+  if(!obj||typeof obj!=="object")
+    return "";
+
+  const wanted=keys.map(
+    x=>String(x).toLowerCase()
+  );
+
+  let result="";
+
+  function walk(value){
+
+    if(result)return;
+
+    if(!value||typeof value!=="object")
+      return;
+
+    for(const [key,val] of Object.entries(value)){
+
+      const normalized=key.toLowerCase();
+
+      if(
+        wanted.includes(normalized) &&
+        val!==null &&
+        val!==undefined &&
+        typeof val!=="object" &&
+        String(val).trim()
+      ){
+        result=String(val).trim();
+        return;
+      }
+
+      walk(val);
+    }
+  }
+
+  walk(obj);
+
+  return result;
+}
+
+function phoneSummary(data,originalPhone){
+
+  const region=findDeep(
+    data,
+    ["region","state","province","area"]
+  );
+
+  const country=findDeep(
+    data,
+    ["country","country_name","countryName"]
+  );
+
+  const timezone=findDeep(
+    data,
+    [
+      "time_code",
+      "timezone",
+      "time_zone",
+      "timeZone",
+      "utc",
+      "utc_offset"
+    ]
+  );
+
+  const number=findDeep(
+    data,
+    [
+      "e164",
+      "international",
+      "international_number",
+      "number",
+      "phone",
+      "phone_number",
+      "formatted"
+    ]
+  )||originalPhone;
+
+  const city=findDeep(
+    data,
+    ["city","town","locality"]
+  );
+
+  const fullName=findDeep(
+    data,
+    [
+      "full_name",
+      "fullName",
+      "owner_name",
+      "person_name"
+    ]
+  );
+
+  return {
+    region:region||"UNKNOWN",
+    country:country||"UNKNOWN",
+    timezone:timezone||"UNKNOWN",
+    number:number||"UNKNOWN",
+    city:city||"UNKNOWN",
+    fullName:fullName||""
+  };
+}
+
+function renderPhoneResult(data){
+
+  const original=
+    data.phone||
+    data.number||
+    data.e164||
+    "";
+
+  const s=phoneSummary(
+    data,
+    original
+  );
+
+  addResult(
+    "NUMBER",
+    s.number,
+    "OK",
+    "☎"
+  );
+
+  addResult(
+    "REGION",
+    s.region,
+    s.region==="UNKNOWN"?"WARNING":"INFO",
+    "⌖"
+  );
+
+  addResult(
+    "COUNTRY",
+    s.country,
+    s.country==="UNKNOWN"?"WARNING":"INFO",
+    "◎"
+  );
+
+  addResult(
+    "TIME CODE",
+    s.timezone,
+    s.timezone==="UNKNOWN"?"WARNING":"INFO",
+    "◷"
+  );
+
+  addResult(
+    "CITY",
+    s.city,
+    s.city==="UNKNOWN"?"WARNING":"INFO",
+    "⌂"
+  );
+
+  if(s.fullName){
+
+    addResult(
+      "FULL NAME",
+      s.fullName,
+      "INFO",
+      "◆"
+    );
+  }
+}
+
+/* ==========================================================
+   PHONE GRAPH
+========================================================== */
+
+function createNode(
+  title,
+  type,
+  content,
+  x,
+  y
+){
+
+  const id=uid();
+
+  db.nodes[id]={
+    id,
+    title,
+    type,
+    content,
+    x,
+    y
+  };
+
+  return id;
+}
+
+function createPhoneGraph(data){
+
+  const phone=
+    data.e164||
+    data.phone||
+    data.number;
+
+  if(!phone)return;
+
+  let phoneNode=Object.values(db.nodes)
+    .find(n=>
+      n.type==="PHONE" &&
+      n.content===String(phone)
+    );
+
+  if(!phoneNode){
+
+    const center=getGraphCenter();
+
+    const id=createNode(
+      "Phone Number",
+      "PHONE",
+      String(phone),
+      center.x,
+      center.y
+    );
+
+    phoneNode=db.nodes[id];
+  }
+
+  const summary=phoneSummary(
+    data,
+    phone
+  );
+
+  const values=[
+    ["Region","REGION",summary.region],
+    ["Country","COUNTRY",summary.country],
+    ["Time Code","TIME CODE",summary.timezone],
+    ["Number","NUMBER",summary.number],
+    ["City","CITY",summary.city],
+    ["Full Name","FULL NAME",summary.fullName]
+  ];
+
+  let index=0;
+
+  for(const item of values){
+
+    const content=item[2];
+
+    if(
+      !content||
+      content==="UNKNOWN"
+    )continue;
+
+    const duplicate=Object.values(db.nodes)
+      .find(n=>
+        n.type===item[1] &&
+        n.content===String(content)
+      );
+
+    let target=duplicate;
+
+    if(!target){
+
+      const angle=
+        index*
+        (Math.PI*2/values.length);
+
+      const radius=
+        240+
+        (index%3)*70;
+
+      const id=createNode(
+        item[0],
+        item[1],
+        String(content),
+        phoneNode.x+
+          Math.cos(angle)*radius,
+        phoneNode.y+
+          Math.sin(angle)*radius
+      );
+
+      target=db.nodes[id];
+    }
+
+    const exists=db.links.some(link=>
+      (link.a===phoneNode.id&&link.b===target.id)||
+      (link.a===target.id&&link.b===phoneNode.id)
+    );
+
+    if(!exists){
+
+      db.links.push({
+        a:phoneNode.id,
+        b:target.id
+      });
+    }
+
+    index++;
+  }
+
+  saveDB();
+  renderNodes();
+  renderLines();
+}
+
+/* ==========================================================
+   ADDRESS
+========================================================== */
+
+async function checkAddressReal(value){
+
+  addResult(
+    "SEARCH",
+    "Ищем адрес...",
+    "INFO",
+    "•"
+  );
+
+  try{
+
+    const response=await fetch(
+      "/api/map/search?q="+
+      encodeURIComponent(value),
+      {
+        headers:{
+          "Accept":"application/json"
+        }
+      }
+    );
+
+    const data=await response.json();
+
+    $("toolResults").innerHTML="";
+
+    if(!response.ok||!data.success){
+
+      addResult(
+        "ADDRESS ERROR",
+        data.error||"Адрес не найден.",
+        "ERROR",
+        "!"
+      );
+
+      return;
+    }
+
+    const results=data.results||[];
+
+    if(!results.length){
+
+      addResult(
+        "RESULT",
+        "Ничего не найдено.",
+        "WARNING",
+        "?"
+      );
+
+      return;
+    }
+
+    results.slice(0,5).forEach((item,index)=>{
+
+      addResult(
+        "RESULT "+(index+1),
+        item.display_name||"UNKNOWN",
+        "OK",
+        "⌖"
+      );
+
+      addResult(
+        "CITY",
+        item.city||"UNKNOWN",
+        "INFO",
+        "⌂"
+      );
+
+      addResult(
+        "COUNTRY",
+        item.country||"UNKNOWN",
+        "INFO",
+        "◎"
+      );
+
+      addResult(
+        "COORDINATES",
+        `${item.lat}, ${item.lon}`,
+        "INFO",
+        "◉"
+      );
+    });
+
+    createAddressGraph(results[0]);
+
+  }catch(error){
+
+    $("toolResults").innerHTML="";
+
+    addResult(
+      "CONNECTION",
+      error?.message||"Ошибка соединения.",
+      "ERROR",
+      "!"
+    );
+  }
+}
+
+function createAddressGraph(data){
+
+  if(!data)return;
+
+  const center=getGraphCenter();
+
+  let addressNode=Object.values(db.nodes)
+    .find(n=>
+      n.type==="ADDRESS" &&
+      n.content===data.display_name
+    );
+
+  if(!addressNode){
+
+    const id=createNode(
+      "Address",
+      "ADDRESS",
+      data.display_name,
+      center.x,
+      center.y
+    );
+
+    addressNode=db.nodes[id];
+  }
+
+  const values=[
+    ["City","CITY",data.city],
+    ["Country","COUNTRY",data.country],
+    ["Coordinates","COORDINATES",
+      `${data.lat}, ${data.lon}`],
+    ["Postcode","POSTCODE",data.postcode]
+  ];
+
+  let index=0;
+
+  values.forEach(item=>{
+
+    if(!item[2]||item[2]==="UNKNOWN")
+      return;
+
+    const angle=
+      index*
+      (Math.PI*2/values.length);
+
+    const id=createNode(
+      item[0],
+      item[1],
+      item[2],
+      addressNode.x+
+        Math.cos(angle)*230,
+      addressNode.y+
+        Math.sin(angle)*230
+    );
+
+    db.links.push({
+      a:addressNode.id,
+      b:id
+    });
+
+    index++;
+  });
+
+  saveDB();
+  renderNodes();
+  renderLines();
+}
+
+/* ==========================================================
+   GEOSINT
+========================================================== */
+
+async function runGeoSINT(){
+
+  if(!geoSelectedFile){
+
+    toast("Сначала прикрепите фото");
+
+    return;
+  }
+
+  $("toolRun").disabled=true;
+  $("toolRun").textContent="ANALYZING...";
+  $("toolResults").innerHTML="";
+
+  addResult(
+    "AI ANALYSIS",
+    "Анализируем визуальные признаки изображения...",
+    "INFO",
+    "◆"
+  );
+
+  try{
+
+    const form=new FormData();
+
+    form.append(
+      "photo",
+      geoSelectedFile
+    );
+
+    /*
+      Специальный промпт отправляется вместе
+      с фотографией.
+
+      AI должен оценивать только видимые признаки:
+      архитектуру, дорожные знаки, ландшафт,
+      язык вывесок, номера дорог, климат и т.д.
+
+      Не запрашиваем личность человека
+      или точный адрес частного объекта.
+    */
+
+    form.append(
+      "prompt",
+      `
+You are the GeoSINT visual analysis module of NZX OSINT TOOL.
+
+Analyze the attached image using ONLY visible evidence.
+
+Return JSON with:
+{
+  "country": "",
+  "city_estimate": "",
+  "region_estimate": "",
+  "environment": "",
+  "visible_clues": [],
+  "confidence": "low|medium|high"
+}
+
+Estimate the BROAD geographic area only.
+Do not identify private people.
+Do not infer a person's identity.
+Do not claim an exact private address.
+If the image does not contain enough evidence, return UNKNOWN.
+
+Use visible clues such as:
+- road signs
+- public landmarks
+- architecture
+- terrain
+- vegetation
+- road markings
+- public language/signage
+- utility infrastructure
+- climate
+- public transport
+- recognizable public places
+
+Never invent clues that are not visible.
+      `.trim()
+    );
+
+    const response=await fetch(
+      "/api/geosint",
+      {
+        method:"POST",
+        body:form
+      }
+    );
+
+    let data=null;
+
+    try{
+      data=await response.json();
+    }catch{
+      data=null;
+    }
+
+    $("toolResults").innerHTML="";
+
+    if(!response.ok){
+
+      addResult(
+        "GEOSINT ERROR",
+        data?.error||
+        ("HTTP "+response.status),
+        "ERROR",
+        "!"
+      );
+
+      return;
+    }
+
+    if(!data){
+
+      addResult(
+        "RESPONSE",
+        "Backend не вернул результат.",
+        "ERROR",
+        "!"
+      );
+
+      return;
+    }
+
+    /*
+      Поддержка как:
+      {
+        country,
+        city_estimate,
+        region_estimate...
+      }
+
+      так и:
+      {
+        result:{...}
+      }
+    */
+
+    const r=data.result||data;
+
+    addResult(
+      "COUNTRY",
+      r.country||"UNKNOWN",
+      r.country&&r.country!=="UNKNOWN"
+        ?"OK":"WARNING",
+      "◎"
+    );
+
+    addResult(
+      "CITY ESTIMATE",
+      r.city_estimate||
+      r.city||
+      "UNKNOWN",
+      r.city_estimate||r.city
+        ?"INFO":"WARNING",
+      "⌂"
+    );
+
+    addResult(
+      "REGION",
+      r.region_estimate||
+      r.region||
+      "UNKNOWN",
+      "INFO",
+      "⌖"
+    );
+
+    addResult(
+      "ENVIRONMENT",
+      r.environment||
+      "UNKNOWN",
+      "INFO",
+      "◌"
+    );
+
+    if(
+      Array.isArray(r.visible_clues) &&
+      r.visible_clues.length
+    ){
+
+      addResult(
+        "VISIBLE CLUES",
+        r.visible_clues.join("\\n"),
+        "INFO",
+        "◆"
+      );
+    }
+
+    addResult(
+      "CONFIDENCE",
+      r.confidence||"low",
+      r.confidence==="high"
+        ?"OK"
+        :r.confidence==="medium"
+          ?"WARNING"
+          :"WARNING",
+      "◈"
+    );
+
+  }catch(error){
+
+    $("toolResults").innerHTML="";
+
+    addResult(
+      "CONNECTION",
+      error?.message||
+      "Не удалось связаться с GeoSINT backend.",
+      "ERROR",
+      "!"
+    );
+
+  }finally{
+
+    $("toolRun").disabled=false;
+    $("toolRun").textContent="ANALYZE";
+  }
+}
+
+/* ==========================================================
+   NODE MODAL
+========================================================== */
+
+let editingNode=null;
+
+function openNodeModal(nodeId=null){
+
+  editingNode=nodeId;
+
+  $("nodeModalTitle").textContent=
+    nodeId?"Edit Node":"New Node";
+
+  if(nodeId){
+
+    const node=db.nodes[nodeId];
+
+    if(!node)return;
+
+    $("nodeTitle").value=node.title||"";
+    $("nodeType").value=node.type||"";
+    $("nodeContent").value=node.content||"";
+
+  }else{
+
+    $("nodeTitle").value="";
+    $("nodeType").value="";
+    $("nodeContent").value="";
+  }
+
+  $("nodeModal").classList.add("open");
+}
+
+function closeNodeModal(){
+
+  $("nodeModal").classList.remove("open");
+
+  editingNode=null;
+}
+
+function saveNode(){
+
+  const title=$("nodeTitle").value.trim();
+
+  const type=$("nodeType")
+    .value
+    .trim()
+    .toUpperCase();
+
+  const content=$("nodeContent")
+    .value
+    .trim();
+
+  if(!title){
+
+    toast("Введите название");
+
+    return;
+  }
+
+  if(editingNode){
+
+    const node=db.nodes[editingNode];
+
+    if(node){
+
+      node.title=title;
+      node.type=type||"UNKNOWN";
+      node.content=content;
+    }
+
+  }else{
+
+    const center=getGraphCenter();
+
+    createNode(
+      title,
+      type||"UNKNOWN",
+      content,
+      center.x+(Math.random()-.5)*260,
+      center.y+(Math.random()-.5)*180
+    );
+  }
+
+  saveDB();
+
+  renderNodes();
+  renderLines();
+
+  closeNodeModal();
+
+  toast("Node saved");
+}
+
+/* ==========================================================
+   GRAPH STATE
+========================================================== */
+
+const graph=$("graph");
+const world=$("world");
+
+let zoom=1;
+let panX=0;
+let panY=0;
+
+let draggingNode=null;
+let dragOffsetX=0;
+let dragOffsetY=0;
+
+let panning=false;
+let panStartX=0;
+let panStartY=0;
+
+let linkSource=null;
+
+function applyWorld(){
+
+  world.style.transform=`
+    translate(
+      calc(-50% + ${panX}px),
+      calc(-50% + ${panY}px)
+    )
+    scale(${zoom})
+  `;
+}
+
+function getGraphCenter(){
+
+  return{
+    x:-panX/zoom,
+    y:-panY/zoom
+  };
+}
+
+/* ==========================================================
+   RENDER NODES
+========================================================== */
+
+function renderNodes(){
+
+  world.querySelectorAll(".node")
+    .forEach(el=>el.remove());
+
+  Object.values(db.nodes).forEach(node=>{
+
+    const el=document.createElement("div");
+
+    el.className="node";
+    el.dataset.id=node.id;
+
+    el.style.left=node.x+"px";
+    el.style.top=node.y+"px";
+
+    el.innerHTML=`
+
+      <button
+        class="node-delete"
+        title="Delete node"
+      >×</button>
+
+      <div class="node-type">
+        ${escapeHTML(node.type||"UNKNOWN")}
+      </div>
+
+      <div class="node-title">
+        ${escapeHTML(node.title)}
+      </div>
+
+      <div class="node-content">
+        ${escapeHTML(node.content)}
+      </div>
+
+      <div
+        class="node-dot"
+        title="Link node"
+      ></div>
+    `;
+
+    world.appendChild(el);
+
+    const deleteBtn=
+      el.querySelector(".node-delete");
+
+    deleteBtn.addEventListener(
+      "pointerdown",
+      event=>{
+        event.stopPropagation();
+      }
+    );
+
+    deleteBtn.addEventListener(
+      "click",
+      event=>{
+        event.stopPropagation();
+        deleteNode(node.id);
+      }
+    );
+
+    const dot=
+      el.querySelector(".node-dot");
+
+    dot.addEventListener(
+      "pointerdown",
+      event=>{
+        event.stopPropagation();
+      }
+    );
+
+    dot.addEventListener(
+      "click",
+      event=>{
+        event.stopPropagation();
+        handleLinkDot(node.id);
+      }
+    );
+
+    el.addEventListener(
+      "dblclick",
+      event=>{
+
+        if(
+          event.target.closest(".node-delete")||
+          event.target.closest(".node-dot")
+        )
+          return;
+
+        openNodeModal(node.id);
+      }
+    );
+
+    el.addEventListener(
+      "pointerdown",
+      event=>{
+
+        if(
+          event.target.closest(".node-delete")||
+          event.target.closest(".node-dot")
+        )
+          return;
+
+        startNodeDrag(
+          event,
+          node
+        );
+      }
+    );
+  });
+}
+
+/* ==========================================================
+   NODE DRAGGING
+========================================================== */
+
+function startNodeDrag(event,node){
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  draggingNode=node;
+
+  node._dragging=true;
+
+  const rect=graph.getBoundingClientRect();
+
+  const graphX=(
+    event.clientX-
+    rect.left-
+    rect.width/2-
+    panX
+  )/zoom;
+
+  const graphY=(
+    event.clientY-
+    rect.top-
+    rect.height/2-
+    panY
+  )/zoom;
+
+  dragOffsetX=node.x-graphX;
+  dragOffsetY=node.y-graphY;
+
+  const el=world.querySelector(
+    `[data-id="${node.id}"]`
+  );
+
+  if(el)
+    el.classList.add("dragging");
+
+  if(event.pointerId!==undefined){
+
+    try{
+      graph.setPointerCapture(
+        event.pointerId
+      );
+    }catch{}
+  }
+
+  window.addEventListener(
+    "pointermove",
+    moveNode,
+    {passive:false}
+  );
+
+  window.addEventListener(
+    "pointerup",
+    stopNodeDrag,
+    {once:true}
+  );
+}
+
+function moveNode(event){
+
+  if(!draggingNode)return;
+
+  event.preventDefault();
+
+  const rect=graph.getBoundingClientRect();
+
+  const graphX=(
+    event.clientX-
+    rect.left-
+    rect.width/2-
+    panX
+  )/zoom;
+
+  const graphY=(
+    event.clientY-
+    rect.top-
+    rect.height/2-
+    panY
+  )/zoom;
+
+  draggingNode.x=
+    graphX+dragOffsetX;
+
+  draggingNode.y=
+    graphY+dragOffsetY;
+
+  const el=world.querySelector(
+    `[data-id="${draggingNode.id}"]`
+  );
+
+  if(el){
+
+    el.style.left=
+      draggingNode.x+"px";
+
+    el.style.top=
+      draggingNode.y+"px";
+  }
+
+  renderLines();
+}
+
+function stopNodeDrag(){
+
+  if(!draggingNode)return;
+
+  const el=world.querySelector(
+    `[data-id="${draggingNode.id}"]`
+  );
+
+  if(el)
+    el.classList.remove("dragging");
+
+  draggingNode._dragging=false;
+
+  draggingNode=null;
+
+  window.removeEventListener(
+    "pointermove",
+    moveNode
+  );
+
+  saveDB();
+
+  renderLines();
+}
+
+/* ==========================================================
+   DELETE NODE
+========================================================== */
+
+function deleteNode(id){
+
+  const node=db.nodes[id];
+
+  if(!node)return;
+
+  if(!confirm(
+    `Delete node "${node.title}"?`
+  ))
+    return;
+
+  delete db.nodes[id];
+
+  db.links=db.links.filter(
+    link=>
+      link.a!==id &&
+      link.b!==id
+  );
+
+  if(linkSource===id)
+    linkSource=null;
+
+  saveDB();
+
+  renderNodes();
+  renderLines();
+
+  toast("Node deleted");
+}
+
+/* ==========================================================
+   LINKING
+========================================================== */
+
+function handleLinkDot(id){
+
+  if(!linkSource){
+
+    linkSource=id;
+
+    highlightNode(id);
+
+    toast("Select another node");
+
+    return;
+  }
+
+  if(linkSource===id){
+
+    linkSource=null;
+    clearHighlights();
+
+    return;
+  }
+
+  const exists=db.links.some(
+    link=>
+      (link.a===linkSource&&link.b===id)||
+      (link.a===id&&link.b===linkSource)
+  );
+
+  if(!exists){
+
+    db.links.push({
+      a:linkSource,
+      b:id
+    });
+
+    saveDB();
+
+    renderLines();
+
+    toast("Nodes linked");
+  }
+
+  linkSource=null;
+
+  clearHighlights();
+}
+
+function highlightNode(id){
+
+  clearHighlights();
+
+  const el=world.querySelector(
+    `[data-id="${id}"]`
+  );
+
+  if(el)
+    el.classList.add("highlight");
+}
+
+function clearHighlights(){
+
+  world.querySelectorAll(
+    ".node.highlight"
+  ).forEach(
+    el=>el.classList.remove("highlight")
+  );
+}
+
+/* ==========================================================
+   BEAUTIFUL ANIMATED LINES
+========================================================== */
+
+function renderLines(){
+
+  const svg=$("lines");
+
+  svg.innerHTML="";
+
+  db.links.forEach(link=>{
+
+    const a=db.nodes[link.a];
+    const b=db.nodes[link.b];
+
+    if(!a||!b)return;
+
+    const dx=b.x-a.x;
+    const dy=b.y-a.y;
+
+    const length=Math.sqrt(
+      dx*dx+dy*dy
+    );
+
+    if(!length)return;
+
+    const nx=-dy/length;
+    const ny=dx/length;
+
+    const bend=Math.min(
+      55,
+      Math.max(
+        20,
+        length*.12
+      )
+    );
+
+    const mx=(a.x+b.x)/2;
+    const my=(a.y+b.y)/2;
+
+    const cx=mx+nx*bend;
+    const cy=my+ny*bend;
+
+    /*
+      Glow under-line
+    */
+
+    const glow=document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path"
+    );
+
+    glow.setAttribute(
+      "d",
+      `M ${a.x} ${a.y}
+       Q ${cx} ${cy}
+       ${b.x} ${b.y}`
+    );
+
+    glow.setAttribute(
+      "fill",
+      "none"
+    );
+
+    glow.setAttribute(
+      "stroke",
+      "rgba(255,255,255,.045)"
+    );
+
+    glow.setAttribute(
+      "stroke-width",
+      "5"
+    );
+
+    svg.appendChild(glow);
+
+    /*
+      Main animated line
+    */
+
+    const path=document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "path"
+    );
+
+    path.setAttribute(
+      "d",
+      `M ${a.x} ${a.y}
+       Q ${cx} ${cy}
+       ${b.x} ${b.y}`
+    );
+
+    path.setAttribute(
+      "fill",
+      "none"
+    );
+
+    path.setAttribute(
+      "stroke",
+      "rgba(255,255,255,.20)"
+    );
+
+    path.setAttribute(
+      "stroke-width",
+      "1.25"
+    );
+
+    path.setAttribute(
+      "stroke-linecap",
+      "round"
+    );
+
+    path.setAttribute(
+      "stroke-dasharray",
+      "3 7"
+    );
+
+    path.style.animation=
+      "dash 4.5s linear infinite";
+
+    svg.appendChild(path);
+
+    /*
+      Tiny moving point
+    */
+
+    const dot=document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "circle"
+    );
+
+    dot.setAttribute(
+      "r",
+      "1.8"
+    );
+
+    dot.setAttribute(
+      "fill",
+      "rgba(255,255,255,.65)"
+    );
+
+    const animate=document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "animateMotion"
+    );
+
+    animate.setAttribute(
+      "dur",
+      `${2.8+Math.random()*2}s`
+    );
+
+    animate.setAttribute(
+      "repeatCount",
+      "indefinite"
+    );
+
+    const motionPath=document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "mpath"
+    );
+
+    const lineId=
+      "line_"+Math.random()
+        .toString(36)
+        .slice(2);
+
+    path.setAttribute(
+      "id",
+      lineId
+    );
+
+    motionPath.setAttribute(
+      "href",
+      "#"+lineId
+    );
+
+    animate.appendChild(
+      motionPath
+    );
+
+    dot.appendChild(
+      animate
+    );
+
+    svg.appendChild(dot);
+  });
+}
+
+/* ==========================================================
+   PAN / ZOOM
+========================================================== */
+
+graph.addEventListener(
+  "pointerdown",
+  event=>{
+
+    if(
+      event.target.closest(".node")
+    )
+      return;
+
+    panning=true;
+
+    panStartX=
+      event.clientX-panX;
+
+    panStartY=
+      event.clientY-panY;
+
+    try{
+      graph.setPointerCapture(
+        event.pointerId
+      );
+    }catch{}
+  }
+);
+
+graph.addEventListener(
+  "pointermove",
+  event=>{
+
+    if(!panning)return;
+
+    event.preventDefault();
+
+    panX=
+      event.clientX-panStartX;
+
+    panY=
+      event.clientY-panStartY;
+
+    applyWorld();
+  },
+  {passive:false}
+);
+
+graph.addEventListener(
+  "pointerup",
+  ()=>{
+    panning=false;
+    saveDB();
+  }
+);
+
+graph.addEventListener(
+  "pointercancel",
+  ()=>{
+    panning=false;
+  }
+);
+
+graph.addEventListener(
+  "wheel",
+  event=>{
+
+    event.preventDefault();
+
+    zoom+=
+      event.deltaY<0
+        ? .08
+        : -.08;
+
+    zoom=Math.max(
+      .35,
+      Math.min(2.5,zoom)
+    );
+
+    applyWorld();
+
+  },
+  {passive:false}
+);
+
+function centerGraph(){
+
+  zoom=1;
+  panX=0;
+  panY=0;
+
+  applyWorld();
+
+  toast("Graph centered");
+}
+
+/* ==========================================================
+   SEARCH
+========================================================== */
+
+$("chainSearch").addEventListener(
+  "input",
+  event=>{
+
+    const query=event.target.value
+      .trim()
+      .toLowerCase();
+
+    world.querySelectorAll(".node")
+      .forEach(el=>{
+
+        const node=db.nodes[
+          el.dataset.id
+        ];
+
+        if(!query){
+
+          el.classList.remove(
+            "highlight"
+          );
+
+          return;
+        }
+
+        const text=(
+          node.title+
+          " "+
+          node.type+
+          " "+
+          node.content
+        ).toLowerCase();
+
+        el.classList.toggle(
+          "highlight",
+          text.includes(query)
+        );
+      });
+  }
+);
+
+/* ==========================================================
+   SATURN PARTICLES
+========================================================== */
+
+const canvas=$("saturn");
+const ctx=canvas.getContext("2d");
+
+let particles=[];
+let rotation=0;
+
+function resizeSaturn(){
+
+  const rect=canvas.getBoundingClientRect();
+
+  const dpr=window.devicePixelRatio||1;
+
+  canvas.width=rect.width*dpr;
+  canvas.height=rect.height*dpr;
+
+  ctx.setTransform(
+    dpr,0,0,dpr,0,0
+  );
+
+  createParticles(
+    rect.width,
+    rect.height
+  );
+}
+
+function createParticles(width,height){
+
+  particles=[];
+
+  const count=1100;
+
+  const radius=Math.min(
+    width,
+    height
+  )*.28;
+
+  for(let i=0;i<count;i++){
+
+    const u=Math.random()*2-1;
+
+    const angle=
+      Math.random()*Math.PI*2;
+
+    const r=Math.sqrt(
+      1-u*u
+    );
+
+    particles.push({
+
+      x:r*Math.cos(angle),
+      y:u,
+      z:r*Math.sin(angle),
+
+      size:.45+
+        Math.random()*1.15,
+
+      alpha:.15+
+        Math.random()*.65
+    });
+  }
+}
+
+function drawSaturn(){
+
+  const width=canvas.clientWidth;
+  const height=canvas.clientHeight;
+
+  ctx.clearRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+  const cx=width/2;
+  const cy=height/2;
+
+  const radius=Math.min(
+    width,
+    height
+  )*.28;
+
+  rotation+=.00065;
+
+  const c=Math.cos(rotation);
+  const s=Math.sin(rotation);
+
+  for(const p of particles){
+
+    const x=
+      p.x*c-
+      p.z*s;
+
+    const z=
+      p.x*s+
+      p.z*c;
+
+    const scale=
+      .55+
+      (z+1)*.23;
+
+    const px=
+      cx+
+      x*radius*scale;
+
+    const py=
+      cy+
+      p.y*radius*scale;
+
+    const alpha=Math.max(
+      .04,
+      p.alpha*
+      (.45+(z+1)*.28)
+    );
+
+    ctx.beginPath();
+
+    ctx.arc(
+      px,
+      py,
+      p.size*scale,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fillStyle=
+      `rgba(255,255,255,${alpha})`;
+
+    ctx.fill();
+  }
+
+  requestAnimationFrame(
+    drawSaturn
+  );
+}
+
+window.addEventListener(
+  "resize",
+  resizeSaturn
+);
+
+/* ==========================================================
+   SATURN RING
+========================================================== */
+
+let ringTime=0;
+
+function animateRing(){
+
+  ringTime+=.016;
+
+  const degrees=
+    (ringTime*.75)%360;
+
+  $("saturnRing").style.transform=`
+    translate(-50%,-50%)
+    rotateX(67deg)
+    rotateZ(${-15+degrees}deg)
+  `;
+
+  requestAnimationFrame(
+    animateRing
+  );
+}
+
+/* ==========================================================
+   INIT
+========================================================== */
 
 function init(){
 
-    loadDB();
+  updateProfileUI();
 
-    renderNodes();
+  applyWorld();
 
-    setupGraphPan();
+  renderNodes();
 
-    setupSearch();
+  renderLines();
 
-    updateProfileUI();
+  resizeSaturn();
 
-    startIntro();
+  drawSaturn();
 
-    /*
-       Начальная небольшая позиция графа.
-    */
-
-    applyView();
+  animateRing();
 }
 
 init();
@@ -3113,4 +3307,4 @@ init();
 </script>
 
 </body>
-  </html>Ю
+    </html>
