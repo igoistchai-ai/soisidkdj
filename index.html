@@ -1,1 +1,3815 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 
+<title>NZX OSINT TOOL</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#030407;
+    --panel:rgba(10,12,18,.76);
+    --panel2:rgba(15,18,27,.88);
+    --border:rgba(255,255,255,.09);
+    --text:#f5f7fb;
+    --muted:#818896;
+    --accent:#8d5cff;
+    --accent2:#5d8cff;
+    --green:#4dff9b;
+    --red:#ff5577;
+    --yellow:#ffc857;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#020307;
+    color:var(--text);
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+button,input{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+#space{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    background:
+        radial-gradient(circle at 50% 50%,rgba(92,70,180,.08),transparent 35%),
+        #020307;
+}
+
+#saturn{
+    position:fixed;
+    width:720px;
+    height:720px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    z-index:0;
+    opacity:.72;
+    filter:blur(.1px);
+}
+
+#saturn canvas{
+    width:100%;
+    height:100%;
+}
+
+.app{
+    position:relative;
+    z-index:2;
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+}
+
+.topbar{
+    height:72px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:0 20px;
+    background:rgba(3,4,8,.68);
+    backdrop-filter:blur(24px);
+    border-bottom:1px solid var(--border);
+}
+
+.logo{
+    min-width:220px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    font-weight:800;
+    letter-spacing:.08em;
+    font-size:14px;
+}
+
+.logoMark{
+    width:35px;
+    height:35px;
+    border-radius:11px;
+    background:
+        linear-gradient(135deg,#a877ff,#4b72ff);
+    box-shadow:
+        0 0 25px rgba(130,88,255,.4);
+    display:grid;
+    place-items:center;
+    font-size:14px;
+}
+
+.search{
+    flex:1;
+    max-width:560px;
+    position:relative;
+}
+
+.search input{
+    width:100%;
+    height:42px;
+    border-radius:13px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.045);
+    outline:none;
+    color:white;
+    padding:0 15px 0 42px;
+    transition:.2s;
+}
+
+.search input:focus{
+    border-color:rgba(141,92,255,.65);
+    box-shadow:0 0 0 4px rgba(141,92,255,.08);
+}
+
+.searchIcon{
+    position:absolute;
+    left:15px;
+    top:12px;
+    color:#777d89;
+}
+
+.topActions{
+    margin-left:auto;
+    display:flex;
+    gap:8px;
+}
+
+.btn{
+    height:40px;
+    border:1px solid var(--border);
+    color:#e8eaf0;
+    background:rgba(255,255,255,.05);
+    border-radius:11px;
+    padding:0 14px;
+    transition:.18s;
+}
+
+.btn:hover{
+    background:rgba(255,255,255,.09);
+    border-color:rgba(255,255,255,.15);
+    transform:translateY(-1px);
+}
+
+.btn.primary{
+    border:0;
+    color:white;
+    background:linear-gradient(135deg,#8655ff,#566dff);
+    box-shadow:0 8px 28px rgba(111,77,255,.25);
+}
+
+.content{
+    flex:1;
+    min-height:0;
+    display:flex;
+}
+
+.sidebar{
+    width:250px;
+    flex-shrink:0;
+    padding:16px;
+    border-right:1px solid var(--border);
+    background:rgba(4,5,9,.62);
+    backdrop-filter:blur(20px);
+}
+
+.navTitle{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.15em;
+    color:#555b68;
+    padding:10px 10px 7px;
+}
+
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.nav button{
+    border:1px solid transparent;
+    background:transparent;
+    color:#969ba7;
+    border-radius:11px;
+    height:43px;
+    padding:0 12px;
+    display:flex;
+    align-items:center;
+    gap:11px;
+    text-align:left;
+}
+
+.nav button:hover{
+    color:white;
+    background:rgba(255,255,255,.045);
+}
+
+.nav button.active{
+    color:white;
+    background:linear-gradient(
+        90deg,
+        rgba(141,92,255,.18),
+        rgba(141,92,255,.04)
+    );
+    border-color:rgba(141,92,255,.17);
+}
+
+.navIcon{
+    width:20px;
+    text-align:center;
+}
+
+.main{
+    flex:1;
+    min-width:0;
+    position:relative;
+    overflow:hidden;
+}
+
+.page{
+    position:absolute;
+    inset:0;
+    overflow:auto;
+    padding:25px;
+    display:none;
+}
+
+.page.active{
+    display:block;
+    animation:pageIn .3s ease;
+}
+
+@keyframes pageIn{
+    from{
+        opacity:0;
+        transform:translateY(8px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+.hero{
+    max-width:1050px;
+    margin:0 auto;
+}
+
+.heroTitle{
+    font-size:42px;
+    font-weight:850;
+    letter-spacing:-.04em;
+    margin-bottom:10px;
+}
+
+.heroTitle span{
+    background:linear-gradient(90deg,#fff,#9873ff);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.heroText{
+    color:#858b98;
+    max-width:650px;
+    line-height:1.6;
+}
+
+.cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-top:26px;
+}
+
+.card{
+    background:rgba(9,11,17,.75);
+    border:1px solid var(--border);
+    border-radius:17px;
+    padding:18px;
+    backdrop-filter:blur(18px);
+    box-shadow:0 15px 50px rgba(0,0,0,.15);
+}
+
+.card:hover{
+    border-color:rgba(141,92,255,.22);
+}
+
+.stat{
+    color:#656b77;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+}
+
+.statValue{
+    margin-top:8px;
+    font-size:27px;
+    font-weight:800;
+}
+
+.section{
+    margin-top:18px;
+    background:rgba(7,9,14,.74);
+    border:1px solid var(--border);
+    border-radius:19px;
+    overflow:hidden;
+}
+
+.sectionHead{
+    padding:17px 19px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.sectionTitle{
+    font-size:14px;
+    font-weight:750;
+}
+
+.sectionBody{
+    padding:19px;
+}
+
+.toolGrid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+}
+
+.tool{
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.025);
+    border-radius:16px;
+    padding:20px;
+    transition:.2s;
+}
+
+.tool:hover{
+    transform:translateY(-2px);
+    border-color:rgba(141,92,255,.28);
+}
+
+.tool h3{
+    font-size:16px;
+    margin-bottom:7px;
+}
+
+.tool p{
+    color:#7d8390;
+    line-height:1.55;
+    font-size:13px;
+}
+
+.tool button{
+    margin-top:16px;
+}
+
+.field{
+    display:flex;
+    gap:9px;
+    margin-bottom:12px;
+}
+
+.field input{
+    flex:1;
+    min-width:0;
+    height:46px;
+    padding:0 14px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    outline:none;
+    color:white;
+    background:rgba(255,255,255,.045);
+}
+
+.field input:focus{
+    border-color:rgba(141,92,255,.55);
+}
+
+.resultList{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.result{
+    min-height:52px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.025);
+    border-radius:12px;
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.resultService{
+    flex:1;
+    font-weight:700;
+}
+
+.status{
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.1em;
+    padding:6px 9px;
+    border-radius:7px;
+}
+
+.status.found{
+    color:var(--green);
+    background:rgba(77,255,155,.08);
+}
+
+.status.not{
+    color:#ff6b88;
+    background:rgba(255,85,119,.08);
+}
+
+.status.unknown{
+    color:var(--yellow);
+    background:rgba(255,200,87,.08);
+}
+
+#graphPage{
+    padding:0;
+    overflow:hidden;
+}
+
+.graph{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    cursor:grab;
+    background:
+        linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);
+    background-size:40px 40px;
+}
+
+.graph:active{
+    cursor:grabbing;
+}
+
+#links{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    overflow:visible;
+}
+
+.link{
+    stroke:rgba(143,102,255,.55);
+    stroke-width:1.5;
+    fill:none;
+    filter:drop-shadow(0 0 5px rgba(141,92,255,.3));
+}
+
+.link.animate{
+    stroke-dasharray:7 9;
+    animation:flow 1.3s linear infinite;
+}
+
+@keyframes flow{
+    to{
+        stroke-dashoffset:-32;
+    }
+}
+
+.node{
+    position:absolute;
+    width:190px;
+    min-height:76px;
+    padding:13px 14px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:15px;
+    background:
+        linear-gradient(
+            135deg,
+            rgba(20,22,32,.94),
+            rgba(8,10,16,.94)
+        );
+    box-shadow:
+        0 18px 50px rgba(0,0,0,.3),
+        inset 0 1px 0 rgba(255,255,255,.035);
+    user-select:none;
+    animation:nodeIn .35s cubic-bezier(.2,.8,.2,1);
+    z-index:3;
+}
+
+@keyframes nodeIn{
+    from{
+        opacity:0;
+        transform:scale(.75) translateY(12px);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
+}
+
+.node.selected{
+    border-color:#986fff;
+    box-shadow:
+        0 0 0 1px rgba(152,111,255,.3),
+        0 0 35px rgba(120,78,255,.18);
+}
+
+.node.blink{
+    animation:
+        nodeBlink .55s ease-in-out 6;
+}
+
+@keyframes nodeBlink{
+    50%{
+        box-shadow:
+            0 0 0 3px rgba(151,105,255,.65),
+            0 0 45px rgba(151,105,255,.7);
+    }
+}
+
+.nodeTitle{
+    font-weight:800;
+    font-size:13px;
+    margin-bottom:5px;
+}
+
+.nodeText{
+    color:#777e8d;
+    font-size:11px;
+    line-height:1.4;
+    max-height:32px;
+    overflow:hidden;
+}
+
+.nodeDot{
+    position:absolute;
+    width:9px;
+    height:9px;
+    right:-5px;
+    top:50%;
+    transform:translateY(-50%);
+    border-radius:50%;
+    background:#9564ff;
+    box-shadow:0 0 12px #9564ff;
+}
+
+.graphTools{
+    position:absolute;
+    left:18px;
+    top:18px;
+    display:flex;
+    gap:8px;
+    z-index:20;
+}
+
+.graphName{
+    position:absolute;
+    left:50%;
+    top:18px;
+    transform:translateX(-50%);
+    z-index:20;
+    padding:9px 15px;
+    border:1px solid var(--border);
+    background:rgba(5,6,10,.75);
+    backdrop-filter:blur(15px);
+    border-radius:11px;
+    color:#aeb4c1;
+    font-size:11px;
+}
+
+.mapBox{
+    height:520px;
+    position:relative;
+    overflow:hidden;
+    border-radius:16px;
+    border:1px solid var(--border);
+    background:#080b10;
+}
+
+#mapFrame{
+    width:100%;
+    height:100%;
+    border:0;
+    background:#080b10;
+}
+
+.mapResults{
+    position:absolute;
+    left:12px;
+    top:12px;
+    width:350px;
+    max-height:420px;
+    overflow:auto;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    z-index:5;
+}
+
+.mapResult{
+    padding:12px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:rgba(5,7,11,.88);
+    backdrop-filter:blur(15px);
+    cursor:pointer;
+}
+
+.mapResult:hover{
+    border-color:rgba(141,92,255,.45);
+}
+
+.mapResult strong{
+    font-size:12px;
+}
+
+.mapResult small{
+    display:block;
+    color:#777e8a;
+    margin-top:4px;
+}
+
+.profile{
+    max-width:760px;
+    margin:auto;
+}
+
+.profileTop{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    margin-bottom:20px;
+}
+
+.avatar{
+    width:80px;
+    height:80px;
+    border-radius:22px;
+    border:1px solid var(--border);
+    object-fit:cover;
+    background:linear-gradient(135deg,#8655ff,#4f6cff);
+}
+
+.profileName{
+    font-size:25px;
+    font-weight:800;
+}
+
+.muted{
+    color:#777e8b;
+    font-size:13px;
+}
+
+.userRow{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:rgba(255,255,255,.025);
+}
+
+.userAvatar{
+    width:38px;
+    height:38px;
+    border-radius:11px;
+    object-fit:cover;
+    background:linear-gradient(135deg,#8055ff,#4c6dff);
+}
+
+.modal{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:rgba(0,0,0,.62);
+    backdrop-filter:blur(12px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.modal.open{
+    display:flex;
+}
+
+.modalBox{
+    width:430px;
+    max-width:100%;
+    border:1px solid var(--border);
+    border-radius:20px;
+    background:#0b0e15;
+    box-shadow:0 30px 100px rgba(0,0,0,.55);
+    padding:22px;
+    animation:modalIn .25s ease;
+}
+
+@keyframes modalIn{
+    from{
+        opacity:0;
+        transform:scale(.94) translateY(12px);
+    }
+}
+
+.modalTitle{
+    font-size:19px;
+    font-weight:800;
+    margin-bottom:17px;
+}
+
+.modalActions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:15px;
+}
+
+.toast{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    z-index:500;
+    padding:13px 16px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:rgba(11,13,19,.92);
+    box-shadow:0 15px 50px rgba(0,0,0,.4);
+    color:#e9ebf1;
+    transform:translateY(20px);
+    opacity:0;
+    pointer-events:none;
+    transition:.25s;
+}
+
+.toast.show{
+    opacity:1;
+    transform:none;
+}
+
+.auth{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:#020307;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.auth.show{
+    display:flex;
+}
+
+.authBox{
+    width:420px;
+    max-width:100%;
+    border:1px solid var(--border);
+    border-radius:22px;
+    background:
+        radial-gradient(
+            circle at 50% 0%,
+            rgba(130,84,255,.12),
+            transparent 45%
+        ),
+        rgba(8,10,16,.95);
+    padding:28px;
+    box-shadow:0 35px 120px rgba(0,0,0,.65);
+}
+
+.authLogo{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.authLogo .logoMark{
+    margin:auto;
+    width:50px;
+    height:50px;
+    font-size:18px;
+}
+
+.authLogo h1{
+    margin-top:14px;
+    font-size:22px;
+}
+
+.authLogo p{
+    margin-top:5px;
+    color:#6e7480;
+    font-size:12px;
+}
+
+.authTabs{
+    display:flex;
+    gap:5px;
+    padding:4px;
+    border-radius:12px;
+    background:rgba(255,255,255,.04);
+    margin-bottom:17px;
+}
+
+.authTabs button{
+    flex:1;
+    border:0;
+    background:transparent;
+    color:#777e89;
+    border-radius:9px;
+    height:37px;
+}
+
+.authTabs button.active{
+    background:rgba(255,255,255,.08);
+    color:white;
+}
+
+.hidden{
+    display:none!important;
+}
+
+.mobileMenu{
+    display:none;
+}
+
+@media(max-width:950px){
+
+    .sidebar{
+        width:210px;
+    }
+
+    .cards{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .toolGrid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:700px){
+
+    .topbar{
+        height:62px;
+        padding:0 12px;
+    }
+
+    .logo{
+        min-width:auto;
+    }
+
+    .logoText{
+        display:none;
+    }
+
+    .search{
+        max-width:none;
+    }
+
+    .topActions .btn:not(.primary){
+        display:none;
+    }
+
+    .sidebar{
+        position:absolute;
+        z-index:50;
+        top:62px;
+        bottom:0;
+        left:0;
+        transform:translateX(-100%);
+        transition:.25s;
+        width:245px;
+    }
+
+    .sidebar.open{
+        transform:none;
+    }
+
+    .mobileMenu{
+        display:block;
+    }
+
+    .page{
+        padding:16px;
+    }
+
+    .heroTitle{
+        font-size:31px;
+    }
+
+    .cards{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .field{
+        flex-direction:column;
+    }
+
+    .mapResults{
+        width:calc(100% - 24px);
+    }
+
+    #saturn{
+        width:500px;
+        height:500px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="space"></canvas>
+
+<div id="saturn">
+    <canvas id="saturnCanvas"></canvas>
+</div>
+
+<div class="app">
+
+<header class="topbar">
+
+    <button
+        class="btn mobileMenu"
+        onclick="toggleSidebar()"
+    >☰</button>
+
+    <div class="logo">
+        <div class="logoMark">NX</div>
+        <div class="logoText">NZX OSINT TOOL</div>
+    </div>
+
+    <div class="search">
+        <span class="searchIcon">⌕</span>
+        <input
+            id="globalSearch"
+            placeholder="Search nodes, chains, users..."
+            oninput="globalSearch()"
+        >
+    </div>
+
+    <div class="topActions">
+        <button class="btn" onclick="openPage('profile')">
+            Profile
+        </button>
+
+        <button
+            class="btn primary"
+            onclick="openAuth()"
+            id="authButton"
+        >
+            Login
+        </button>
+    </div>
+
+</header>
+
+<div class="content">
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="navTitle">Workspace</div>
+
+    <div class="nav">
+
+        <button
+            class="active"
+            data-page="home"
+            onclick="openPage('home')"
+        >
+            <span class="navIcon">⌂</span>
+            Dashboard
+        </button>
+
+        <button
+            data-page="graph"
+            onclick="openPage('graph')"
+        >
+            <span class="navIcon">◈</span>
+            OSINT Graph
+        </button>
+
+        <button
+            data-page="email"
+            onclick="openPage('email')"
+        >
+            <span class="navIcon">@</span>
+            Email Search
+        </button>
+
+        <button
+            data-page="phone"
+            onclick="openPage('phone')"
+        >
+            <span class="navIcon">⌕</span>
+            Phone Check
+        </button>
+
+        <button
+            data-page="map"
+            onclick="openPage('map')"
+        >
+            <span class="navIcon">⌖</span>
+            Map Search
+        </button>
+
+    </div>
+
+    <div class="navTitle">Account</div>
+
+    <div class="nav">
+
+        <button
+            data-page="chains"
+            onclick="openPage('chains')"
+        >
+            <span class="navIcon">☷</span>
+            My Chains
+        </button>
+
+        <button
+            data-page="users"
+            onclick="openPage('users')"
+        >
+            <span class="navIcon">◎</span>
+            Users
+        </button>
+
+        <button
+            data-page="profile"
+            onclick="openPage('profile')"
+        >
+            <span class="navIcon">◉</span>
+            Profile
+        </button>
+
+    </div>
+
+</aside>
+
+<main class="main">
+
+<!-- ======================================================
+     DASHBOARD
+====================================================== -->
+
+<section
+    class="page active"
+    id="homePage"
+>
+
+<div class="hero">
+
+    <div class="heroTitle">
+        Welcome to <span>NZX OSINT TOOL</span>
+    </div>
+
+    <div class="heroText">
+        Интерактивная рабочая среда для построения OSINT-цепочек,
+        анализа открытых данных, поиска адресов и визуализации
+        взаимосвязей.
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <div class="stat">Nodes</div>
+            <div
+                class="statValue"
+                id="statNodes"
+            >0</div>
+        </div>
+
+        <div class="card">
+            <div class="stat">Chains</div>
+            <div
+                class="statValue"
+                id="statChains"
+            >0</div>
+        </div>
+
+        <div class="card">
+            <div class="stat">Searches</div>
+            <div
+                class="statValue"
+                id="statSearches"
+            >0</div>
+        </div>
+
+        <div class="card">
+            <div class="stat">System</div>
+            <div
+                class="statValue"
+                style="color:var(--green)"
+            >ONLINE</div>
+        </div>
+
+    </div>
+
+    <div class="section">
+
+        <div class="sectionHead">
+            <div class="sectionTitle">
+                Quick tools
+            </div>
+        </div>
+
+        <div class="sectionBody">
+
+            <div class="toolGrid">
+
+                <div class="tool">
+                    <h3>◈ OSINT Graph</h3>
+                    <p>
+                        Создавай узлы и связывай их в интерактивную
+                        цепочку с автоматическими линиями.
+                    </p>
+
+                    <button
+                        class="btn primary"
+                        onclick="openPage('graph')"
+                    >
+                        Open Graph
+                    </button>
+                </div>
+
+                <div class="tool">
+                    <h3>@ Email Intelligence</h3>
+                    <p>
+                        Проверка формата, домена и публичных
+                        сигналов, доступных без авторизации.
+                    </p>
+
+                    <button
+                        class="btn primary"
+                        onclick="openPage('email')"
+                    >
+                        Search Email
+                    </button>
+                </div>
+
+                <div class="tool">
+                    <h3>⌖ Address Intelligence</h3>
+                    <p>
+                        Поиск адресов и координат через открытый
+                        картографический источник.
+                    </p>
+
+                    <button
+                        class="btn primary"
+                        onclick="openPage('map')"
+                    >
+                        Open Map
+                    </button>
+                </div>
+
+                <div class="tool">
+                    <h3>⌕ Phone Check</h3>
+                    <p>
+                        Нормализация номера и проверка
+                        базового международного формата.
+                    </p>
+
+                    <button
+                        class="btn primary"
+                        onclick="openPage('phone')"
+                    >
+                        Check Phone
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- ======================================================
+     GRAPH
+====================================================== -->
+
+<section
+    class="page"
+    id="graphPage"
+>
+
+<div
+    class="graph"
+    id="graph"
+>
+
+<svg id="links"></svg>
+
+<div class="graphName">
+    NZX OSINT GRAPH
+</div>
+
+<div class="graphTools">
+
+    <button
+        class="btn primary"
+        onclick="newNode()"
+    >
+        + Node
+    </button>
+
+    <button
+        class="btn"
+        onclick="saveCurrentChain()"
+    >
+        Save
+    </button>
+
+    <button
+        class="btn"
+        onclick="clearGraph()"
+    >
+        Clear
+    </button>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- ======================================================
+     EMAIL
+====================================================== -->
+
+<section
+    class="page"
+    id="emailPage"
+>
+
+<div class="hero">
+
+    <div class="heroTitle">
+        Email <span>Intelligence</span>
+    </div>
+
+    <div class="heroText">
+        Введите email. Система последовательно показывает
+        результаты публичных проверок.
+    </div>
+
+    <div class="section">
+
+        <div class="sectionBody">
+
+            <div class="field">
+
+                <input
+                    id="emailInput"
+                    type="email"
+                    placeholder="example@gmail.com"
+                >
+
+                <button
+                    class="btn primary"
+                    onclick="emailSearch()"
+                >
+                    Start Search
+                </button>
+
+            </div>
+
+            <div
+                id="emailResults"
+                class="resultList"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- ======================================================
+     PHONE
+====================================================== -->
+
+<section
+    class="page"
+    id="phonePage"
+>
+
+<div class="hero">
+
+    <div class="heroTitle">
+        Phone <span>Check</span>
+    </div>
+
+    <div class="heroText">
+        Проверка базовой структуры международного номера.
+        Формат OK не означает, что номер активен.
+    </div>
+
+    <div class="section">
+
+        <div class="sectionBody">
+
+            <div class="field">
+
+                <input
+                    id="phoneInput"
+                    placeholder="+374 99 123456"
+                >
+
+                <button
+                    class="btn primary"
+                    onclick="phoneSearch()"
+                >
+                    Check
+                </button>
+
+            </div>
+
+            <div
+                id="phoneResult"
+                class="resultList"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- ======================================================
+     MAP
+====================================================== -->
+
+<section
+    class="page"
+    id="mapPage"
+>
+
+<div class="hero">
+
+    <div class="heroTitle">
+        Address <span>Search</span>
+    </div>
+
+    <div class="heroText">
+        Поиск адреса и координат. Можно вводить улицу,
+        город, здание или приблизительное описание.
+    </div>
+
+    <div class="section">
+
+        <div class="sectionBody">
+
+            <div class="field">
+
+                <input
+                    id="mapInput"
+                    placeholder="Yerevan, Republic Square"
+                    onkeydown="if(event.key==='Enter') mapSearch()"
+                >
+
+                <button
+                    class="btn primary"
+                    onclick="mapSearch()"
+                >
+                    Search
+                </button>
+
+            </div>
+
+            <div class="mapBox">
+
+                <iframe
+                    id="mapFrame"
+                    src="about:blank"
+                ></iframe>
+
+                <div
+                    id="mapResults"
+                    class="mapResults"
+                ></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- ======================================================
+     CHAINS
+====================================================== -->
+
+<section
+    class="page"
+    id="chainsPage"
+>
+
+<div class="hero">
+
+    <div class="heroTitle">
+        My <span>Chains</span>
+    </div>
+
+    <div class="heroText">
+        Сохранённые OSINT-цепочки.
+    </div>
+
+    <div
+        class="section"
+        style="margin-top:25px"
+    >
+
+        <div
+            class="sectionBody"
+            id="chainsList"
+        >
+            Loading...
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- ======================================================
+     USERS
+====================================================== -->
+
+<section
+    class="page"
+    id="usersPage"
+>
+
+<div class="hero">
+
+    <div class="heroTitle">
+        Search <span>Users</span>
+    </div>
+
+    <div class="heroText">
+        Поиск пользователей зарегистрированных в NZX.
+    </div>
+
+    <div class="section">
+
+        <div class="sectionBody">
+
+            <div class="field">
+
+                <input
+                    id="userSearchInput"
+                    placeholder="username"
+                    oninput="searchUsers()"
+                >
+
+            </div>
+
+            <div
+                class="resultList"
+                id="usersResults"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+
+<!-- ======================================================
+     PROFILE
+====================================================== -->
+
+<section
+    class="page"
+    id="profilePage"
+>
+
+<div class="profile">
+
+    <div class="heroTitle">
+        My <span>Profile</span>
+    </div>
+
+    <div class="section">
+
+        <div class="sectionBody">
+
+            <div class="profileTop">
+
+                <img
+                    class="avatar"
+                    id="profileAvatar"
+                    src=""
+                    onerror="this.style.display='none'"
+                >
+
+                <div>
+                    <div
+                        class="profileName"
+                        id="profileName"
+                    >
+                        Guest
+                    </div>
+
+                    <div
+                        class="muted"
+                        id="profileEmail"
+                    >
+                        Not logged in
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="field">
+
+                <input
+                    id="profileUsername"
+                    placeholder="Username"
+                >
+
+            </div>
+
+            <div class="field">
+
+                <input
+                    id="profileAvatarInput"
+                    placeholder="Avatar URL"
+                >
+
+            </div>
+
+            <button
+                class="btn primary"
+                onclick="saveProfile()"
+            >
+                Save Profile
+            </button>
+
+            <button
+                class="btn"
+                onclick="logout()"
+                style="margin-left:6px"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+</div>
+
+
+<!-- ======================================================
+     AUTH
+====================================================== -->
+
+<div
+    class="auth"
+    id="auth"
+>
+
+<div class="authBox">
+
+    <div class="authLogo">
+
+        <div class="logoMark">
+            NX
+        </div>
+
+        <h1>NZX OSINT TOOL</h1>
+
+        <p>
+            Secure workspace
+        </p>
+
+    </div>
+
+    <div class="authTabs">
+
+        <button
+            id="loginTab"
+            class="active"
+            onclick="switchAuth('login')"
+        >
+            Login
+        </button>
+
+        <button
+            id="registerTab"
+            onclick="switchAuth('register')"
+        >
+            Register
+        </button>
+
+    </div>
+
+
+    <div id="loginForm">
+
+        <div class="field">
+            <input
+                id="loginValue"
+                placeholder="Username or email"
+            >
+        </div>
+
+        <div class="field">
+            <input
+                id="loginPassword"
+                type="password"
+                placeholder="Password"
+            >
+        </div>
+
+        <button
+            class="btn primary"
+            style="width:100%"
+            onclick="login()"
+        >
+            Enter
+        </button>
+
+    </div>
+
+
+    <div
+        id="registerForm"
+        class="hidden"
+    >
+
+        <div class="field">
+            <input
+                id="registerUsername"
+                placeholder="Username"
+            >
+        </div>
+
+        <div class="field">
+            <input
+                id="registerEmail"
+                type="email"
+                placeholder="Email"
+            >
+        </div>
+
+        <div class="field">
+            <input
+                id="registerPassword"
+                type="password"
+                placeholder="Password"
+            >
+        </div>
+
+        <button
+            class="btn primary"
+            style="width:100%"
+            onclick="register()"
+        >
+            Create Account
+        </button>
+
+    </div>
+
+    <button
+        class="btn"
+        style="width:100%;margin-top:9px"
+        onclick="closeAuth()"
+    >
+        Close
+    </button>
+
+</div>
+
+</div>
+
+
+<!-- ======================================================
+     NODE MODAL
+====================================================== -->
+
+<div
+    class="modal"
+    id="nodeModal"
+>
+
+<div class="modalBox">
+
+    <div class="modalTitle">
+        Create Node
+    </div>
+
+    <div class="field">
+        <input
+            id="nodeTitle"
+            placeholder="Node name"
+        >
+    </div>
+
+    <div class="field">
+        <input
+            id="nodeContent"
+            placeholder="Description / data"
+        >
+    </div>
+
+    <div class="modalActions">
+
+        <button
+            class="btn"
+            onclick="closeNodeModal()"
+        >
+            Cancel
+        </button>
+
+        <button
+            class="btn primary"
+            onclick="createNode()"
+        >
+            Create
+        </button>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+<script>
+
+/* ==========================================================
+   GLOBAL
+========================================================== */
+
+const $ = id => document.getElementById(id);
+
+let currentUser = null;
+
+let searches = 0;
+
+let graphNodes = [];
+let graphLinks = [];
+
+let graphOffsetX = 0;
+let graphOffsetY = 0;
+
+let graphScale = 1;
+
+let draggingNode = null;
+let dragDX = 0;
+let dragDY = 0;
+
+let panning = false;
+let panStartX = 0;
+let panStartY = 0;
+
+let currentChainName = "Untitled Chain";
+
+let editingNode = null;
+
+
+/* ==========================================================
+   TOAST
+========================================================== */
+
+let toastTimer;
+
+function toast(message){
+
+    const el = $("toast");
+
+    el.textContent = message;
+    el.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(()=>{
+        el.classList.remove("show");
+    },2600);
+}
+
+
+/* ==========================================================
+   NAVIGATION
+========================================================== */
+
+function openPage(name){
+
+    document.querySelectorAll(".page")
+        .forEach(x=>x.classList.remove("active"));
+
+    document.querySelectorAll(".nav button")
+        .forEach(x=>x.classList.remove("active"));
+
+    const page = $(name + "Page");
+
+    if(page){
+        page.classList.add("active");
+    }
+
+    const button = document.querySelector(
+        `.nav button[data-page="${name}"]`
+    );
+
+    if(button){
+        button.classList.add("active");
+    }
+
+    $("sidebar").classList.remove("open");
+
+    if(name === "chains"){
+        loadChains();
+    }
+
+    if(name === "profile"){
+        renderProfile();
+    }
+}
+
+function toggleSidebar(){
+    $("sidebar").classList.toggle("open");
+}
+
+
+/* ==========================================================
+   AUTH UI
+========================================================== */
+
+function openAuth(){
+
+    if(currentUser){
+        openPage("profile");
+        return;
+    }
+
+    $("auth").classList.add("show");
+}
+
+function closeAuth(){
+    $("auth").classList.remove("show");
+}
+
+function switchAuth(type){
+
+    if(type === "login"){
+
+        $("loginForm").classList.remove("hidden");
+        $("registerForm").classList.add("hidden");
+
+        $("loginTab").classList.add("active");
+        $("registerTab").classList.remove("active");
+
+    }else{
+
+        $("loginForm").classList.add("hidden");
+        $("registerForm").classList.remove("hidden");
+
+        $("loginTab").classList.remove("active");
+        $("registerTab").classList.add("active");
+    }
+}
+
+
+/* ==========================================================
+   LOGIN
+========================================================== */
+
+async function login(){
+
+    const loginValue = $("loginValue").value.trim();
+    const password = $("loginPassword").value;
+
+    if(!loginValue || !password){
+        toast("Заполни поля");
+        return;
+    }
+
+    try{
+
+        const r = await fetch("/api/login",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                login:loginValue,
+                password
+            })
+        });
+
+        const data = await r.json();
+
+        if(!data.ok){
+            toast(data.error || "Ошибка");
+            return;
+        }
+
+        currentUser = data.user;
+
+        closeAuth();
+
+        updateAuthButton();
+
+        renderProfile();
+
+        toast("Добро пожаловать, " + currentUser.username);
+
+    }catch(e){
+
+        toast("Ошибка подключения");
+    }
+}
+
+
+/* ==========================================================
+   REGISTER
+========================================================== */
+
+async function register(){
+
+    const username = $("registerUsername").value.trim();
+    const email = $("registerEmail").value.trim();
+    const password = $("registerPassword").value;
+
+    if(!username || !email || !password){
+        toast("Заполни все поля");
+        return;
+    }
+
+    try{
+
+        const r = await fetch("/api/register",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                username,
+                email,
+                password
+            })
+        });
+
+        const data = await r.json();
+
+        if(!data.ok){
+            toast(data.error || "Ошибка");
+            return;
+        }
+
+        currentUser = data.user;
+
+        closeAuth();
+
+        updateAuthButton();
+
+        renderProfile();
+
+        toast("Аккаунт создан");
+
+    }catch(e){
+
+        toast("Ошибка подключения");
+    }
+}
+
+
+/* ==========================================================
+   LOGOUT
+========================================================== */
+
+async function logout(){
+
+    await fetch("/api/logout",{
+        method:"POST"
+    });
+
+    currentUser = null;
+
+    updateAuthButton();
+
+    renderProfile();
+
+    toast("Вы вышли из аккаунта");
+}
+
+function updateAuthButton(){
+
+    $("authButton").textContent =
+        currentUser
+        ? currentUser.username
+        : "Login";
+}
+
+
+/* ==========================================================
+   CURRENT USER
+========================================================== */
+
+async function loadMe(){
+
+    try{
+
+        const r = await fetch("/api/me");
+
+        const data = await r.json();
+
+        if(data.logged){
+
+            currentUser = data.user;
+
+        }else{
+
+            currentUser = null;
+        }
+
+        updateAuthButton();
+        renderProfile();
+
+    }catch(e){}
+}
+
+
+/* ==========================================================
+   PROFILE
+========================================================== */
+
+function renderProfile(){
+
+    if(!currentUser){
+
+        $("profileName").textContent = "Guest";
+        $("profileEmail").textContent = "Not logged in";
+
+        $("profileUsername").value = "";
+        $("profileAvatarInput").value = "";
+
+        $("profileAvatar").style.display = "none";
+
+        return;
+    }
+
+    $("profileName").textContent =
+        "@" + currentUser.username;
+
+    $("profileEmail").textContent =
+        currentUser.email;
+
+    $("profileUsername").value =
+        currentUser.username;
+
+    $("profileAvatarInput").value =
+        currentUser.avatar || "";
+
+    if(currentUser.avatar){
+
+        $("profileAvatar").src =
+            currentUser.avatar;
+
+        $("profileAvatar").style.display =
+            "block";
+
+    }else{
+
+        $("profileAvatar").style.display =
+            "none";
+    }
+}
+
+
+async function saveProfile(){
+
+    if(!currentUser){
+        openAuth();
+        return;
+    }
+
+    const username =
+        $("profileUsername").value.trim();
+
+    const avatar =
+        $("profileAvatarInput").value.trim();
+
+    const r = await fetch("/api/profile",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            username,
+            avatar
+        })
+    });
+
+    const data = await r.json();
+
+    if(!data.ok){
+
+        toast(data.error || "Ошибка");
+        return;
+    }
+
+    currentUser.username = data.username;
+    currentUser.avatar = data.avatar;
+
+    updateAuthButton();
+    renderProfile();
+
+    toast("Профиль сохранён");
+}
+
+
+/* ==========================================================
+   EMAIL OSINT
+========================================================== */
+
+async function emailSearch(){
+
+    const email =
+        $("emailInput").value.trim();
+
+    if(!email){
+        toast("Введите email");
+        return;
+    }
+
+    const box =
+        $("emailResults");
+
+    box.innerHTML = "";
+
+    searches++;
+    updateStats();
+
+    addResult(
+        box,
+        "INITIALIZING",
+        "UNKNOWN"
+    );
+
+    try{
+
+        const r = await fetch(
+            "/api/osint/email",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({email})
+            }
+        );
+
+        const data = await r.json();
+
+        box.innerHTML = "";
+
+        if(!data.ok){
+
+            addResult(
+                box,
+                "SYSTEM",
+                "UNKNOWN"
+            );
+
+            return;
+        }
+
+        for(const result of data.results){
+
+            await sleep(350);
+
+            addResult(
+                box,
+                result.service,
+                result.status,
+                result.url
+            );
+        }
+
+        toast("Email scan finished");
+
+    }catch(e){
+
+        addResult(
+            box,
+            "NETWORK",
+            "UNKNOWN"
+        );
+    }
+}
+
+
+function addResult(box,service,status,url){
+
+    const row =
+        document.createElement("div");
+
+    row.className = "result";
+
+    let cls = "unknown";
+
+    if(status === "FOUND"){
+        cls = "found";
+    }
+
+    if(status === "NOT FOUND"){
+        cls = "not";
+    }
+
+    row.innerHTML = `
+        <div class="resultService">
+            ${escapeHtml(service)}
+        </div>
+        <div class="status ${cls}">
+            ${escapeHtml(status)}
+        </div>
+    `;
+
+    if(url){
+
+        row.style.cursor = "pointer";
+
+        row.onclick = ()=>{
+            window.open(
+                url,
+                "_blank",
+                "noopener,noreferrer"
+            );
+        };
+    }
+
+    box.appendChild(row);
+}
+
+
+/* ==========================================================
+   PHONE
+========================================================== */
+
+async function phoneSearch(){
+
+    const phone =
+        $("phoneInput").value.trim();
+
+    if(!phone){
+        toast("Введите номер");
+        return;
+    }
+
+    searches++;
+    updateStats();
+
+    const box =
+        $("phoneResult");
+
+    box.innerHTML =
+        `<div class="result">
+            <div class="resultService">
+                Checking...
+            </div>
+        </div>`;
+
+    try{
+
+        const r = await fetch(
+            "/api/osint/phone",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({phone})
+            }
+        );
+
+        const data = await r.json();
+
+        box.innerHTML = "";
+
+        addResult(
+            box,
+            "PHONE FORMAT",
+            data.valid
+                ? "FOUND"
+                : "NOT FOUND"
+        );
+
+        const normalized =
+            document.createElement("div");
+
+        normalized.className = "result";
+
+        normalized.innerHTML = `
+            <div class="resultService">
+                Normalized
+            </div>
+            <div>
+                ${escapeHtml(
+                    data.normalized || phone
+                )}
+            </div>
+        `;
+
+        box.appendChild(normalized);
+
+        const note =
+            document.createElement("div");
+
+        note.className = "result";
+
+        note.innerHTML = `
+            <div class="resultService">
+                Note
+            </div>
+            <div class="muted">
+                ${escapeHtml(data.message || "")}
+            </div>
+        `;
+
+        box.appendChild(note);
+
+    }catch(e){
+
+        box.innerHTML = "";
+
+        addResult(
+            box,
+            "NETWORK",
+            "UNKNOWN"
+        );
+    }
+}
+
+
+/* ==========================================================
+   MAP
+========================================================== */
+
+async function mapSearch(){
+
+    const q =
+        $("mapInput").value.trim();
+
+    if(!q){
+        toast("Введите адрес");
+        return;
+    }
+
+    searches++;
+    updateStats();
+
+    const results =
+        $("mapResults");
+
+    results.innerHTML = `
+        <div class="mapResult">
+            <strong>Searching...</strong>
+        </div>
+    `;
+
+    try{
+
+        const r = await fetch(
+            "/api/map/search?q=" +
+            encodeURIComponent(q)
+        );
+
+        const data = await r.json();
+
+        results.innerHTML = "";
+
+        if(!data.ok || !data.results.length){
+
+            results.innerHTML = `
+                <div class="mapResult">
+                    <strong>No results</strong>
+                    <small>
+                        Попробуй более точный запрос.
+                    </small>
+                </div>
+            `;
+
+            return;
+        }
+
+        data.results.forEach((item,index)=>{
+
+            const el =
+                document.createElement("div");
+
+            el.className = "mapResult";
+
+            el.innerHTML = `
+                <strong>
+                    ${escapeHtml(item.display_name)}
+                </strong>
+                <small>
+                    ${item.lat.toFixed(6)},
+                    ${item.lon.toFixed(6)}
+                </small>
+            `;
+
+            el.onclick = ()=>{
+                showMap(item.lat,item.lon);
+            };
+
+            results.appendChild(el);
+
+            if(index === 0){
+
+                showMap(
+                    item.lat,
+                    item.lon
+                );
+            }
+        });
+
+    }catch(e){
+
+        results.innerHTML = `
+            <div class="mapResult">
+                <strong>Map error</strong>
+            </div>
+        `;
+    }
+}
+
+
+function showMap(lat,lon){
+
+    /*
+       OpenStreetMap embed.
+       No API key is required.
+    */
+
+    const delta = .01;
+
+    const bbox = [
+        lon-delta,
+        lat-delta,
+        lon+delta,
+        lat+delta
+    ].join(",");
+
+    $("mapFrame").src =
+        "https://www.openstreetmap.org/export/embed.html?" +
+        "bbox=" + encodeURIComponent(bbox) +
+        "&layer=mapnik" +
+        "&marker=" +
+        encodeURIComponent(lat + "," + lon);
+}
+
+
+/* ==========================================================
+   USERS
+========================================================== */
+
+let userSearchTimer;
+
+function searchUsers(){
+
+    clearTimeout(userSearchTimer);
+
+    userSearchTimer =
+        setTimeout(async()=>{
+
+            const q =
+                $("userSearchInput").value.trim();
+
+            const box =
+                $("usersResults");
+
+            if(q.length < 2){
+
+                box.innerHTML = "";
+
+                return;
+            }
+
+            try{
+
+                const r = await fetch(
+                    "/api/users/search?q=" +
+                    encodeURIComponent(q)
+                );
+
+                const data = await r.json();
+
+                box.innerHTML = "";
+
+                data.users.forEach(user=>{
+
+                    const row =
+                        document.createElement("div");
+
+                    row.className =
+                        "userRow";
+
+                    row.innerHTML = `
+
+                        ${
+                            user.avatar
+                            ? `<img class="userAvatar"
+                                    src="${escapeAttr(user.avatar)}">`
+                            : `<div class="userAvatar"></div>`
+                        }
+
+                        <div>
+                            <strong>
+                                @${escapeHtml(user.username)}
+                            </strong>
+
+                            <div class="muted">
+                                NZX user
+                            </div>
+                        </div>
+                    `;
+
+                    box.appendChild(row);
+                });
+
+            }catch(e){}
+
+        },250);
+}
+
+
+/* ==========================================================
+   GRAPH
+========================================================== */
+
+function loadGraph(){
+
+    const saved =
+        localStorage.getItem(
+            "nzx-osint-graph"
+        );
+
+    if(!saved){
+
+        graphNodes = [];
+
+        graphLinks = [];
+
+        return;
+    }
+
+    try{
+
+        const data =
+            JSON.parse(saved);
+
+        graphNodes =
+            data.nodes || [];
+
+        graphLinks =
+            data.links || [];
+
+    }catch(e){
+
+        graphNodes = [];
+        graphLinks = [];
+    }
+
+    renderGraph();
+}
+
+
+function saveGraphLocal(){
+
+    localStorage.setItem(
+        "nzx-osint-graph",
+        JSON.stringify({
+            nodes:graphNodes,
+            links:graphLinks
+        })
+    );
+
+    updateStats();
+}
+
+
+function newNode(){
+
+    editingNode = null;
+
+    $("nodeTitle").value = "";
+    $("nodeContent").value = "";
+
+    $("nodeModal")
+        .classList
+        .add("open");
+
+    setTimeout(()=>{
+        $("nodeTitle").focus();
+    },100);
+}
+
+
+function closeNodeModal(){
+
+    $("nodeModal")
+        .classList
+        .remove("open");
+}
+
+
+function createNode(){
+
+    const title =
+        $("nodeTitle").value.trim();
+
+    const content =
+        $("nodeContent").value.trim();
+
+    if(!title){
+
+        toast("Введите название");
+
+        return;
+    }
+
+    const graph =
+        $("graph").getBoundingClientRect();
+
+    const centerX =
+        graph.width / 2;
+
+    const centerY =
+        graph.height / 2;
+
+    const node = {
+
+        id:
+            crypto.randomUUID
+            ? crypto.randomUUID()
+            : Date.now().toString(),
+
+        title,
+
+        content,
+
+        x:
+            centerX -
+            95 -
+            graphOffsetX,
+
+        y:
+            centerY -
+            38 -
+            graphOffsetY
+    };
+
+    graphNodes.push(node);
+
+    closeNodeModal();
+
+    saveGraphLocal();
+
+    renderGraph();
+
+    autoConnect();
+
+    toast("Node created");
+}
+
+
+function renderGraph(){
+
+    const graph =
+        $("graph");
+
+    graph
+        .querySelectorAll(".node")
+        .forEach(x=>x.remove());
+
+    graphNodes.forEach(node=>{
+
+        const el =
+            document.createElement("div");
+
+        el.className = "node";
+
+        el.dataset.id =
+            node.id;
+
+        el.style.left =
+            node.x + "px";
+
+        el.style.top =
+            node.y + "px";
+
+        el.innerHTML = `
+
+            <div class="nodeTitle">
+                ${escapeHtml(node.title)}
+            </div>
+
+            <div class="nodeText">
+                ${escapeHtml(node.content || "")}
+            </div>
+
+            <div class="nodeDot"></div>
+        `;
+
+        el.addEventListener(
+            "mousedown",
+            e=>{
+                if(e.target.classList.contains("nodeDot")){
+                    return;
+                }
+
+                startNodeDrag(
+                    e,
+                    node,
+                    el
+                );
+            }
+        );
+
+        el.addEventListener(
+            "dblclick",
+            ()=>{
+                editNode(node);
+            }
+        );
+
+        graph.appendChild(el);
+    });
+
+    renderLinks();
+
+    updateStats();
+}
+
+
+function editNode(node){
+
+    const title =
+        prompt(
+            "Node name:",
+            node.title
+        );
+
+    if(title === null){
+        return;
+    }
+
+    const content =
+        prompt(
+            "Node content:",
+            node.content || ""
+        );
+
+    if(content === null){
+        return;
+    }
+
+    node.title = title;
+    node.content = content;
+
+    saveGraphLocal();
+
+    renderGraph();
+}
+
+
+function startNodeDrag(e,node,el){
+
+    e.preventDefault();
+
+    draggingNode = node;
+
+    const rect =
+        $("graph").getBoundingClientRect();
+
+    dragDX =
+        e.clientX -
+        rect.left -
+        node.x;
+
+    dragDY =
+        e.clientY -
+        rect.top -
+        node.y;
+
+    el.classList.add("selected");
+
+    document.addEventListener(
+        "mousemove",
+        moveNode
+    );
+
+    document.addEventListener(
+        "mouseup",
+        stopNodeDrag
+    );
+}
+
+
+function moveNode(e){
+
+    if(!draggingNode){
+        return;
+    }
+
+    const rect =
+        $("graph").getBoundingClientRect();
+
+    draggingNode.x =
+        e.clientX -
+        rect.left -
+        dragDX;
+
+    draggingNode.y =
+        e.clientY -
+        rect.top -
+        dragDY;
+
+    const el =
+        document.querySelector(
+            `.node[data-id="${draggingNode.id}"]`
+        );
+
+    if(el){
+
+        el.style.left =
+            draggingNode.x + "px";
+
+        el.style.top =
+            draggingNode.y + "px";
+    }
+
+    renderLinks();
+
+    autoConnect();
+}
+
+
+function stopNodeDrag(){
+
+    if(!draggingNode){
+        return;
+    }
+
+    draggingNode = null;
+
+    document
+        .querySelectorAll(".node")
+        .forEach(x=>
+            x.classList.remove("selected")
+        );
+
+    document.removeEventListener(
+        "mousemove",
+        moveNode
+    );
+
+    document.removeEventListener(
+        "mouseup",
+        stopNodeDrag
+    );
+
+    saveGraphLocal();
+}
+
+
+function autoConnect(){
+
+    const threshold = 250;
+
+    for(let i=0;i<graphNodes.length;i++){
+
+        for(let j=i+1;j<graphNodes.length;j++){
+
+            const a =
+                graphNodes[i];
+
+            const b =
+                graphNodes[j];
+
+            const dx =
+                a.x - b.x;
+
+            const dy =
+                a.y - b.y;
+
+            const distance =
+                Math.sqrt(
+                    dx*dx + dy*dy
+                );
+
+            const exists =
+                graphLinks.some(
+                    l=>
+                        (
+                            l.a===a.id &&
+                            l.b===b.id
+                        ) ||
+                        (
+                            l.a===b.id &&
+                            l.b===a.id
+                        )
+                );
+
+            if(
+                distance < threshold &&
+                !exists
+            ){
+
+                graphLinks.push({
+                    a:a.id,
+                    b:b.id,
+                    animated:true
+                });
+
+                renderLinks();
+            }
+        }
+    }
+
+    saveGraphLocal();
+}
+
+
+function renderLinks(){
+
+    const svg =
+        $("links");
+
+    svg.innerHTML = "";
+
+    graphLinks.forEach(link=>{
+
+        const a =
+            graphNodes.find(
+                n=>n.id===link.a
+            );
+
+        const b =
+            graphNodes.find(
+                n=>n.id===link.b
+            );
+
+        if(!a || !b){
+            return;
+        }
+
+        const line =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "line"
+            );
+
+        line.setAttribute(
+            "x1",
+            a.x + 95
+        );
+
+        line.setAttribute(
+            "y1",
+            a.y + 38
+        );
+
+        line.setAttribute(
+            "x2",
+            b.x + 95
+        );
+
+        line.setAttribute(
+            "y2",
+            b.y + 38
+        );
+
+        line.classList.add("link");
+
+        if(link.animated){
+            line.classList.add("animate");
+        }
+
+        svg.appendChild(line);
+    });
+}
+
+
+/* ==========================================================
+   GRAPH PAN / ZOOM
+========================================================== */
+
+$("graph").addEventListener(
+    "mousedown",
+    e=>{
+
+        if(
+            e.target.closest(".node") ||
+            e.target.closest(".graphTools")
+        ){
+            return;
+        }
+
+        panning = true;
+
+        panStartX =
+            e.clientX -
+            graphOffsetX;
+
+        panStartY =
+            e.clientY -
+            graphOffsetY;
+    }
+);
+
+window.addEventListener(
+    "mousemove",
+    e=>{
+
+        if(!panning){
+            return;
+        }
+
+        graphOffsetX =
+            e.clientX -
+            panStartX;
+
+        graphOffsetY =
+            e.clientY -
+            panStartY;
+
+        $("graph").style.transform =
+            `translate(${graphOffsetX}px,${graphOffsetY}px)`;
+    }
+);
+
+window.addEventListener(
+    "mouseup",
+    ()=>{
+
+        if(panning){
+
+            panning = false;
+        }
+    }
+);
+
+
+/* ==========================================================
+   CLEAR GRAPH
+========================================================== */
+
+function clearGraph(){
+
+    if(
+        !confirm(
+            "Удалить все узлы?"
+        )
+    ){
+        return;
+    }
+
+    graphNodes = [];
+    graphLinks = [];
+
+    saveGraphLocal();
+
+    renderGraph();
+}
+
+
+/* ==========================================================
+   SAVE CHAIN
+========================================================== */
+
+async function saveCurrentChain(){
+
+    if(!currentUser){
+
+        openAuth();
+
+        toast(
+            "Войди, чтобы сохранять цепочки"
+        );
+
+        return;
+    }
+
+    const name =
+        prompt(
+            "Название цепочки:",
+            currentChainName
+        );
+
+    if(name === null){
+        return;
+    }
+
+    currentChainName =
+        name.trim() ||
+        "Untitled Chain";
+
+    const r =
+        await fetch(
+            "/api/chains",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    name:currentChainName,
+                    data:{
+                        nodes:graphNodes,
+                        links:graphLinks
+                    }
+                })
+            }
+        );
+
+    const data =
+        await r.json();
+
+    if(data.ok){
+
+        toast("Цепочка сохранена");
+
+    }else{
+
+        toast(
+            data.error ||
+            "Ошибка сохранения"
+        );
+    }
+}
+
+
+/* ==========================================================
+   LOAD CHAINS
+========================================================== */
+
+async function loadChains(){
+
+    const box =
+        $("chainsList");
+
+    if(!currentUser){
+
+        box.innerHTML = `
+            <div class="muted">
+                Войди в аккаунт, чтобы увидеть
+                сохранённые цепочки.
+            </div>
+        `;
+
+        return;
+    }
+
+    box.innerHTML = "Loading...";
+
+    try{
+
+        const r =
+            await fetch("/api/chains");
+
+        const data =
+            await r.json();
+
+        box.innerHTML = "";
+
+        if(!data.chains.length){
+
+            box.innerHTML = `
+                <div class="muted">
+                    У тебя пока нет сохранённых цепочек.
+                </div>
+            `;
+
+            return;
+        }
+
+        data.chains.forEach(chain=>{
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "userRow";
+
+            row.style.marginBottom =
+                "8px";
+
+            row.innerHTML = `
+
+                <div
+                    style="
+                    width:40px;
+                    height:40px;
+                    border-radius:11px;
+                    display:grid;
+                    place-items:center;
+                    background:rgba(141,92,255,.12);
+                    "
+                >
+                    ◈
+                </div>
+
+                <div style="flex:1">
+                    <strong>
+                        ${escapeHtml(chain.name)}
+                    </strong>
+
+                    <div class="muted">
+                        ${chain.data.nodes?.length || 0}
+                        nodes
+                    </div>
+                </div>
+
+                <button
+                    class="btn"
+                    onclick='openSavedChain(${JSON.stringify(chain.data)})'
+                >
+                    Open
+                </button>
+
+            `;
+
+            box.appendChild(row);
+        });
+
+    }catch(e){
+
+        box.innerHTML =
+            "Failed to load chains";
+    }
+}
+
+
+function openSavedChain(data){
+
+    graphNodes =
+        data.nodes || [];
+
+    graphLinks =
+        data.links || [];
+
+    localStorage.setItem(
+        "nzx-osint-graph",
+        JSON.stringify({
+            nodes:graphNodes,
+            links:graphLinks
+        })
+    );
+
+    openPage("graph");
+
+    renderGraph();
+
+    toast("Chain opened");
+}
+
+
+/* ==========================================================
+   GLOBAL SEARCH
+========================================================== */
+
+function globalSearch(){
+
+    const q =
+        $("globalSearch")
+            .value
+            .trim()
+            .toLowerCase();
+
+    document
+        .querySelectorAll(".node")
+        .forEach(node=>{
+
+            const id =
+                node.dataset.id;
+
+            const data =
+                graphNodes.find(
+                    n=>n.id===id
+                );
+
+            if(!q){
+
+                node.classList.remove(
+                    "blink"
+                );
+
+                return;
+            }
+
+            const match =
+                data &&
+                (
+                    data.title
+                        .toLowerCase()
+                        .includes(q)
+                    ||
+                    (data.content || "")
+                        .toLowerCase()
+                        .includes(q)
+                );
+
+            if(match){
+
+                node.classList.add(
+                    "blink"
+                );
+
+            }else{
+
+                node.classList.remove(
+                    "blink"
+                );
+            }
+        });
+}
+
+
+/* ==========================================================
+   STATS
+========================================================== */
+
+function updateStats(){
+
+    $("statNodes").textContent =
+        graphNodes.length;
+
+    $("statSearches").textContent =
+        searches;
+}
+
+
+/* ==========================================================
+   SATURN PARTICLE BACKGROUND
+========================================================== */
+
+const space =
+    $("space");
+
+const sctx =
+    space.getContext("2d");
+
+let stars = [];
+
+function resizeSpace(){
+
+    space.width =
+        window.innerWidth *
+        devicePixelRatio;
+
+    space.height =
+        window.innerHeight *
+        devicePixelRatio;
+
+    sctx.setTransform(
+        devicePixelRatio,
+        0,
+        0,
+        devicePixelRatio,
+        0,
+        0
+    );
+
+    stars = [];
+
+    const count =
+        Math.min(
+            180,
+            Math.floor(
+                window.innerWidth *
+                window.innerHeight /
+                7000
+            )
+        );
+
+    for(let i=0;i<count;i++){
+
+        stars.push({
+
+            x:Math.random() *
+                window.innerWidth,
+
+            y:Math.random() *
+                window.innerHeight,
+
+            r:Math.random()*1.3,
+
+            a:.1 +
+                Math.random()*.4,
+
+            s:.001 +
+                Math.random()*.004
+        });
+    }
+}
+
+function animateSpace(t){
+
+    const w =
+        window.innerWidth;
+
+    const h =
+        window.innerHeight;
+
+    sctx.clearRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+    for(const star of stars){
+
+        star.a +=
+            Math.sin(
+                t * star.s
+            ) * .0005;
+
+        sctx.globalAlpha =
+            Math.max(
+                .05,
+                Math.min(
+                    .65,
+                    star.a
+                )
+            );
+
+        sctx.beginPath();
+
+        sctx.arc(
+            star.x,
+            star.y,
+            star.r,
+            0,
+            Math.PI*2
+        );
+
+        sctx.fillStyle =
+            "#ffffff";
+
+        sctx.fill();
+    }
+
+    requestAnimationFrame(
+        animateSpace
+    );
+}
+
+window.addEventListener(
+    "resize",
+    resizeSpace
+);
+
+resizeSpace();
+
+requestAnimationFrame(
+    animateSpace
+);
+
+
+/* ==========================================================
+   SATURN
+========================================================== */
+
+const saturnCanvas =
+    $("saturnCanvas");
+
+const saturnCtx =
+    saturnCanvas.getContext("2d");
+
+let saturnParticles = [];
+
+function resizeSaturn(){
+
+    const rect =
+        $("saturn").getBoundingClientRect();
+
+    const dpr =
+        devicePixelRatio;
+
+    saturnCanvas.width =
+        rect.width*dpr;
+
+    saturnCanvas.height =
+        rect.height*dpr;
+
+    saturnCtx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+    saturnParticles = [];
+
+    const count = 1150;
+
+    for(let i=0;i<count;i++){
+
+        const u =
+            Math.random();
+
+        const v =
+            Math.random();
+
+        const theta =
+            2*Math.PI*u;
+
+        const phi =
+            Math.acos(
+                2*v-1
+            );
+
+        const radius =
+            205 +
+            (Math.random()-.5)*4;
+
+        saturnParticles.push({
+
+            theta,
+
+            phi,
+
+            r:radius,
+
+            size:
+                .45 +
+                Math.random()*.9
+        });
+    }
+}
+
+function animateSaturn(t){
+
+    const rect =
+        $("saturn").getBoundingClientRect();
+
+    const w =
+        rect.width;
+
+    const h =
+        rect.height;
+
+    saturnCtx.clearRect(
+        0,
+        0,
+        w,
+        h
+    );
+
+    const cx =
+        w/2;
+
+    const cy =
+        h/2;
+
+    const rotation =
+        t * .000045;
+
+    for(const p of saturnParticles){
+
+        const theta =
+            p.theta +
+            rotation;
+
+        const sinPhi =
+            Math.sin(p.phi);
+
+        const x =
+            p.r *
+            sinPhi *
+            Math.cos(theta);
+
+        const y =
+            p.r *
+            Math.cos(p.phi);
+
+        const z =
+            p.r *
+            sinPhi *
+            Math.sin(theta);
+
+        const perspective =
+            1 +
+            z/850;
+
+        const sx =
+            cx +
+            x*perspective;
+
+        const sy =
+            cy +
+            y*perspective;
+
+        const alpha =
+            .15 +
+            .75 *
+            ((z+p.r)/(2*p.r));
+
+        saturnCtx.globalAlpha =
+            Math.max(
+                .05,
+                Math.min(
+                    .95,
+                    alpha
+                )
+            );
+
+        saturnCtx.beginPath();
+
+        saturnCtx.arc(
+            sx,
+            sy,
+            p.size*perspective,
+            0,
+            Math.PI*2
+        );
+
+        saturnCtx.fillStyle =
+            "#a98cff";
+
+        saturnCtx.fill();
+    }
+
+    /*
+       Particle rings.
+       These are also generated on canvas,
+       not a static image.
+    */
+
+    for(let ring=0;ring<3;ring++){
+
+        const radius =
+            235 +
+            ring*27;
+
+        saturnCtx.save();
+
+        saturnCtx.translate(
+            cx,
+            cy
+        );
+
+        saturnCtx.rotate(
+            -0.35 +
+            Math.sin(t*.00003)*.08
+        );
+
+        saturnCtx.scale(
+            1,
+            .28
+        );
+
+        saturnCtx.globalAlpha =
+            .22 -
+            ring*.04;
+
+        saturnCtx.beginPath();
+
+        saturnCtx.arc(
+            0,
+            0,
+            radius,
+            0,
+            Math.PI*2
+        );
+
+        saturnCtx.strokeStyle =
+            "#9276df";
+
+        saturnCtx.lineWidth =
+            1.3;
+
+        saturnCtx.stroke();
+
+        saturnCtx.restore();
+    }
+
+    requestAnimationFrame(
+        animateSaturn
+    );
+}
+
+window.addEventListener(
+    "resize",
+    resizeSaturn
+);
+
+resizeSaturn();
+
+requestAnimationFrame(
+    animateSaturn
+);
+
+
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+function sleep(ms){
+    return new Promise(
+        resolve=>setTimeout(
+            resolve,
+            ms
+        )
+    );
+}
+
+
+function escapeHtml(value){
+
+    return String(value)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
+
+
+function escapeAttr(value){
+
+    return escapeHtml(value)
+        .replaceAll("`","&#096;");
+}
+
+
+/* ==========================================================
+   INIT
+========================================================== */
+
+loadGraph();
+
+loadMe();
+
+updateStats();
+
+</script>
+
+</body>
+  </html>
