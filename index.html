@@ -1,11 +1,49 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,maximum-scale=1"
+/>
+
 <title>NZX OSINT TOOL</title>
 
 <style>
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html,
+body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#050505;
+  color:#f5f5f5;
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+button,
+input,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
 :root{
   --bg:#050505;
   --panel:rgba(10,10,10,.92);
@@ -20,188 +58,546 @@
   --bad:#ff9b9b;
 }
 
-*{box-sizing:border-box}
 
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#050505;
-  color:var(--text);
-  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-}
-
-button,input,textarea{font:inherit}
-button{color:inherit;border:0}
+/* ==========================================================
+   APP
+========================================================== */
 
 .app{
-  position:fixed;
-  inset:0;
-  display:flex;
-  flex-direction:column;
+  width:100%;
+  height:100%;
+  position:relative;
+  background:
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(255,255,255,.025),
+      transparent 45%
+    ),
+    #050505;
 }
 
+
+/* ==========================================================
+   TOPBAR
+========================================================== */
+
 .topbar{
-  height:70px;
-  flex:none;
+  position:fixed;
+  z-index:100;
+  top:0;
+  left:0;
+  right:0;
+  height:72px;
+
   display:flex;
   align-items:center;
-  gap:12px;
-  padding:10px 15px;
+
+  padding:0 18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8,8,8,.98),
+      rgba(8,8,8,.88)
+    );
+
   border-bottom:1px solid var(--line);
-  background:rgba(5,5,5,.88);
-  backdrop-filter:blur(25px);
-  z-index:100;
+
+  backdrop-filter:blur(18px);
 }
 
 .logo{
-  width:43px;
-  height:43px;
-  border-radius:12px;
-  display:grid;
-  place-items:center;
-  background:#fff;
-  color:#050505;
-  font-weight:1000;
-  font-size:20px;
+  width:38px;
+  height:38px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid #fff;
+  border-radius:11px;
+
+  font-size:19px;
+  font-weight:900;
+
+  margin-right:12px;
+
+  box-shadow:
+    0 0 25px rgba(255,255,255,.08);
+}
+
+.brand{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  min-width:210px;
 }
 
 .brand b{
-  display:block;
   font-size:14px;
-  letter-spacing:1px;
+  letter-spacing:.15em;
 }
 
 .brand small{
-  display:block;
-  margin-top:2px;
-  color:#555;
+  color:#666;
   font-size:8px;
-  letter-spacing:2px;
+  letter-spacing:.24em;
 }
 
 .top-tools{
-  margin-left:auto;
   display:flex;
+  align-items:center;
   gap:7px;
+  margin-left:auto;
 }
 
 .top-btn{
-  height:38px;
-  padding:0 15px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#0e0e0e;
-  color:#aaa;
-  cursor:pointer;
-  font-size:10px;
+  height:34px;
+
+  padding:0 13px;
+
+  color:#bbb;
+
+  background:#0c0c0c;
+
+  border:1px solid var(--line2);
+
+  border-radius:8px;
+
+  font-size:9px;
   font-weight:800;
-  letter-spacing:.8px;
-  transition:.2s;
+  letter-spacing:.1em;
+
+  transition:
+    .2s ease;
 }
 
 .top-btn:hover{
   color:#fff;
-  border-color:var(--line2);
-  background:#151515;
+  background:#161616;
+  border-color:#666;
+  transform:translateY(-1px);
 }
 
 .profile-mini{
-  width:40px;
-  height:40px;
-  margin-left:8px;
-  padding:0;
-  border:1px solid var(--line2);
+  width:38px;
+  height:38px;
+
   border-radius:50%;
-  overflow:hidden;
+
+  border:1px solid #333;
+
   background:#111;
-  cursor:pointer;
+
+  overflow:hidden;
+
+  margin-left:10px;
+
+  padding:0;
 }
 
 .profile-mini img{
   width:100%;
   height:100%;
   object-fit:cover;
+  display:block;
 }
 
-.body{
-  flex:1;
-  min-height:0;
-  display:flex;
-}
+
+/* ==========================================================
+   SIDEBAR
+========================================================== */
 
 .sidebar{
-  width:70px;
-  flex:none;
-  border-right:1px solid var(--line);
-  background:#070707;
+  position:fixed;
+
+  left:0;
+  top:72px;
+  bottom:0;
+
+  width:66px;
+
+  z-index:90;
+
   display:flex;
-  flex-direction:column;
   align-items:center;
-  padding:13px 8px;
-  z-index:80;
+  flex-direction:column;
+
+  padding-top:18px;
+
+  background:
+    rgba(6,6,6,.94);
+
+  border-right:1px solid var(--line);
+
+  backdrop-filter:blur(18px);
 }
 
 .side-btn{
-  width:48px;
-  height:48px;
-  margin-bottom:7px;
-  border-radius:12px;
+  width:42px;
+  height:42px;
+
+  margin-bottom:8px;
+
   border:1px solid transparent;
-  background:transparent;
+
+  border-radius:10px;
+
   color:#555;
-  cursor:pointer;
-  font-size:17px;
-  transition:.2s;
+
+  background:transparent;
+
+  font-size:19px;
+
+  transition:.2s ease;
 }
 
-.side-btn:hover{
-  color:#fff;
-  background:#111;
-}
-
+.side-btn:hover,
 .side-btn.active{
   color:#fff;
-  border-color:var(--line);
   background:#111;
+  border-color:#292929;
 }
 
-.main{
-  position:relative;
-  flex:1;
-  min-width:0;
-  min-height:0;
-  overflow:hidden;
-}
+
+/* ==========================================================
+   PAGES
+========================================================== */
 
 .page{
-  position:absolute;
-  inset:0;
   display:none;
+
+  position:absolute;
+
+  top:72px;
+  left:66px;
+  right:0;
+  bottom:0;
 }
 
 .page.active{
   display:block;
-  animation:pageIn .25s ease;
 }
 
-@keyframes pageIn{
-  from{opacity:0;transform:translateY(5px)}
-  to{opacity:1;transform:none}
+
+/* ==========================================================
+   CHAIN
+========================================================== */
+
+.chain-page{
+  width:100%;
+  height:100%;
+  position:relative;
 }
 
-/* SATURN */
+.chain-toolbar{
+  position:absolute;
+
+  top:17px;
+  left:18px;
+  right:18px;
+
+  z-index:30;
+
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+.chain-search{
+  width:240px;
+  height:37px;
+
+  padding:0 12px;
+
+  border-radius:9px;
+
+  border:1px solid var(--line2);
+
+  background:
+    rgba(10,10,10,.86);
+
+  color:#fff;
+
+  outline:none;
+
+  font-size:11px;
+}
+
+.chain-search:focus{
+  border-color:#666;
+}
+
+.chain-search::placeholder{
+  color:#555;
+}
+
+.btn{
+  height:37px;
+
+  padding:0 13px;
+
+  border-radius:9px;
+
+  border:1px solid var(--line2);
+
+  color:#aaa;
+
+  background:#0c0c0c;
+
+  font-size:10px;
+  font-weight:800;
+
+  transition:.2s ease;
+}
+
+.btn:hover{
+  color:#fff;
+  background:#151515;
+  border-color:#777;
+}
+
+.btn.primary{
+  color:#050505;
+  background:#fff;
+  border-color:#fff;
+}
+
+.btn.primary:hover{
+  background:#ddd;
+}
+
+
+/* ==========================================================
+   GRAPH
+========================================================== */
+
+.graph{
+  width:100%;
+  height:100%;
+
+  position:relative;
+
+  overflow:hidden;
+
+  background-color:#050505;
+
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.025) 1px,
+      transparent 1px
+    );
+
+  background-size:40px 40px;
+}
+
+.world{
+  position:absolute;
+
+  left:50%;
+  top:50%;
+
+  width:1px;
+  height:1px;
+
+  transform:
+    translate(-50%,-50%)
+    scale(1);
+
+  transform-origin:center;
+}
+
+.lines{
+  position:absolute;
+
+  left:-5000px;
+  top:-5000px;
+
+  width:10000px;
+  height:10000px;
+
+  overflow:visible;
+
+  pointer-events:none;
+}
+
+.node{
+  position:absolute;
+
+  width:170px;
+  min-height:72px;
+
+  transform:
+    translate(-50%,-50%);
+
+  padding:12px 13px;
+
+  border:1px solid rgba(255,255,255,.13);
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20,20,20,.97),
+      rgba(9,9,9,.97)
+    );
+
+  border-radius:12px;
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.45);
+
+  user-select:none;
+
+  cursor:grab;
+
+  transition:
+    border-color .2s,
+    box-shadow .2s,
+    transform .2s;
+}
+
+.node:hover{
+  border-color:#555;
+
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.6);
+}
+
+.node.dragging{
+  cursor:grabbing;
+
+  border-color:#888;
+
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.8);
+}
+
+.node.highlight{
+  border-color:#fff;
+
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.2),
+    0 0 40px rgba(255,255,255,.1);
+}
+
+.node-type{
+  color:#555;
+
+  font-size:8px;
+
+  font-weight:900;
+
+  letter-spacing:.15em;
+
+  margin-bottom:6px;
+}
+
+.node-title{
+  color:#eee;
+
+  font-size:11px;
+
+  font-weight:800;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+}
+
+.node-content{
+  margin-top:5px;
+
+  color:#777;
+
+  font-size:9px;
+
+  line-height:1.4;
+
+  max-height:28px;
+
+  overflow:hidden;
+
+  word-break:break-word;
+}
+
+.node-delete{
+  position:absolute;
+
+  right:7px;
+  top:6px;
+
+  width:20px;
+  height:20px;
+
+  border:0;
+
+  border-radius:5px;
+
+  color:#555;
+
+  background:transparent;
+
+  font-size:12px;
+}
+
+.node-delete:hover{
+  color:#fff;
+  background:#222;
+}
+
+.node-dot{
+  position:absolute;
+
+  width:10px;
+  height:10px;
+
+  right:-5px;
+  top:50%;
+
+  transform:translateY(-50%);
+
+  border-radius:50%;
+
+  background:#fff;
+
+  box-shadow:
+    0 0 14px rgba(255,255,255,.45);
+
+  cursor:crosshair;
+}
+
+
+/* ==========================================================
+   SATURN
+========================================================== */
 
 .saturn{
   position:absolute;
-  width:720px;
-  height:720px;
+
   left:50%;
   top:50%;
-  transform:translate(-50%,-50%);
+
+  width:470px;
+  height:470px;
+
+  transform:
+    translate(-50%,-50%);
+
+  opacity:.62;
+
   pointer-events:none;
-  opacity:.48;
+
+  filter:
+    drop-shadow(
+      0 0 35px rgba(255,255,255,.08)
+    );
 }
 
 #saturn{
@@ -211,410 +607,64 @@ button{color:inherit;border:0}
 
 .saturn-ring{
   position:absolute;
+
   left:50%;
   top:50%;
-  width:74%;
-  height:24%;
-  transform:translate(-50%,-50%) rotateX(67deg) rotateZ(-15deg);
-  border:1px solid rgba(220,220,220,.15);
+
+  width:360px;
+  height:105px;
+
   border-radius:50%;
+
+  border:
+    1px solid rgba(255,255,255,.14);
+
   box-shadow:
-    0 0 0 8px rgba(255,255,255,.012),
-    0 0 35px rgba(255,255,255,.04);
+    0 0 20px rgba(255,255,255,.05);
+
+  transform:
+    translate(-50%,-50%)
+    rotateX(67deg);
+
+  transform-style:preserve-3d;
+
+  opacity:.65;
 }
 
-/* GRAPH */
 
-.chain-page{
-  position:absolute;
-  inset:0;
-  overflow:hidden;
-}
-
-.chain-toolbar{
-  position:absolute;
-  left:16px;
-  right:16px;
-  top:15px;
-  height:52px;
-  z-index:30;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:6px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:rgba(8,8,8,.82);
-  backdrop-filter:blur(20px);
-}
-
-.chain-search{
-  flex:1;
-  height:38px;
-  border:0;
-  outline:0;
-  background:transparent;
-  color:#fff;
-  padding:0 10px;
-}
-
-.chain-search::placeholder{color:#555}
-
-.graph{
-  position:absolute;
-  inset:0;
-  overflow:hidden;
-  cursor:grab;
-  background-image:
-    linear-gradient(rgba(255,255,255,.017) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.017) 1px,transparent 1px),
-    radial-gradient(circle,rgba(255,255,255,.06) 1px,transparent 1px);
-  background-size:80px 80px,80px 80px,30px 30px;
-}
-
-.graph.dragging{cursor:grabbing}
-
-.world{
-  position:absolute;
-  width:1px;
-  height:1px;
-  left:0;
-  top:0;
-  transform-origin:0 0;
-}
-
-.lines{
-  position:absolute;
-  left:-5000px;
-  top:-5000px;
-  width:10000px;
-  height:10000px;
-  overflow:visible;
-  pointer-events:none;
-}
-
-.edge{
-  fill:none;
-  stroke:rgba(220,220,220,.32);
-  stroke-width:2;
-  vector-effect:non-scaling-stroke;
-  stroke-linecap:round;
-}
-
-.edge-glow{
-  fill:none;
-  stroke:rgba(255,255,255,.035);
-  stroke-width:9;
-  vector-effect:non-scaling-stroke;
-}
-
-.node{
-  position:absolute;
-  width:225px;
-  min-height:106px;
-  transform:translate(-50%,-50%);
-  user-select:none;
-  animation:nodeIn .4s cubic-bezier(.16,1,.3,1);
-}
-
-@keyframes nodeIn{
-  from{
-    opacity:0;
-    transform:translate(-50%,-50%) scale(.7);
-    filter:blur(4px);
-  }
-  to{
-    opacity:1;
-    transform:translate(-50%,-50%) scale(1);
-    filter:none;
-  }
-}
-
-.node-card{
-  position:relative;
-  min-height:106px;
-  padding:16px;
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:18px;
-  background:linear-gradient(145deg,rgba(24,24,24,.98),rgba(9,9,9,.98));
-  box-shadow:
-    0 22px 60px rgba(0,0,0,.5),
-    inset 0 1px rgba(255,255,255,.04);
-  cursor:grab;
-  transition:.2s;
-}
-
-.node-card:hover{
-  transform:translateY(-3px);
-  border-color:rgba(255,255,255,.28);
-}
-
-.node.moving .node-card{
-  transform:scale(1.04);
-  border-color:#fff;
-}
-
-.node-title{
-  font-weight:850;
-  font-size:15px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.node-type{
-  display:inline-flex;
-  margin-top:7px;
-  padding:3px 7px;
-  border-radius:6px;
-  background:#1b1b1b;
-  color:#888;
-  font-size:8px;
-  letter-spacing:1px;
-}
-
-.node-content{
-  margin-top:8px;
-  color:#777;
-  font-size:12px;
-  line-height:1.45;
-  max-height:45px;
-  overflow:hidden;
-  white-space:pre-line;
-  word-break:break-word;
-}
-
-.node-dot{
-  position:absolute;
-  right:-7px;
-  top:50%;
-  width:13px;
-  height:13px;
-  transform:translateY(-50%);
-  border-radius:50%;
-  background:#111;
-  border:2px solid #888;
-  box-shadow:0 0 0 5px #070707;
-  z-index:5;
-}
-
-.node.near .node-dot{
-  background:#fff;
-  border-color:#fff;
-  box-shadow:
-    0 0 0 5px #070707,
-    0 0 22px rgba(255,255,255,.7);
-}
-
-.node-found .node-card{
-  animation:foundPulse 1s ease 3;
-  border-color:#fff;
-}
-
-@keyframes foundPulse{
-  50%{
-    box-shadow:
-      0 0 0 3px rgba(255,255,255,.12),
-      0 0 50px rgba(255,255,255,.12);
-  }
-}
-
-.node-delete{
-  position:absolute;
-  right:8px;
-  top:8px;
-  width:23px;
-  height:23px;
-  border-radius:7px;
-  background:#000;
-  color:#777;
-  cursor:pointer;
-  opacity:0;
-}
-
-.node-card:hover .node-delete{opacity:1}
-
-/* MODAL */
-
-.tool-modal{
-  position:fixed;
-  inset:0;
-  z-index:450;
-  display:none;
-  place-items:center;
-  background:rgba(0,0,0,.76);
-  backdrop-filter:blur(14px);
-  padding:20px;
-}
-
-.tool-modal.show{display:grid}
-
-.modal-box{
-  width:min(510px,100%);
-  max-height:85vh;
-  overflow:auto;
-  padding:25px;
-  border:1px solid rgba(255,255,255,.16);
-  border-radius:22px;
-  background:linear-gradient(145deg,#151515,#090909);
-  box-shadow:0 35px 120px rgba(0,0,0,.75);
-  animation:modalIn .25s ease;
-}
-
-@keyframes modalIn{
-  from{opacity:0;transform:translateY(15px) scale(.97)}
-  to{opacity:1;transform:none}
-}
-
-.modal-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:20px;
-}
-
-.modal-top h2{
-  margin:0;
-  font-size:19px;
-}
-
-.close{
-  width:32px;
-  height:32px;
-  border:1px solid var(--line);
-  border-radius:9px;
-  background:#111;
-  color:#777;
-  cursor:pointer;
-}
-
-.modal-description{
-  color:#666;
-  font-size:11px;
-  line-height:1.5;
-  margin-bottom:15px;
-}
-
-.modal-input{
-  width:100%;
-  height:50px;
-  padding:0 15px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  outline:none;
-  background:#070707;
-  color:#fff;
-}
-
-.modal-input:focus{border-color:var(--line2)}
-
-.modal-actions{
-  display:flex;
-  gap:8px;
-  margin-top:12px;
-}
-
-.modal-actions button{
-  height:43px;
-  flex:1;
-  border-radius:10px;
-  cursor:pointer;
-  border:1px solid var(--line);
-  background:#111;
-  color:#aaa;
-}
-
-.modal-actions button.primary{
-  background:#fff;
-  color:#050505;
-  border-color:#fff;
-}
-
-.results{
-  margin-top:17px;
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-}
-
-.result{
-  min-height:58px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:10px 13px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:#0d0d0d;
-  animation:resultIn .25s ease;
-}
-
-@keyframes resultIn{
-  from{opacity:0;transform:translateY(5px)}
-  to{opacity:1;transform:none}
-}
-
-.result-icon{
-  width:34px;
-  height:34px;
-  flex:none;
-  border-radius:9px;
-  display:grid;
-  place-items:center;
-  background:#181818;
-  color:#aaa;
-  font-size:11px;
-  font-weight:900;
-}
-
-.result-main{
-  flex:1;
-  min-width:0;
-}
-
-.result-main b{
-  display:block;
-  font-size:12px;
-}
-
-.result-main small{
-  display:block;
-  margin-top:3px;
-  color:#777;
-  font-size:10px;
-  white-space:pre-wrap;
-  word-break:break-word;
-  line-height:1.45;
-}
-
-.result-status{
-  font-size:9px;
-  font-weight:900;
-  letter-spacing:.8px;
-  flex:none;
-}
-
-.status-found{color:var(--good)}
-.status-unknown{color:var(--warn)}
-.status-error{color:var(--bad)}
-.status-info{color:#aaa}
-
-/* PROFILE */
+/* ==========================================================
+   PROFILE
+========================================================== */
 
 .profile{
-  position:absolute;
-  inset:0;
-  overflow:auto;
-  padding:40px;
+  width:100%;
+  height:100%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:30px;
 }
 
 .profile-card{
-  width:min(720px,100%);
-  margin:auto;
-  padding:25px;
+  width:min(600px,100%);
+
   border:1px solid var(--line);
-  border-radius:20px;
-  background:#0c0c0c;
+
+  border-radius:18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(20,20,20,.95),
+      rgba(7,7,7,.96)
+    );
+
+  box-shadow:
+    0 30px 100px rgba(0,0,0,.5);
+
+  padding:28px;
 }
 
 .profile-head{
@@ -624,88 +674,321 @@ button{color:inherit;border:0}
 }
 
 .profile-avatar{
-  width:88px;
-  height:88px;
-  flex:none;
-  object-fit:cover;
+  width:84px;
+  height:84px;
+
   border-radius:50%;
-  border:1px solid var(--line2);
-  background:#151515;
+
+  object-fit:cover;
+
+  background:#111;
+
+  border:1px solid #333;
 }
 
 .profile-info h1{
-  margin:0;
-  font-size:23px;
+  font-size:24px;
 }
 
 .profile-info p{
-  margin:5px 0 0;
   color:#666;
+
+  margin-top:5px;
+
+  font-size:12px;
 }
 
 .profile-actions{
-  margin-top:18px;
   display:flex;
   gap:8px;
+  margin-top:25px;
   flex-wrap:wrap;
 }
 
 .profile-button{
-  height:40px;
-  padding:0 13px;
-  border-radius:10px;
-  border:1px solid var(--line);
+  height:38px;
+
+  padding:0 14px;
+
+  border-radius:8px;
+
+  border:1px solid #333;
+
   background:#111;
+
   color:#aaa;
-  cursor:pointer;
+
+  font-size:10px;
+  font-weight:800;
+}
+
+.profile-button:hover{
+  color:#fff;
+  border-color:#666;
 }
 
 .profile-button.primary{
-  background:#fff;
   color:#000;
+  background:#fff;
+  border-color:#fff;
 }
 
-/* NODE MODAL */
 
+/* ==========================================================
+   MODALS
+========================================================== */
+
+.tool-modal,
 #nodeModal{
   position:fixed;
+
   inset:0;
-  z-index:400;
+
+  z-index:500;
+
   display:none;
-  place-items:center;
-  background:rgba(0,0,0,.76);
-  backdrop-filter:blur(10px);
+
+  align-items:center;
+  justify-content:center;
+
   padding:20px;
+
+  background:
+    rgba(0,0,0,.72);
+
+  backdrop-filter:blur(12px);
 }
 
+.tool-modal.open,
+#nodeModal.open{
+  display:flex;
+}
+
+.modal-box,
 .node-modal-box{
-  width:min(450px,100%);
-  padding:23px;
-  border-radius:22px;
-  border:1px solid rgba(255,255,255,.15);
-  background:linear-gradient(145deg,#151515,#0b0b0b);
-  box-shadow:0 35px 100px #000;
+  width:min(520px,100%);
+
+  max-height:
+    calc(100vh - 40px);
+
+  overflow:auto;
+
+  border:
+    1px solid rgba(255,255,255,.14);
+
+  border-radius:16px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #151515,
+      #090909
+    );
+
+  box-shadow:
+    0 40px 120px rgba(0,0,0,.75);
+
+  padding:22px;
 }
 
-.field{margin-top:13px}
+.modal-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  margin-bottom:10px;
+}
+
+.modal-top h2{
+  font-size:17px;
+  letter-spacing:.04em;
+}
+
+.close{
+  width:32px;
+  height:32px;
+
+  border:0;
+
+  border-radius:8px;
+
+  background:#111;
+
+  color:#777;
+
+  font-size:20px;
+}
+
+.close:hover{
+  color:#fff;
+}
+
+.modal-description{
+  color:#666;
+
+  font-size:10px;
+
+  line-height:1.5;
+
+  margin-bottom:16px;
+}
+
+.modal-input{
+  width:100%;
+  height:45px;
+
+  padding:0 13px;
+
+  color:#fff;
+
+  background:#080808;
+
+  border:1px solid #2b2b2b;
+
+  border-radius:9px;
+
+  outline:none;
+}
+
+.modal-input:focus{
+  border-color:#777;
+}
+
+.modal-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+
+  margin-top:12px;
+}
+
+.modal-actions button{
+  height:36px;
+
+  padding:0 14px;
+
+  border-radius:8px;
+
+  border:1px solid #333;
+
+  color:#aaa;
+
+  background:#111;
+
+  font-size:9px;
+  font-weight:900;
+}
+
+.modal-actions button:hover{
+  color:#fff;
+  border-color:#777;
+}
+
+.modal-actions button.primary{
+  background:#fff;
+  color:#000;
+  border-color:#fff;
+}
+
+.results{
+  display:flex;
+  flex-direction:column;
+
+  gap:7px;
+
+  margin-top:18px;
+}
+
+.result{
+  padding:11px 12px;
+
+  border-radius:9px;
+
+  border:1px solid #202020;
+
+  background:#0c0c0c;
+}
+
+.result-head{
+  display:flex;
+  align-items:center;
+  gap:7px;
+
+  color:#777;
+
+  font-size:8px;
+  font-weight:900;
+
+  letter-spacing:.12em;
+}
+
+.result-value{
+  margin-top:5px;
+
+  color:#ddd;
+
+  font-size:11px;
+
+  line-height:1.45;
+
+  white-space:pre-wrap;
+
+  word-break:break-word;
+}
+
+.result.good{
+  border-color:
+    rgba(170,255,170,.18);
+}
+
+.result.warn{
+  border-color:
+    rgba(255,220,100,.18);
+}
+
+.result.bad{
+  border-color:
+    rgba(255,100,100,.18);
+}
+
+.field{
+  margin-bottom:13px;
+}
 
 .field label{
   display:block;
-  margin-bottom:7px;
-  color:#666;
-  font-size:9px;
-  letter-spacing:1px;
+
+  color:#555;
+
+  font-size:8px;
+  font-weight:900;
+
+  letter-spacing:.13em;
+
+  margin-bottom:6px;
 }
 
 .field input,
 .field textarea{
   width:100%;
-  border:1px solid var(--line);
-  outline:0;
-  background:#080808;
+
   color:#fff;
-  border-radius:11px;
-  padding:12px;
+
+  background:#080808;
+
+  border:1px solid #292929;
+
+  border-radius:8px;
+
+  outline:none;
+
+  padding:10px;
+
+  font-size:11px;
+}
+
+.field input{
+  height:40px;
 }
 
 .field textarea{
@@ -713,755 +996,1170 @@ button{color:inherit;border:0}
   resize:vertical;
 }
 
-.btn{
-  height:39px;
-  padding:0 13px;
-  border-radius:10px;
-  border:1px solid var(--line);
-  background:#111;
-  color:#aaa;
-  cursor:pointer;
+.field input:focus,
+.field textarea:focus{
+  border-color:#666;
 }
 
-.btn:hover{
-  color:#fff;
-  border-color:var(--line2);
-}
 
-.btn.primary{
-  background:#fff;
-  color:#050505;
-  border-color:#fff;
-  font-weight:850;
-}
-
-/* TOAST */
+/* ==========================================================
+   TOAST
+========================================================== */
 
 .toast{
   position:fixed;
+
+  z-index:900;
+
   left:50%;
-  bottom:25px;
-  z-index:700;
-  transform:translate(-50%,20px);
+  bottom:22px;
+
+  transform:
+    translate(-50%,20px);
+
   opacity:0;
+
   pointer-events:none;
-  padding:10px 16px;
-  border-radius:999px;
-  background:#fff;
-  color:#050505;
+
+  padding:10px 15px;
+
+  border:1px solid #333;
+
+  border-radius:9px;
+
+  background:#111;
+
+  color:#ddd;
+
   font-size:10px;
-  font-weight:850;
-  transition:.2s;
+
+  transition:.25s ease;
 }
 
 .toast.show{
   opacity:1;
-  transform:translate(-50%,0);
+
+  transform:
+    translate(-50%,0);
 }
+
+
+/* ==========================================================
+   MOBILE
+========================================================== */
 
 @media(max-width:760px){
 
-  .topbar{height:62px}
+  .topbar{
+    height:62px;
+    padding:0 10px;
+  }
 
-  .brand small{display:none}
+  .brand{
+    min-width:0;
+  }
 
-  .brand b{font-size:11px}
+  .brand b{
+    font-size:11px;
+  }
 
-  .top-tools{display:none}
+  .brand small{
+    display:none;
+  }
+
+  .top-tools{
+    margin-left:auto;
+  }
+
+  .top-btn{
+    width:35px;
+    padding:0;
+    overflow:hidden;
+    font-size:0;
+  }
+
+  .top-btn:first-child::after{
+    content:"☎";
+    font-size:14px;
+  }
+
+  .top-btn:nth-child(2)::after{
+    content:"✉";
+    font-size:14px;
+  }
+
+  .top-btn:nth-child(3)::after{
+    content:"⌖";
+    font-size:14px;
+  }
 
   .sidebar{
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:0;
-    width:100%;
-    height:57px;
-    flex-direction:row;
-    justify-content:space-around;
-    padding:4px;
-    border-right:0;
-    border-top:1px solid var(--line);
-    z-index:300;
+    top:62px;
+    width:54px;
   }
 
-  .side-btn{
-    margin:0;
-    height:48px;
-  }
-
-  .main{padding-bottom:57px}
-
-  .saturn{
-    width:520px;
-    height:520px;
+  .page{
+    top:62px;
+    left:54px;
   }
 
   .chain-toolbar{
-    left:9px;
-    right:9px;
-    top:9px;
+    left:10px;
+    right:10px;
   }
 
-  .profile{padding:20px}
+  .chain-search{
+    width:100%;
+  }
+
+  .node{
+    width:150px;
+  }
+
+  .saturn{
+    width:330px;
+    height:330px;
+  }
+
+  .saturn-ring{
+    width:270px;
+  }
+
 }
+
 </style>
 </head>
+
 
 <body>
 
 <div class="app">
 
-<header class="topbar">
+  <!-- =====================================================
+       TOPBAR
+  ====================================================== -->
 
-  <div class="logo">N</div>
+  <header class="topbar">
 
-  <div class="brand">
-    <b>NZX OSINT TOOL</b>
-    <small>INTELLIGENCE WORKSPACE</small>
-  </div>
+    <div class="logo">
+      N
+    </div>
 
-  <div class="top-tools">
+    <div class="brand">
 
-    <button class="top-btn" onclick="openTool('phone')">
-      CHECK NUMBER
-    </button>
+      <b>
+        NZX OSINT TOOL
+      </b>
 
-    <button class="top-btn" onclick="openTool('email')">
-      CHECK GMAIL
-    </button>
+      <small>
+        INTELLIGENCE WORKSPACE
+      </small>
 
-    <button class="top-btn" onclick="openTool('address')">
-      CHECK ADDRESS
-    </button>
+    </div>
 
-  </div>
 
-  <button class="profile-mini" onclick="openProfile()">
-    <img id="miniAvatar" alt="">
-  </button>
+    <div class="top-tools">
 
-</header>
-
-<div class="body">
-
-<aside class="sidebar">
-
-  <button
-    class="side-btn active"
-    data-page="chain"
-    onclick="showPage('chain')">
-    ⌘
-  </button>
-
-  <button
-    class="side-btn"
-    data-page="profile"
-    onclick="openProfile()">
-    ◎
-  </button>
-
-</aside>
-
-<main class="main">
-
-<section class="page active" id="page-chain">
-
-  <div class="chain-page">
-
-    <div class="chain-toolbar">
-
-      <input
-        class="chain-search"
-        id="chainSearch"
-        placeholder="Search chain or node...">
-
-      <button class="btn" onclick="openNodeModal()">
-        ＋ Node
+      <button
+        class="top-btn"
+        onclick="openTool('phone')"
+      >
+        CHECK NUMBER
       </button>
 
-      <button class="btn" onclick="centerGraph()">
-        ⌂
+      <button
+        class="top-btn"
+        onclick="openTool('address')"
+      >
+        CHECK ADDRESS
       </button>
 
     </div>
 
-    <div class="graph" id="graph">
 
-      <div class="saturn">
-        <canvas id="saturn"></canvas>
-        <div class="saturn-ring" id="saturnRing"></div>
+    <button
+      class="profile-mini"
+      onclick="openProfile()"
+    >
+
+      <img
+        id="miniAvatar"
+        alt=""
+      >
+
+    </button>
+
+  </header>
+
+
+  <!-- =====================================================
+       SIDEBAR
+  ====================================================== -->
+
+  <aside class="sidebar">
+
+    <button
+      class="side-btn active"
+      data-page="chain"
+      onclick="showPage('chain')"
+    >
+      ⌘
+    </button>
+
+    <button
+      class="side-btn"
+      data-page="profile"
+      onclick="openProfile()"
+    >
+      ◎
+    </button>
+
+  </aside>
+
+
+  <!-- =====================================================
+       CHAIN
+  ====================================================== -->
+
+  <section
+    class="page active"
+    id="page-chain"
+  >
+
+    <div class="chain-page">
+
+      <div class="chain-toolbar">
+
+        <input
+          class="chain-search"
+          id="chainSearch"
+          placeholder="Search chain or node..."
+        >
+
+        <button
+          class="btn"
+          onclick="openNodeModal()"
+        >
+          ＋ Node
+        </button>
+
+        <button
+          class="btn"
+          onclick="centerGraph()"
+        >
+          ⌂
+        </button>
+
       </div>
 
-      <div class="world" id="world">
 
-        <svg
-          class="lines"
-          id="lines"
-          viewBox="-5000 -5000 10000 10000">
-        </svg>
+      <div
+        class="graph"
+        id="graph"
+      >
 
-      </div>
+        <div class="saturn">
 
-    </div>
+          <canvas
+            id="saturn"
+          ></canvas>
 
-  </div>
+          <div
+            class="saturn-ring"
+            id="saturnRing"
+          ></div>
 
-</section>
+        </div>
 
-<section class="page" id="page-profile">
 
-  <div class="profile">
+        <div
+          class="world"
+          id="world"
+        >
 
-    <div class="profile-card">
-
-      <div class="profile-head">
-
-        <img
-          class="profile-avatar"
-          id="profileAvatar"
-          alt="">
-
-        <div class="profile-info">
-
-          <h1 id="profileName">
-            NZX User
-          </h1>
-
-          <p id="profileUsername">
-            @nzx_user
-          </p>
+          <svg
+            class="lines"
+            id="lines"
+            viewBox="-5000 -5000 10000 10000"
+          ></svg>
 
         </div>
 
       </div>
 
-      <div class="profile-actions">
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       PROFILE
+  ====================================================== -->
+
+  <section
+    class="page"
+    id="page-profile"
+  >
+
+    <div class="profile">
+
+      <div class="profile-card">
+
+        <div class="profile-head">
+
+          <img
+            class="profile-avatar"
+            id="profileAvatar"
+            alt=""
+          >
+
+          <div class="profile-info">
+
+            <h1 id="profileName">
+              NZX User
+            </h1>
+
+            <p id="profileUsername">
+              @nzx_user
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="profile-actions">
+
+          <button
+            class="profile-button primary"
+            onclick="chooseAvatar()"
+          >
+            Choose avatar
+          </button>
+
+          <button
+            class="profile-button"
+            onclick="editProfileName()"
+          >
+            Edit name
+          </button>
+
+          <button
+            class="profile-button"
+            onclick="showPage('chain')"
+          >
+            Back to Chain
+          </button>
+
+        </div>
+
+
+        <input
+          id="avatarFile"
+          type="file"
+          accept="image/*"
+          style="display:none"
+        >
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       TOOL MODAL
+  ====================================================== -->
+
+  <div
+    class="tool-modal"
+    id="toolModal"
+    onclick="outsideToolModal(event)"
+  >
+
+    <div
+      class="modal-box"
+      onclick="event.stopPropagation()"
+    >
+
+      <div class="modal-top">
+
+        <h2 id="toolTitle">
+          Check
+        </h2>
 
         <button
-          class="profile-button primary"
-          onclick="chooseAvatar()">
-          Choose avatar
-        </button>
-
-        <button
-          class="profile-button"
-          onclick="editProfileName()">
-          Edit name
-        </button>
-
-        <button
-          class="profile-button"
-          onclick="showPage('chain')">
-          Back to Chain
+          class="close"
+          onclick="closeTool()"
+        >
+          ×
         </button>
 
       </div>
 
+
+      <div
+        class="modal-description"
+        id="toolDescription"
+      ></div>
+
+
       <input
-        id="avatarFile"
-        type="file"
-        accept="image/*"
-        style="display:none">
+        class="modal-input"
+        id="toolInput"
+        autocomplete="off"
+      >
+
+
+      <div class="modal-actions">
+
+        <button
+          onclick="closeTool()"
+        >
+          CLOSE
+        </button>
+
+        <button
+          class="primary"
+          id="toolRun"
+          onclick="runTool()"
+        >
+          CHECK
+        </button>
+
+      </div>
+
+
+      <div
+        class="results"
+        id="toolResults"
+      ></div>
 
     </div>
 
   </div>
 
-</section>
 
-</main>
-</div>
-</div>
+  <!-- =====================================================
+       NODE MODAL
+  ====================================================== -->
 
-<!-- TOOL MODAL -->
+  <div id="nodeModal">
 
-<div
-  class="tool-modal"
-  id="toolModal"
-  onclick="outsideToolModal(event)">
+    <div class="node-modal-box">
 
-  <div
-    class="modal-box"
-    onclick="event.stopPropagation()">
-
-    <div class="modal-top">
-
-      <h2 id="toolTitle">
-        Check
+      <h2
+        id="nodeModalTitle"
+        style="margin:0 0 18px"
+      >
+        New Node
       </h2>
 
-      <button
-        class="close"
-        onclick="closeTool()">
-        ×
-      </button>
 
-    </div>
+      <div class="field">
 
-    <div
-      class="modal-description"
-      id="toolDescription">
-    </div>
+        <label>
+          NAME
+        </label>
 
-    <input
-      class="modal-input"
-      id="toolInput"
-      autocomplete="off">
+        <input
+          id="nodeTitle"
+          placeholder="Username"
+        >
 
-    <div class="modal-actions">
+      </div>
 
-      <button onclick="closeTool()">
-        CLOSE
-      </button>
 
-      <button
-        class="primary"
-        id="toolRun"
-        onclick="runTool()">
-        CHECK
-      </button>
+      <div class="field">
 
-    </div>
+        <label>
+          TYPE
+        </label>
 
-    <div
-      class="results"
-      id="toolResults">
-    </div>
+        <input
+          id="nodeType"
+          placeholder="PHONE / USERNAME / LOCATION"
+        >
 
-  </div>
-</div>
+      </div>
 
-<!-- NODE MODAL -->
 
-<div id="nodeModal">
+      <div class="field">
 
-  <div class="node-modal-box">
+        <label>
+          CONTENT
+        </label>
 
-    <h2
-      id="nodeModalTitle"
-      style="margin:0 0 18px">
-      New Node
-    </h2>
+        <textarea
+          id="nodeContent"
+          placeholder="Information..."
+        ></textarea>
 
-    <div class="field">
-      <label>NAME</label>
-      <input
-        id="nodeTitle"
-        placeholder="Username">
-    </div>
+      </div>
 
-    <div class="field">
-      <label>TYPE</label>
-      <input
-        id="nodeType"
-        placeholder="EMAIL / USERNAME / LOCATION">
-    </div>
 
-    <div class="field">
-      <label>CONTENT</label>
-      <textarea
-        id="nodeContent"
-        placeholder="Information..."></textarea>
-    </div>
+      <div
+        style="
+          display:flex;
+          gap:8px;
+          margin-top:17px;
+        "
+      >
 
-    <div
-      style="display:flex;gap:8px;margin-top:17px">
+        <button
+          class="btn"
+          style="margin-left:auto"
+          onclick="closeNodeModal()"
+        >
+          Cancel
+        </button>
 
-      <button
-        class="btn"
-        style="margin-left:auto"
-        onclick="closeNodeModal()">
-        Cancel
-      </button>
+        <button
+          class="btn primary"
+          onclick="saveNode()"
+        >
+          Save
+        </button>
 
-      <button
-        class="btn primary"
-        onclick="saveNode()">
-        Save
-      </button>
+      </div>
 
     </div>
 
   </div>
+
+
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+
 </div>
 
-<div class="toast" id="toast"></div>
 
 <script>
-"use strict";
 
-/* =========================================================
-   DATABASE
-========================================================= */
+/* ==========================================================
+   STORAGE
+========================================================== */
 
-const STORAGE_KEY="nzx-osint-real-v3";
+const STORAGE_KEY =
+  "nzx-osint-real-v4";
 
-let db={
+
+let db = {
+
   nodes:{},
+
   links:[],
+
   profile:{
+
     name:"NZX User",
+
     username:"nzx_user",
+
     avatar:""
   },
+
   searches:0
 };
 
+
 try{
 
-  const saved=
-    localStorage.getItem(STORAGE_KEY);
+  const saved =
+    localStorage.getItem(
+      STORAGE_KEY
+    );
 
   if(saved){
 
-    const parsed=
+    const parsed =
       JSON.parse(saved);
 
-    if(parsed){
+    db = {
 
-      db=Object.assign(
-        db,
-        parsed
-      );
+      ...db,
 
-      if(!db.nodes) db.nodes={};
-      if(!db.links) db.links=[];
-      if(!db.profile) db.profile={
-        name:"NZX User",
-        username:"nzx_user",
-        avatar:""
-      };
-    }
+      ...parsed,
+
+      nodes:
+        parsed.nodes || {},
+
+      links:
+        parsed.links || {},
+
+      profile:{
+        ...db.profile,
+        ...(parsed.profile || {})
+      }
+
+    };
   }
 
-}catch(e){
-  console.warn(e);
+}catch(error){
+
+  console.warn(
+    "Storage error",
+    error
+  );
 }
+
+
+/* ==========================================================
+   HELPERS
+========================================================== */
 
 function saveDB(){
 
   try{
+
     localStorage.setItem(
       STORAGE_KEY,
       JSON.stringify(db)
     );
-  }catch(e){
-    console.warn(e);
+
+  }catch(error){
+
+    console.warn(
+      "Could not save database",
+      error
+    );
   }
 }
 
-const $=id=>
-  document.getElementById(id);
+
+function $(id){
+
+  return document.getElementById(id);
+}
+
 
 function escapeHTML(value){
 
-  const div=
-    document.createElement("div");
-
-  div.textContent=
-    value==null
-    ?""
-    :String(value);
-
-  return div.innerHTML;
+  return String(
+    value ?? ""
+  )
+  .replaceAll("&","&amp;")
+  .replaceAll("<","&lt;")
+  .replaceAll(">","&gt;")
+  .replaceAll('"',"&quot;")
+  .replaceAll("'","&#039;");
 }
+
 
 function objectToText(value){
 
-  if(value===null)
-    return "null";
+  if(value === null ||
+     value === undefined){
 
-  if(value===undefined)
-    return "undefined";
-
-  if(typeof value==="string")
-    return value;
+    return "UNKNOWN";
+  }
 
   if(
-    typeof value==="number"||
-    typeof value==="boolean"
-  )
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ){
+
     return String(value);
+  }
 
   try{
+
     return JSON.stringify(
       value,
       null,
       2
     );
-  }catch(e){
+
+  }catch{
+
     return String(value);
   }
 }
 
+
 function uid(){
 
-  return "node_"+
-    Date.now().toString(36)+
-    "_"+
+  return (
+    "node_" +
+    Date.now() +
+    "_" +
     Math.random()
       .toString(36)
-      .slice(2,8);
+      .slice(2,8)
+  );
 }
+
+
+let toastTimer=null;
 
 function toast(message){
 
-  const el=$("toast");
+  const el =
+    $("toast");
 
-  el.textContent=
-    String(message);
+  el.textContent =
+    message;
 
-  el.classList.add("show");
-
-  clearTimeout(
-    toast.timer
+  el.classList.add(
+    "show"
   );
 
-  toast.timer=
+  clearTimeout(
+    toastTimer
+  );
+
+  toastTimer =
     setTimeout(
       ()=>{
-        el.classList.remove("show");
+        el.classList.remove(
+          "show"
+        );
       },
-      1800
+      2200
     );
 }
 
-/* =========================================================
-   NAVIGATION
-========================================================= */
+
+/* ==========================================================
+   PAGE
+========================================================== */
 
 function showPage(page){
 
   document
     .querySelectorAll(".page")
     .forEach(
-      p=>p.classList.remove("active")
+      el=>{
+        el.classList.remove(
+          "active"
+        );
+      }
     );
 
-  const target=
+  const target =
     $("page-"+page);
 
-  if(target)
-    target.classList.add("active");
+  if(target){
+
+    target.classList.add(
+      "active"
+    );
+  }
 
   document
     .querySelectorAll(".side-btn")
     .forEach(
-      btn=>{
-        btn.classList.toggle(
+      button=>{
+
+        button.classList.toggle(
           "active",
-          btn.dataset.page===page
+          button.dataset.page === page
         );
+
       }
     );
 }
 
-window.showPage=showPage;
 
 function openProfile(){
 
-  showPage("profile");
+  showPage(
+    "profile"
+  );
 
-  updateProfile();
+  updateProfileUI();
 }
 
-window.openProfile=
-  openProfile;
 
-/* =========================================================
+/* ==========================================================
+   PROFILE
+========================================================== */
+
+function avatarFallback(){
+
+  return (
+    "data:image/svg+xml," +
+    encodeURIComponent(`
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="200"
+        height="200"
+        viewBox="0 0 200 200"
+      >
+        <rect
+          width="200"
+          height="200"
+          fill="#111"
+        />
+        <circle
+          cx="100"
+          cy="78"
+          r="38"
+          fill="#333"
+        />
+        <path
+          d="M35 190c7-49 36-69 65-69s58 20 65 69"
+          fill="#333"
+        />
+        <text
+          x="100"
+          y="30"
+          fill="#777"
+          text-anchor="middle"
+          font-size="13"
+          font-family="Arial"
+        >
+          NZX
+        </text>
+      </svg>
+    `)
+  );
+}
+
+
+function updateProfileUI(){
+
+  const avatar =
+    db.profile.avatar ||
+    avatarFallback();
+
+  $("miniAvatar").src =
+    avatar;
+
+  $("profileAvatar").src =
+    avatar;
+
+  $("profileName").textContent =
+    db.profile.name;
+
+  $("profileUsername").textContent =
+    "@" +
+    db.profile.username;
+}
+
+
+function chooseAvatar(){
+
+  $("avatarFile").click();
+}
+
+
+$("avatarFile")
+.addEventListener(
+  "change",
+  event=>{
+
+    const file =
+      event.target.files?.[0];
+
+    if(!file)
+      return;
+
+    const reader =
+      new FileReader();
+
+    reader.onload =
+      ()=>{
+
+        db.profile.avatar =
+          reader.result;
+
+        saveDB();
+
+        updateProfileUI();
+
+        toast(
+          "Avatar updated"
+        );
+      };
+
+    reader.readAsDataURL(
+      file
+    );
+  }
+);
+
+
+function editProfileName(){
+
+  const name =
+    prompt(
+      "Enter profile name:",
+      db.profile.name
+    );
+
+  if(
+    name === null
+  )
+    return;
+
+  const cleaned =
+    name.trim();
+
+  if(!cleaned)
+    return;
+
+  db.profile.name =
+    cleaned;
+
+  saveDB();
+
+  updateProfileUI();
+
+  toast(
+    "Profile updated"
+  );
+}
+
+
+/* ==========================================================
    TOOLS
-========================================================= */
+========================================================== */
 
-let currentTool=null;
-
-const toolConfig={
+const toolConfig = {
 
   phone:{
-    title:"CHECK NUMBER",
-    placeholder:"+374 XX XXX XXX",
-    description:
-      "Проверка номера через backend. Показываются только данные, которые вернул backend."
-  },
 
-  email:{
-    title:"CHECK GMAIL",
-    placeholder:"example@gmail.com",
+    title:
+      "CHECK NUMBER",
+
+    placeholder:
+      "+374 XX XXX XXX",
+
     description:
-      "Проверка email через доступные реальные источники."
+      "Проверка номера через PhoneValidation API. Показываются только данные, которые реально вернул провайдер."
   },
 
   address:{
-    title:"CHECK ADDRESS",
-    placeholder:"Yerevan, Armenia или 40.1772, 44.5035",
+
+    title:
+      "CHECK ADDRESS",
+
+    placeholder:
+      "Yerevan, Armenia",
+
     description:
-      "Введите адрес или координаты. Используется геокодирование."
+      "Поиск адреса через OpenStreetMap Nominatim."
   }
 
 };
 
+
+let currentTool =
+  null;
+
+
 function openTool(type){
 
-  currentTool=type;
-
-  const cfg=
+  const config =
     toolConfig[type];
 
-  if(!cfg) return;
+  if(!config)
+    return;
 
-  $("toolTitle").textContent=
-    cfg.title;
+  currentTool =
+    type;
 
-  $("toolDescription").textContent=
-    cfg.description;
+  $("toolTitle").textContent =
+    config.title;
 
-  $("toolInput").placeholder=
-    cfg.placeholder;
+  $("toolDescription").textContent =
+    config.description;
 
-  $("toolInput").value="";
+  $("toolInput").placeholder =
+    config.placeholder;
 
-  $("toolResults").innerHTML="";
+  $("toolInput").value =
+    "";
+
+  $("toolResults").innerHTML =
+    "";
 
   $("toolModal")
-    .classList.add("show");
+    .classList.add(
+      "open"
+    );
 
   setTimeout(
-    ()=>$("toolInput").focus(),
+    ()=>{
+      $("toolInput").focus();
+    },
     50
   );
 }
 
-window.openTool=openTool;
 
 function closeTool(){
 
   $("toolModal")
-    .classList.remove("show");
+    .classList.remove(
+      "open"
+    );
 
-  currentTool=null;
+  currentTool =
+    null;
 }
 
-window.closeTool=closeTool;
 
-function outsideToolModal(e){
+function outsideToolModal(event){
 
-  if(e.target.id==="toolModal")
+  if(
+    event.target ===
+    $("toolModal")
+  ){
+
     closeTool();
+  }
 }
 
-window.outsideToolModal=
-  outsideToolModal;
 
-$("toolInput").addEventListener(
+$("toolInput")
+.addEventListener(
   "keydown",
-  e=>{
-    if(e.key==="Enter"){
-      e.preventDefault();
+  event=>{
+
+    if(
+      event.key === "Enter"
+    ){
+
+      event.preventDefault();
+
       runTool();
     }
   }
 );
 
-/* =========================================================
-   RESULT
-========================================================= */
-
-function addResult(
-  title,
-  value,
-  status="UNKNOWN",
-  icon="?"
-){
-
-  const el=
-    document.createElement("div");
-
-  el.className="result";
-
-  let cls="status-unknown";
-
-  if(status==="FOUND")
-    cls="status-found";
-
-  if(status==="ERROR")
-    cls="status-error";
-
-  if(status==="INFO")
-    cls="status-info";
-
-  el.innerHTML=`
-    <div class="result-icon">
-      ${escapeHTML(icon)}
-    </div>
-
-    <div class="result-main">
-      <b>${escapeHTML(title)}</b>
-      <small>${escapeHTML(value)}</small>
-    </div>
-
-    <span class="result-status ${cls}">
-      ${escapeHTML(status)}
-    </span>
-  `;
-
-  $("toolResults")
-    .appendChild(el);
-}
-
-/* =========================================================
-   RUN
-========================================================= */
 
 async function runTool(){
 
   if(!currentTool)
     return;
 
-  const value=
+  const value =
     $("toolInput")
       .value
       .trim();
 
-  $("toolResults").innerHTML="";
-
   if(!value){
 
-    addResult(
-      "INPUT",
-      "Введите значение.",
-      "ERROR",
-      "!"
+    toast(
+      "Введите значение"
     );
 
     return;
   }
 
-  db.searches++;
-  saveDB();
+  $("toolRun").disabled =
+    true;
 
-  if(currentTool==="phone"){
-    await checkPhoneReal(value);
-    return;
-  }
+  $("toolRun").textContent =
+    "CHECKING...";
 
-  if(currentTool==="email"){
-    await checkEmailReal(value);
-    return;
-  }
+  $("toolResults")
+    .innerHTML =
+      "";
 
-  if(currentTool==="address"){
-    await checkAddressReal(value);
-    return;
+  try{
+
+    if(
+      currentTool === "phone"
+    ){
+
+      await checkPhoneReal(
+        value
+      );
+
+    }else if(
+      currentTool === "address"
+    ){
+
+      await checkAddressReal(
+        value
+      );
+    }
+
+  }finally{
+
+    $("toolRun").disabled =
+      false;
+
+    $("toolRun").textContent =
+      "CHECK";
   }
 }
 
-window.runTool=runTool;
 
-/* =========================================================
+/* ==========================================================
+   RESULT UI
+========================================================== */
+
+function addResult(
+  title,
+  value,
+  status="INFO",
+  icon="•"
+){
+
+  const box =
+    document.createElement(
+      "div"
+    );
+
+  let cls =
+    "result";
+
+  if(status === "OK")
+    cls += " good";
+
+  if(status === "WARNING")
+    cls += " warn";
+
+  if(status === "ERROR")
+    cls += " bad";
+
+  box.className =
+    cls;
+
+  box.innerHTML = `
+
+    <div class="result-head">
+
+      <span>
+        ${escapeHTML(icon)}
+      </span>
+
+      <span>
+        ${escapeHTML(title)}
+      </span>
+
+    </div>
+
+    <div class="result-value">
+      ${escapeHTML(
+        objectToText(value)
+      )}
+    </div>
+
+  `;
+
+  $("toolResults")
+    .appendChild(
+      box
+    );
+}
+
+
+/* ==========================================================
    PHONE
-   JSON -> FORM FALLBACK
-========================================================= */
+========================================================== */
 
-async function checkPhoneReal(value){
+async function checkPhoneReal(
+  value
+){
 
   addResult(
     "REQUEST",
@@ -1470,150 +2168,65 @@ async function checkPhoneReal(value){
     "•"
   );
 
-  let response=null;
-  let data=null;
-
   try{
 
-    /* FIRST: JSON */
+    /*
+      Backend ожидает FormData.
+    */
 
-    response=
+    const form =
+      new URLSearchParams();
+
+    form.append(
+      "phone",
+      value
+    );
+
+    const response =
       await fetch(
         "/api/osint/phone",
         {
           method:"POST",
+
           headers:{
-            "Content-Type":"application/json",
-            "Accept":"application/json"
+            "Accept":
+              "application/json"
           },
-          body:JSON.stringify({
-            phone:value
-          })
+
+          body:form
         }
       );
 
+    let data=null;
+
     try{
-      data=await response.json();
-    }catch(e){
+
+      data =
+        await response.json();
+
+    }catch{
+
       data=null;
     }
 
-    /*
-      Если backend отвечает 422,
-      пробуем form-urlencoded.
-      Это закрывает случай, когда
-      main.py использует Form(...).
-    */
-
-    if(response.status===422){
-
-      response=
-        await fetch(
-          "/api/osint/phone",
-          {
-            method:"POST",
-            headers:{
-              "Content-Type":
-                "application/x-www-form-urlencoded",
-              "Accept":
-                "application/json"
-            },
-            body:
-              "phone="+
-              encodeURIComponent(value)
-          }
-        );
-
-      try{
-        data=await response.json();
-      }catch(e){
-        data=null;
-      }
-    }
-
-    $("toolResults").innerHTML="";
-
-    /* ERROR */
+    $("toolResults")
+      .innerHTML =
+      "";
 
     if(!response.ok){
 
-      let errorText=
-        `HTTP ${response.status}`;
-
-      if(data){
-
-        if(Array.isArray(data)){
-
-          errorText=
-            data
-              .map(item=>{
-
-                if(
-                  !item||
-                  typeof item!=="object"
-                ){
-                  return String(item);
-                }
-
-                const loc=
-                  Array.isArray(item.loc)
-                  ?item.loc.join(" → ")
-                  :"";
-
-                const msg=
-                  item.msg||
-                  "";
-
-                return loc
-                  ?`${loc}: ${msg}`
-                  :msg;
-
-              })
-              .join("\n");
-
-        }else if(
-          typeof data.detail==="string"
-        ){
-
-          errorText=
-            data.detail;
-
-        }else if(
-          data.detail!==undefined
-        ){
-
-          errorText=
-            objectToText(
-              data.detail
-            );
-
-        }else if(
-          data.message!==undefined
-        ){
-
-          errorText=
-            objectToText(
-              data.message
-            );
-
-        }else{
-
-          errorText=
-            objectToText(data);
-        }
-      }
-
       addResult(
         "BACKEND ERROR",
-        errorText,
+        data || (
+          "HTTP " +
+          response.status
+        ),
         "ERROR",
         "!"
       );
 
       return;
     }
-
-    /* SUCCESS */
 
     if(!data){
 
@@ -1627,635 +2240,568 @@ async function checkPhoneReal(value){
       return;
     }
 
-    renderBackendObject(data);
+    renderPhoneResult(
+      data
+    );
 
-    createPhoneGraph(data);
+    createPhoneGraph(
+      data
+    );
+
+    db.searches++;
+
+    saveDB();
 
   }catch(error){
 
-    $("toolResults").innerHTML="";
+    $("toolResults")
+      .innerHTML =
+      "";
 
     addResult(
       "CONNECTION",
-      error?.message||
-      "Не удалось связаться с backend.",
+      error?.message ||
+        "Не удалось связаться с backend.",
       "ERROR",
       "!"
     );
   }
 }
 
-/* =========================================================
+
+function renderPhoneResult(
+  data
+){
+
+  addResult(
+    "PHONE",
+    data.phone ||
+      "UNKNOWN",
+    "OK",
+    "☎"
+  );
+
+  addResult(
+    "VALID",
+    data.valid === null ||
+    data.valid === undefined
+      ? "UNKNOWN"
+      : data.valid
+        ? "YES"
+        : "NO",
+    data.valid === true
+      ? "OK"
+      : data.valid === false
+        ? "ERROR"
+        : "WARNING",
+    "✓"
+  );
+
+  addResult(
+    "POSSIBLE",
+    data.possible === null ||
+    data.possible === undefined
+      ? "UNKNOWN"
+      : data.possible
+        ? "YES"
+        : "NO",
+    data.possible === true
+      ? "OK"
+      : data.possible === false
+        ? "WARNING"
+        : "WARNING",
+    "?"
+  );
+
+  addResult(
+    "CONFIDENCE",
+    data.confidence ||
+      "UNKNOWN",
+    data.confidence === "verified"
+      ? "OK"
+      : "WARNING",
+    "◆"
+  );
+
+  if(
+    data.score !== null &&
+    data.score !== undefined
+  ){
+
+    addResult(
+      "SCORE",
+      data.score,
+      "INFO",
+      "◈"
+    );
+  }
+
+  addResult(
+    "COUNTRY",
+    data.country ||
+      "UNKNOWN",
+    "INFO",
+    "◎"
+  );
+
+  addResult(
+    "COUNTRY CODE",
+    data.country_code ||
+      "UNKNOWN",
+    "INFO",
+    "+"
+  );
+
+  addResult(
+    "REGION",
+    data.region ||
+      "UNKNOWN",
+    "INFO",
+    "⌖"
+  );
+
+  addResult(
+    "CARRIER",
+    data.carrier ||
+      "UNKNOWN",
+    "INFO",
+    "◉"
+  );
+
+  addResult(
+    "LINE TYPE",
+    data.line_type ||
+      "UNKNOWN",
+    "INFO",
+    "▣"
+  );
+
+  addResult(
+    "DISPOSABLE / VOIP",
+    data.disposable ||
+      "UNKNOWN",
+    data.disposable === "YES"
+      ? "WARNING"
+      : "INFO",
+    "!"
+  );
+
+  addResult(
+    "NATIONAL",
+    data.national ||
+      "UNKNOWN",
+    "INFO",
+    "N"
+  );
+
+  addResult(
+    "INTERNATIONAL",
+    data.international ||
+      "UNKNOWN",
+    "INFO",
+    "I"
+  );
+
+  addResult(
+    "E.164",
+    data.e164 ||
+      "UNKNOWN",
+    "INFO",
+    "E"
+  );
+
+  addResult(
+    "PROVIDER",
+    data.source ||
+      "UNKNOWN",
+    "INFO",
+    "S"
+  );
+
+  let providerStatus =
+    data.provider_status ||
+    "UNKNOWN";
+
+  let providerStatusType =
+    providerStatus === "OK"
+      ? "OK"
+      : providerStatus ===
+        "NO_API_KEY"
+        ? "WARNING"
+        : providerStatus ===
+          "API_KEY_REJECTED"
+          ? "ERROR"
+          : providerStatus ===
+            "QUOTA_EXCEEDED"
+            ? "WARNING"
+            : "INFO";
+
+  addResult(
+    "PROVIDER STATUS",
+    providerStatus,
+    providerStatusType,
+    providerStatus === "OK"
+      ? "✓"
+      : "!"
+  );
+
+  if(
+    data.credits_remaining !==
+      null &&
+    data.credits_remaining !==
+      undefined
+  ){
+
+    addResult(
+      "CREDITS REMAINING",
+      data.credits_remaining,
+      "INFO",
+      "C"
+    );
+  }
+
+  if(
+    data.provider_error
+  ){
+
+    addResult(
+      "PROVIDER RESPONSE",
+      data.provider_error,
+      "WARNING",
+      "!"
+    );
+  }
+
+  if(
+    data.diagnostics &&
+    Object.keys(
+      data.diagnostics
+    ).length
+  ){
+
+    addResult(
+      "DIAGNOSTICS",
+      data.diagnostics,
+      "INFO",
+      "D"
+    );
+  }
+
+  if(
+    data.city &&
+    data.city !== "UNKNOWN"
+  ){
+
+    addResult(
+      "CITY",
+      data.city,
+      "INFO",
+      "⌂"
+    );
+  }
+}
+
+
+/* ==========================================================
    PHONE GRAPH
-========================================================= */
+========================================================== */
 
-function createPhoneGraph(data){
+function createNode(
+  title,
+  type,
+  content,
+  x,
+  y
+){
 
-  if(
-    !data||
-    typeof data!=="object"
-  )
-    return;
+  const id =
+    uid();
 
-  if(
-    data.ok===false||
-    data.success===false
-  )
-    return;
+  db.nodes[id] = {
 
-  const phone=
-    data.phone||
-    data.international||
-    data.national;
+    id,
+
+    title,
+
+    type,
+
+    content,
+
+    x,
+
+    y
+  };
+
+  return id;
+}
+
+
+function createPhoneGraph(
+  data
+){
+
+  const phone =
+    data.e164 ||
+    data.phone;
 
   if(!phone)
     return;
 
-  const center=
-    screenToWorld(
-      graph.clientWidth/2,
-      graph.clientHeight/2
+  let phoneNode =
+    Object.values(
+      db.nodes
+    ).find(
+      n =>
+        n.type === "PHONE" &&
+        n.content === phone
     );
 
-  const created=[];
+  if(!phoneNode){
 
-  function findExisting(
-    type,
-    content
-  ){
+    const center =
+      getGraphCenter();
 
-    if(
-      content===null||
-      content===undefined
-    )
-      return null;
-
-    const wanted=
-      String(content)
-        .trim()
-        .toLowerCase();
-
-    if(!wanted)
-      return null;
-
-    const found=
-      Object.values(db.nodes)
-      .find(
-        n=>
-          String(n.type||"")
-            .trim()
-            .toLowerCase()===
-          String(type)
-            .trim()
-            .toLowerCase()
-          &&
-          String(n.content||"")
-            .trim()
-            .toLowerCase()===
-          wanted
+    const id =
+      createNode(
+        "Phone Number",
+        "PHONE",
+        phone,
+        center.x,
+        center.y
       );
 
-    return found||null;
+    phoneNode =
+      db.nodes[id];
   }
 
-  function makeNode(
-    title,
-    type,
-    content,
-    index
-  ){
-
-    if(
-      content===null||
-      content===undefined
-    )
-      return null;
-
-    const text=
-      String(content).trim();
-
-    if(!text)
-      return null;
-
-    const existing=
-      findExisting(
-        type,
-        text
-      );
-
-    if(existing)
-      return existing.id;
-
-    const id=uid();
-
-    let x=center.x;
-    let y=center.y;
-
-    if(index>0){
-
-      const angle=
-        (index-1)*
-        (Math.PI*2/8);
-
-      const radius=
-        280+
-        Math.min(index*18,120);
-
-      x+=Math.cos(angle)*radius;
-      y+=Math.sin(angle)*radius;
-    }
-
-    db.nodes[id]={
-      id:id,
-      title:String(title),
-      type:String(type),
-      content:text,
-      x:x,
-      y:y
-    };
-
-    created.push(id);
-
-    return id;
-  }
-
-  const phoneId=
-    makeNode(
-      "Phone Number",
-      "PHONE",
-      phone,
-      0
-    );
-
-  let i=1;
-
-  const countryId=
-    makeNode(
-      "Country",
-      "COUNTRY",
-      data.country,
-      i++
-    );
-
-  const regionId=
-    makeNode(
-      "Region",
-      "REGION",
-      data.region,
-      i++
-    );
-
-  const cityId=
-    makeNode(
-      "Approx. City",
-      "CITY",
-      data.approx_city,
-      i++
-    );
-
-  const validId=
-    data.valid!==undefined
-    ?makeNode(
-      "Number Valid",
-      "VALID",
-      String(data.valid),
-      i++
-    )
-    :null;
-
-  const possibleId=
-    data.possible!==undefined
-    ?makeNode(
-      "Number Possible",
-      "POSSIBLE",
-      String(data.possible),
-      i++
-    )
-    :null;
-
-  const carrierId=
-    makeNode(
-      "Carrier",
-      "CARRIER",
-      data.carrier,
-      i++
-    );
-
-  const nationalId=
-    makeNode(
-      "National Format",
-      "NATIONAL",
-      data.national,
-      i++
-    );
-
-  const internationalId=
-    makeNode(
-      "International Format",
-      "INTERNATIONAL",
-      data.international,
-      i++
-    );
-
-  const codeId=
-    data.country_code!==undefined
-    ?makeNode(
-      "Country Code",
-      "COUNTRY CODE",
-      "+"+String(data.country_code),
-      i++
-    )
-    :null;
-
-  if(phoneId){
+  const values = [
 
     [
-      countryId,
-      regionId,
-      cityId,
-      validId,
-      possibleId,
-      carrierId,
-      nationalId,
-      internationalId,
-      codeId
-    ].forEach(
-      id=>{
-        if(
-          id&&
-          !linked(
-            phoneId,
-            id
+      "Country",
+      "COUNTRY",
+      data.country
+    ],
+
+    [
+      "Country Code",
+      "COUNTRY CODE",
+      data.country_code
+    ],
+
+    [
+      "Region",
+      "REGION",
+      data.region
+    ],
+
+    [
+      "Carrier",
+      "CARRIER",
+      data.carrier
+    ],
+
+    [
+      "Line Type",
+      "LINE TYPE",
+      data.line_type
+    ],
+
+    [
+      "Confidence",
+      "CONFIDENCE",
+      data.confidence
+    ],
+
+    [
+      "Valid",
+      "VALID",
+      data.valid
+    ],
+
+    [
+      "Possible",
+      "POSSIBLE",
+      data.possible
+    ],
+
+    [
+      "Disposable",
+      "DISPOSABLE",
+      data.disposable
+    ]
+
+  ];
+
+  let index=0;
+
+  for(
+    const item of values
+  ){
+
+    const title =
+      item[0];
+
+    const type =
+      item[1];
+
+    const raw =
+      item[2];
+
+    if(
+      raw === null ||
+      raw === undefined ||
+      raw === "" ||
+      raw === "UNKNOWN"
+    ){
+
+      continue;
+    }
+
+    const content =
+      typeof raw === "boolean"
+        ? (
+            raw
+              ? "YES"
+              : "NO"
           )
-        ){
-          connect(
-            phoneId,
-            id
-          );
-        }
-      }
-    );
+        : String(raw);
+
+    const duplicate =
+      Object.values(
+        db.nodes
+      ).find(
+        n =>
+          n.type === type &&
+          n.content === content
+      );
+
+    let target =
+      duplicate;
+
+    if(!target){
+
+      const angle =
+        index *
+        (Math.PI * 2 / 10);
+
+      const radius =
+        250 +
+        (
+          index % 3
+        ) * 70;
+
+      const id =
+        createNode(
+
+          title,
+
+          type,
+
+          content,
+
+          phoneNode.x +
+            Math.cos(angle) *
+            radius,
+
+          phoneNode.y +
+            Math.sin(angle) *
+            radius
+        );
+
+      target =
+        db.nodes[id];
+    }
+
+    const exists =
+      db.links.some(
+        link =>
+          (
+            link.a ===
+              phoneNode.id &&
+            link.b ===
+              target.id
+          ) ||
+          (
+            link.a ===
+              target.id &&
+            link.b ===
+              phoneNode.id
+          )
+      );
+
+    if(!exists){
+
+      db.links.push({
+
+        a:
+          phoneNode.id,
+
+        b:
+          target.id
+      });
+    }
+
+    index++;
   }
 
   saveDB();
 
-  renderAll();
+  renderNodes();
 
-  created.forEach(
-    id=>{
-
-      const el=
-        document.querySelector(
-          `.node[data-id="${id}"]`
-        );
-
-      if(el){
-
-        el.classList.add(
-          "node-found"
-        );
-
-        setTimeout(
-          ()=>{
-            el.classList.remove(
-              "node-found"
-            );
-          },
-          3000
-        );
-      }
-    }
-  );
-
-  if(created.length)
-    toast("Phone data added to graph");
+  renderLines();
 }
 
-/* =========================================================
-   BACKEND RENDER
-========================================================= */
 
-function renderBackendObject(data){
-
-  if(
-    data===null||
-    data===undefined
-  ){
-
-    addResult(
-      "BACKEND RESPONSE",
-      "Пустой ответ.",
-      "UNKNOWN",
-      "?"
-    );
-
-    return;
-  }
-
-  if(typeof data!=="object"){
-
-    addResult(
-      "BACKEND RESPONSE",
-      String(data),
-      "INFO",
-      "{"
-    );
-
-    return;
-  }
-
-  let rendered=false;
-
-  Object.entries(data)
-    .forEach(
-      ([key,value])=>{
-
-        if(
-          value===null||
-          value===undefined
-        )
-          return;
-
-        if(
-          key==="services"&&
-          Array.isArray(value)
-        ){
-
-          value.forEach(
-            service=>{
-
-              if(
-                !service||
-                typeof service!=="object"
-              )
-                return;
-
-              const name=
-                service.service||
-                service.name||
-                "SERVICE";
-
-              const raw=
-                String(
-                  service.status||
-                  "UNKNOWN"
-                ).toUpperCase();
-
-              let status="UNKNOWN";
-
-              if(raw==="FOUND")
-                status="FOUND";
-
-              if(raw==="ERROR")
-                status="ERROR";
-
-              if(raw==="INFO")
-                status="INFO";
-
-              const detail=
-                service.detail??
-                service.message??
-                service.url??
-                "No additional data";
-
-              addResult(
-                name,
-                objectToText(detail),
-                status,
-                String(name)[0]||"?"
-              );
-
-              rendered=true;
-            }
-          );
-
-          return;
-        }
-
-        let valueText=
-          objectToText(value);
-
-        let status="INFO";
-
-        const upper=
-          String(value).toUpperCase();
-
-        if(
-          upper==="TRUE"||
-          upper==="FOUND"
-        )
-          status="FOUND";
-
-        if(upper==="UNKNOWN")
-          status="UNKNOWN";
-
-        addResult(
-          key
-            .replace(/_/g," ")
-            .toUpperCase(),
-          valueText,
-          status,
-          key[0]||"?"
-        );
-
-        rendered=true;
-      }
-    );
-
-  if(!rendered){
-
-    addResult(
-      "BACKEND RESPONSE",
-      objectToText(data),
-      "INFO",
-      "{"
-    );
-  }
-}
-
-/* =========================================================
-   EMAIL
-========================================================= */
-
-async function checkEmailReal(value){
-
-  if(
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-  ){
-
-    addResult(
-      "EMAIL",
-      "Неверный формат email.",
-      "ERROR",
-      "!"
-    );
-
-    return;
-  }
-
-  addResult(
-    "REQUEST",
-    "Проверка email...",
-    "INFO",
-    "•"
-  );
-
-  try{
-
-    const response=
-      await fetch(
-        "/api/osint/email",
-        {
-          method:"POST",
-          headers:{
-            "Content-Type":"application/json",
-            "Accept":"application/json"
-          },
-          body:JSON.stringify({
-            email:value
-          })
-        }
-      );
-
-    let data=null;
-
-    try{
-      data=await response.json();
-    }catch(e){}
-
-    $("toolResults").innerHTML="";
-
-    if(!response.ok){
-
-      let msg=
-        `HTTP ${response.status}`;
-
-      if(data){
-
-        if(
-          typeof data.detail==="string"
-        ){
-          msg=data.detail;
-        }else if(
-          data.detail!==undefined
-        ){
-          msg=objectToText(
-            data.detail
-          );
-        }else{
-          msg=objectToText(data);
-        }
-      }
-
-      addResult(
-        "BACKEND ERROR",
-        msg,
-        "ERROR",
-        "!"
-      );
-
-      return;
-    }
-
-    renderBackendObject(data);
-
-  }catch(error){
-
-    $("toolResults").innerHTML="";
-
-    addResult(
-      "CONNECTION",
-      error?.message||
-      "Не удалось связаться с backend.",
-      "ERROR",
-      "!"
-    );
-  }
-}
-
-/* =========================================================
+/* ==========================================================
    ADDRESS
-========================================================= */
+========================================================== */
 
-async function checkAddressReal(value){
+async function checkAddressReal(
+  value
+){
 
   addResult(
-    "REQUEST",
-    "Поиск координат...",
+    "SEARCH",
+    "Ищем адрес...",
     "INFO",
     "•"
   );
 
   try{
 
-    const coords=
-      value.match(
-        /^\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*$/
+    const url =
+      "/api/map/search?q=" +
+      encodeURIComponent(
+        value
       );
 
-    let url;
-
-    if(coords){
-
-      const lat=
-        parseFloat(coords[1]);
-
-      const lon=
-        parseFloat(coords[2]);
-
-      if(
-        lat<-90||
-        lat>90||
-        lon<-180||
-        lon>180
-      ){
-
-        $("toolResults").innerHTML="";
-
-        addResult(
-          "COORDINATES",
-          "Неверные координаты.",
-          "ERROR",
-          "!"
-        );
-
-        return;
-      }
-
-      url=
-        "https://nominatim.openstreetmap.org/reverse"+
-        "?format=jsonv2"+
-        "&lat="+encodeURIComponent(lat)+
-        "&lon="+encodeURIComponent(lon)+
-        "&addressdetails=1";
-
-    }else{
-
-      url=
-        "https://nominatim.openstreetmap.org/search"+
-        "?format=jsonv2"+
-        "&limit=1"+
-        "&addressdetails=1"+
-        "&q="+encodeURIComponent(value);
-    }
-
-    const response=
+    const response =
       await fetch(
         url,
         {
           headers:{
-            "Accept":"application/json"
+            "Accept":
+              "application/json"
           }
         }
       );
 
-    if(!response.ok){
+    const data =
+      await response.json();
 
-      $("toolResults").innerHTML="";
+    $("toolResults")
+      .innerHTML =
+      "";
+
+    if(
+      !response.ok ||
+      !data.success
+    ){
 
       addResult(
-        "GEOCODING ERROR",
-        `HTTP ${response.status}`,
+        "ADDRESS ERROR",
+        data.error ||
+          "Адрес не найден.",
         "ERROR",
         "!"
       );
@@ -2263,1424 +2809,1496 @@ async function checkAddressReal(value){
       return;
     }
 
-    const data=
-      await response.json();
+    const results =
+      data.results || [];
 
-    $("toolResults").innerHTML="";
-
-    const place=
-      Array.isArray(data)
-      ?data[0]
-      :data;
-
-    if(!place){
+    if(!results.length){
 
       addResult(
-        "LOCATION",
-        "Адрес не найден.",
-        "UNKNOWN",
+        "RESULT",
+        "Ничего не найдено.",
+        "WARNING",
         "?"
       );
 
       return;
     }
 
-    addResult(
-      "DISPLAY NAME",
-      place.display_name||
-      place.name||
-      "UNKNOWN",
-      "FOUND",
-      "⌖"
+    results
+      .slice(0,10)
+      .forEach(
+        (item,index)=>{
+
+          addResult(
+            "RESULT " +
+              (index+1),
+            item.display_name,
+            "OK",
+            "⌖"
+          );
+
+          addResult(
+            "COORDINATES",
+            `${item.lat}, ${item.lon}`,
+            "INFO",
+            "◉"
+          );
+
+          addResult(
+            "CITY",
+            item.city ||
+              "UNKNOWN",
+            "INFO",
+            "⌂"
+          );
+
+          addResult(
+            "COUNTRY",
+            item.country ||
+              "UNKNOWN",
+            "INFO",
+            "◎"
+          );
+
+          addResult(
+            "ROAD",
+            item.road ||
+              "UNKNOWN",
+            "INFO",
+            "R"
+          );
+
+          addResult(
+            "HOUSE",
+            item.house_number ||
+              "UNKNOWN",
+            "INFO",
+            "#"
+          );
+        }
+      );
+
+    createAddressGraph(
+      results[0]
     );
-
-    if(place.lat!=null){
-
-      addResult(
-        "LATITUDE",
-        String(place.lat),
-        "FOUND",
-        "N"
-      );
-    }
-
-    if(place.lon!=null){
-
-      addResult(
-        "LONGITUDE",
-        String(place.lon),
-        "FOUND",
-        "E"
-      );
-    }
-
-    if(place.type){
-
-      addResult(
-        "TYPE",
-        String(place.type),
-        "FOUND",
-        "T"
-      );
-    }
-
-    if(place.address){
-
-      const details=
-        Object.entries(place.address)
-        .map(
-          ([key,val])=>
-            `${key}: ${val}`
-        )
-        .join(" · ");
-
-      if(details){
-
-        addResult(
-          "ADDRESS DETAILS",
-          details,
-          "FOUND",
-          "A"
-        );
-      }
-    }
 
   }catch(error){
 
-    $("toolResults").innerHTML="";
+    $("toolResults")
+      .innerHTML =
+      "";
 
     addResult(
       "CONNECTION",
-      error?.message||
-      "Не удалось выполнить геопоиск.",
+      error?.message ||
+        "Ошибка соединения.",
       "ERROR",
       "!"
     );
   }
 }
 
-/* =========================================================
-   GRAPH
-========================================================= */
 
-const graph=$("graph");
-const world=$("world");
-const lines=$("lines");
+function createAddressGraph(
+  data
+){
 
-let scale=1;
-let panX=0;
-let panY=0;
-
-let draggingNode=null;
-let draggingCanvas=null;
-let linking=null;
-let nearest=null;
-
-function screenToWorld(x,y){
-
-  const r=
-    graph.getBoundingClientRect();
-
-  return {
-    x:(x-r.left-panX)/scale,
-    y:(y-r.top-panY)/scale
-  };
-}
-
-function distance(a,b){
-
-  return Math.hypot(
-    a.x-b.x,
-    a.y-b.y
-  );
-}
-
-function linked(a,b){
-
-  return db.links.some(
-    l=>
-      (l.a===a&&l.b===b)||
-      (l.a===b&&l.b===a)
-  );
-}
-
-function connect(a,b){
-
-  if(!a||!b||a===b)
+  if(!data)
     return;
 
-  if(linked(a,b))
-    return;
+  const center =
+    getGraphCenter();
 
-  db.links.push({
-    a:a,
-    b:b
-  });
-
-  saveDB();
-}
-
-function closestNode(x,y,ignore){
-
-  let result=null;
-  let min=Infinity;
-
-  Object.values(db.nodes)
-    .forEach(
-      n=>{
-
-        if(n.id===ignore)
-          return;
-
-        const d=
-          distance(
-            {x:x,y:y},
-            n
-          );
-
-        if(d<min){
-
-          min=d;
-          result=n;
-        }
-      }
+  let addressNode =
+    Object.values(
+      db.nodes
+    ).find(
+      n =>
+        n.type ===
+          "ADDRESS" &&
+        n.content ===
+          data.display_name
     );
 
-  if(!result)
-    return null;
+  if(!addressNode){
 
-  return {
-    node:result,
-    dist:min
-  };
-}
+    const id =
+      createNode(
 
-function renderNodes(){
+        "Address",
 
-  document
-    .querySelectorAll(".node")
-    .forEach(
-      el=>el.remove()
-    );
+        "ADDRESS",
 
-  Object.values(db.nodes)
-    .forEach(
-      n=>{
+        data.display_name,
 
-        const el=
-          document.createElement("div");
+        center.x,
+        center.y
+      );
 
-        el.className="node";
-        el.dataset.id=n.id;
+    addressNode =
+      db.nodes[id];
+  }
 
-        el.style.left=
-          n.x+"px";
+  const values = [
 
-        el.style.top=
-          n.y+"px";
+    [
+      "City",
+      "CITY",
+      data.city
+    ],
 
-        el.innerHTML=`
+    [
+      "Country",
+      "COUNTRY",
+      data.country
+    ],
 
-          <div class="node-card">
+    [
+      "Coordinates",
+      "COORDINATES",
+      `${data.lat}, ${data.lon}`
+    ],
 
-            <button class="node-delete">
-              ×
-            </button>
+    [
+      "Postcode",
+      "POSTCODE",
+      data.postcode
+    ]
 
-            <div class="node-title">
-              ${escapeHTML(n.title)}
-            </div>
+  ];
 
-            <div class="node-type">
-              ${escapeHTML(n.type||"NODE")}
-            </div>
+  let index=0;
 
-            <div class="node-content">
-              ${escapeHTML(n.content||"No data")}
-            </div>
+  values.forEach(
+    item=>{
 
-          </div>
-
-          <div class="node-dot"></div>
-        `;
-
-        world.appendChild(el);
-
-        const card=
-          el.querySelector(".node-card");
-
-        const dot=
-          el.querySelector(".node-dot");
-
-        const del=
-          el.querySelector(".node-delete");
-
-        card.addEventListener(
-          "pointerdown",
-          e=>
-            startNodeDrag(
-              e,
-              n.id
-            )
-        );
-
-        card.addEventListener(
-          "dblclick",
-          e=>{
-
-            if(
-              !e.target.closest(
-                ".node-delete"
-              )
-            )
-              editNode(n.id);
-          }
-        );
-
-        dot.addEventListener(
-          "pointerdown",
-          e=>
-            startLink(
-              e,
-              n.id
-            )
-        );
-
-        del.addEventListener(
-          "pointerdown",
-          e=>
-            e.stopPropagation()
-        );
-
-        del.addEventListener(
-          "click",
-          e=>{
-
-            e.stopPropagation();
-
-            if(
-              confirm(
-                "Удалить узел?"
-              )
-            ){
-
-              delete db.nodes[n.id];
-
-              db.links=
-                db.links.filter(
-                  l=>
-                    l.a!==n.id&&
-                    l.b!==n.id
-                );
-
-              saveDB();
-              renderAll();
-            }
-          }
-        );
-      }
-    );
-
-  renderLines();
-}
-
-function edgePath(a,b){
-
-  const dx=b.x-a.x;
-  const dy=b.y-a.y;
-
-  const len=
-    Math.max(
-      1,
-      Math.hypot(dx,dy)
-    );
-
-  const nx=dx/len;
-  const ny=dy/len;
-
-  const x1=a.x+nx*105;
-  const y1=a.y+ny*40;
-
-  const x2=b.x-nx*105;
-  const y2=b.y-ny*40;
-
-  const bend=
-    Math.min(
-      180,
-      Math.max(
-        50,
-        len*.3
+      if(
+        !item[2] ||
+        item[2] ===
+          "UNKNOWN"
       )
-    );
-
-  return `
-    M ${x1} ${y1}
-    C
-    ${x1+nx*bend} ${y1+ny*bend},
-    ${x2-nx*bend} ${y2-ny*bend},
-    ${x2} ${y2}
-  `;
-}
-
-function renderLines(){
-
-  lines.innerHTML="";
-
-  db.links.forEach(
-    link=>{
-
-      const a=
-        db.nodes[link.a];
-
-      const b=
-        db.nodes[link.b];
-
-      if(!a||!b)
         return;
 
-      const path=
-        edgePath(a,b);
-
-      const glow=
-        document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "path"
+      const angle =
+        index *
+        (
+          Math.PI *
+          2 /
+          values.length
         );
 
-      glow.setAttribute(
-        "d",
-        path
-      );
+      const id =
+        createNode(
 
-      glow.classList.add(
-        "edge-glow"
-      );
+          item[0],
 
-      lines.appendChild(glow);
+          item[1],
 
-      const edge=
-        document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "path"
+          item[2],
+
+          addressNode.x +
+            Math.cos(angle) *
+            230,
+
+          addressNode.y +
+            Math.sin(angle) *
+            230
         );
 
-      edge.setAttribute(
-        "d",
-        path
-      );
+      db.links.push({
 
-      edge.classList.add("edge");
+        a:
+          addressNode.id,
 
-      lines.appendChild(edge);
+        b:
+          id
+      });
+
+      index++;
     }
   );
 
-  if(linking){
-
-    const a=
-      db.nodes[linking.id];
-
-    if(a){
-
-      const p=
-        document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "path"
-        );
-
-      p.classList.add("edge");
-
-      p.setAttribute(
-        "stroke-dasharray",
-        "7 8"
-      );
-
-      p.setAttribute(
-        "d",
-        `
-        M ${a.x+105} ${a.y}
-        C
-        ${(a.x+105+linking.x)/2} ${a.y},
-        ${(a.x+105+linking.x)/2} ${linking.y},
-        ${linking.x} ${linking.y}
-        `
-      );
-
-      lines.appendChild(p);
-    }
-  }
-}
-
-function renderAll(){
+  saveDB();
 
   renderNodes();
-  applyGraph();
-}
-
-function applyGraph(){
-
-  world.style.transform=
-    `translate(${panX}px,${panY}px) scale(${scale})`;
 
   renderLines();
 }
 
-/* =========================================================
+
+/* ==========================================================
    NODE MODAL
-========================================================= */
+========================================================== */
 
-let editingNode=null;
+let editingNode =
+  null;
 
-function openNodeModal(id=null){
 
-  editingNode=id;
+function openNodeModal(
+  nodeId=null
+){
 
-  $("nodeModal").style.display="grid";
+  editingNode =
+    nodeId;
 
-  if(id){
+  $("nodeModalTitle")
+    .textContent =
+      nodeId
+        ? "Edit Node"
+        : "New Node";
 
-    const n=db.nodes[id];
+  if(nodeId){
 
-    if(!n){
-      closeNodeModal();
+    const node =
+      db.nodes[nodeId];
+
+    if(!node)
       return;
-    }
 
-    $("nodeModalTitle").textContent=
-      "Edit Node";
+    $("nodeTitle").value =
+      node.title || "";
 
-    $("nodeTitle").value=
-      n.title||"";
+    $("nodeType").value =
+      node.type || "";
 
-    $("nodeType").value=
-      n.type||"NODE";
-
-    $("nodeContent").value=
-      n.content||"";
+    $("nodeContent").value =
+      node.content || "";
 
   }else{
 
-    $("nodeModalTitle").textContent=
-      "New Node";
+    $("nodeTitle").value =
+      "";
 
-    $("nodeTitle").value="";
-    $("nodeType").value="NODE";
-    $("nodeContent").value="";
+    $("nodeType").value =
+      "";
+
+    $("nodeContent").value =
+      "";
   }
 
-  setTimeout(
-    ()=>$("nodeTitle").focus(),
-    40
-  );
+  $("nodeModal")
+    .classList.add(
+      "open"
+    );
 }
 
-window.openNodeModal=
-  openNodeModal;
 
 function closeNodeModal(){
 
-  $("nodeModal").style.display="none";
-  editingNode=null;
+  $("nodeModal")
+    .classList.remove(
+      "open"
+    );
+
+  editingNode =
+    null;
 }
 
-window.closeNodeModal=
-  closeNodeModal;
 
 function saveNode(){
 
-  const title=
+  const title =
     $("nodeTitle")
+      .value
+      .trim();
+
+  const type =
+    $("nodeType")
+      .value
+      .trim()
+      .toUpperCase();
+
+  const content =
+    $("nodeContent")
       .value
       .trim();
 
   if(!title){
 
-    toast("Введите название");
+    toast(
+      "Введите название"
+    );
+
     return;
   }
 
   if(editingNode){
 
-    const n=
-      db.nodes[editingNode];
+    const node =
+      db.nodes[
+        editingNode
+      ];
 
-    if(!n){
-      closeNodeModal();
-      return;
+    if(node){
+
+      node.title =
+        title;
+
+      node.type =
+        type ||
+        "UNKNOWN";
+
+      node.content =
+        content;
     }
-
-    n.title=title;
-
-    n.type=
-      $("nodeType")
-        .value
-        .trim()||
-      "NODE";
-
-    n.content=
-      $("nodeContent")
-        .value
-        .trim();
 
   }else{
 
-    const center=
-      screenToWorld(
-        graph.clientWidth/2,
-        graph.clientHeight/2
-      );
+    const center =
+      getGraphCenter();
 
-    const count=
-      Object.keys(db.nodes).length;
+    createNode(
 
-    const angle=
-      count*.8;
+      title,
 
-    const radius=
-      Math.min(
-        70+count*22,
-        250
-      );
+      type ||
+        "UNKNOWN",
 
-    const id=uid();
+      content,
 
-    db.nodes[id]={
+      center.x +
+        (
+          Math.random() -
+          .5
+        ) * 260,
 
-      id:id,
-
-      title:title,
-
-      type:
-        $("nodeType")
-          .value
-          .trim()||
-        "NODE",
-
-      content:
-        $("nodeContent")
-          .value
-          .trim(),
-
-      x:
-        center.x+
-        Math.cos(angle)*
-        radius,
-
-      y:
-        center.y+
-        Math.sin(angle)*
-        radius
-    };
+      center.y +
+        (
+          Math.random() -
+          .5
+        ) * 180
+    );
   }
 
   saveDB();
+
+  renderNodes();
+
+  renderLines();
+
   closeNodeModal();
-  renderAll();
 
-  toast("Node saved");
+  toast(
+    "Node saved"
+  );
 }
 
-window.saveNode=saveNode;
 
-function editNode(id){
-  openNodeModal(id);
+/* ==========================================================
+   GRAPH STATE
+========================================================== */
+
+const graph =
+  $("graph");
+
+const world =
+  $("world");
+
+let zoom =
+  1;
+
+let panX =
+  0;
+
+let panY =
+  0;
+
+let draggingNode =
+  null;
+
+let dragOffsetX =
+  0;
+
+let dragOffsetY =
+  0;
+
+let panning =
+  false;
+
+let panStartX =
+  0;
+
+let panStartY =
+  0;
+
+let linkSource =
+  null;
+
+
+function applyWorld(){
+
+  world.style.transform =
+    `
+      translate(
+        calc(-50% + ${panX}px),
+        calc(-50% + ${panY}px)
+      )
+      scale(${zoom})
+    `;
 }
 
-/* =========================================================
-   DRAG
-========================================================= */
 
-function startNodeDrag(e,id){
+function getGraphCenter(){
 
-  if(
-    e.button!==undefined&&
-    e.button!==0
-  )
-    return;
+  return {
 
-  e.preventDefault();
-  e.stopPropagation();
+    x:
+      -panX / zoom,
 
-  const n=db.nodes[id];
+    y:
+      -panY / zoom
+  };
+}
 
-  if(!n)
-    return;
 
-  const p=
-    screenToWorld(
-      e.clientX,
-      e.clientY
+function renderNodes(){
+
+  world
+    .querySelectorAll(
+      ".node"
+    )
+    .forEach(
+      el =>
+        el.remove()
     );
 
-  draggingNode={
-    id:id,
-    dx:n.x-p.x,
-    dy:n.y-p.y
-  };
+  Object.values(
+    db.nodes
+  ).forEach(
+    node=>{
 
-  const el=
-    document.querySelector(
-      `.node[data-id="${id}"]`
+      const el =
+        document.createElement(
+          "div"
+        );
+
+      el.className =
+        "node";
+
+      el.dataset.id =
+        node.id;
+
+      el.style.left =
+        node.x + "px";
+
+      el.style.top =
+        node.y + "px";
+
+      el.innerHTML = `
+
+        <button
+          class="node-delete"
+          title="Delete"
+        >
+          ×
+        </button>
+
+        <div class="node-type">
+          ${escapeHTML(
+            node.type ||
+            "UNKNOWN"
+          )}
+        </div>
+
+        <div class="node-title">
+          ${escapeHTML(
+            node.title
+          )}
+        </div>
+
+        <div class="node-content">
+          ${escapeHTML(
+            node.content
+          )}
+        </div>
+
+        <div
+          class="node-dot"
+          title="Link"
+        ></div>
+
+      `;
+
+      world.appendChild(
+        el
+      );
+
+      const deleteBtn =
+        el.querySelector(
+          ".node-delete"
+        );
+
+      deleteBtn.onclick =
+        event=>{
+
+          event.stopPropagation();
+
+          deleteNode(
+            node.id
+          );
+        };
+
+      const dot =
+        el.querySelector(
+          ".node-dot"
+        );
+
+      dot.onclick =
+        event=>{
+
+          event.stopPropagation();
+
+          handleLinkDot(
+            node.id
+          );
+        };
+
+      el.addEventListener(
+        "dblclick",
+        event=>{
+
+          if(
+            event.target.closest(
+              ".node-delete"
+            ) ||
+            event.target.closest(
+              ".node-dot"
+            )
+          )
+            return;
+
+          openNodeModal(
+            node.id
+          );
+        }
+      );
+
+      el.addEventListener(
+        "pointerdown",
+        event=>{
+
+          if(
+            event.target.closest(
+              ".node-delete"
+            ) ||
+            event.target.closest(
+              ".node-dot"
+            )
+          )
+            return;
+
+          startNodeDrag(
+            event,
+            node
+          );
+        }
+      );
+    }
+  );
+}
+
+
+function startNodeDrag(
+  event,
+  node
+){
+
+  event.preventDefault();
+
+  draggingNode =
+    node;
+
+  node._dragging =
+    true;
+
+  const rect =
+    graph.getBoundingClientRect();
+
+  const graphX =
+    (
+      event.clientX -
+      rect.left -
+      rect.width / 2 -
+      panX
+    ) / zoom;
+
+  const graphY =
+    (
+      event.clientY -
+      rect.top -
+      rect.height / 2 -
+      panY
+    ) / zoom;
+
+  dragOffsetX =
+    node.x -
+    graphX;
+
+  dragOffsetY =
+    node.y -
+    graphY;
+
+  const el =
+    world.querySelector(
+      `[data-id="${node.id}"]`
     );
 
   if(el)
-    el.classList.add("moving");
-}
-
-function startLink(e,id){
-
-  e.preventDefault();
-  e.stopPropagation();
-
-  const p=
-    screenToWorld(
-      e.clientX,
-      e.clientY
+    el.classList.add(
+      "dragging"
     );
 
-  linking={
-    id:id,
-    x:p.x,
-    y:p.y
-  };
+  window.addEventListener(
+    "pointermove",
+    moveNode
+  );
+
+  window.addEventListener(
+    "pointerup",
+    stopNodeDrag,
+    {
+      once:true
+    }
+  );
+}
+
+
+function moveNode(
+  event
+){
+
+  if(!draggingNode)
+    return;
+
+  const rect =
+    graph.getBoundingClientRect();
+
+  const graphX =
+    (
+      event.clientX -
+      rect.left -
+      rect.width / 2 -
+      panX
+    ) / zoom;
+
+  const graphY =
+    (
+      event.clientY -
+      rect.top -
+      rect.height / 2 -
+      panY
+    ) / zoom;
+
+  draggingNode.x =
+    graphX +
+    dragOffsetX;
+
+  draggingNode.y =
+    graphY +
+    dragOffsetY;
+
+  const el =
+    world.querySelector(
+      `[data-id="${draggingNode.id}"]`
+    );
+
+  if(el){
+
+    el.style.left =
+      draggingNode.x +
+      "px";
+
+    el.style.top =
+      draggingNode.y +
+      "px";
+  }
 
   renderLines();
 }
 
-window.addEventListener(
-  "pointermove",
-  e=>{
 
-    if(draggingNode){
+function stopNodeDrag(){
 
-      const p=
-        screenToWorld(
-          e.clientX,
-          e.clientY
-        );
+  if(!draggingNode)
+    return;
 
-      const n=
+  const el =
+    world.querySelector(
+      `[data-id="${draggingNode.id}"]`
+    );
+
+  if(el)
+    el.classList.remove(
+      "dragging"
+    );
+
+  draggingNode._dragging =
+    false;
+
+  draggingNode =
+    null;
+
+  window.removeEventListener(
+    "pointermove",
+    moveNode
+  );
+
+  saveDB();
+
+  renderLines();
+}
+
+
+function deleteNode(
+  id
+){
+
+  const node =
+    db.nodes[id];
+
+  if(!node)
+    return;
+
+  if(
+    !confirm(
+      `Delete node "${node.title}"?`
+    )
+  )
+    return;
+
+  delete db.nodes[id];
+
+  db.links =
+    db.links.filter(
+      link =>
+        link.a !== id &&
+        link.b !== id
+    );
+
+  saveDB();
+
+  renderNodes();
+
+  renderLines();
+
+  toast(
+    "Node deleted"
+  );
+}
+
+
+/* ==========================================================
+   LINKING
+========================================================== */
+
+function handleLinkDot(
+  id
+){
+
+  if(!linkSource){
+
+    linkSource =
+      id;
+
+    highlightNode(
+      id
+    );
+
+    toast(
+      "Select another node"
+    );
+
+    return;
+  }
+
+  if(
+    linkSource === id
+  ){
+
+    linkSource =
+      null;
+
+    clearHighlights();
+
+    return;
+  }
+
+  const exists =
+    db.links.some(
+      link =>
+        (
+          link.a ===
+            linkSource &&
+          link.b ===
+            id
+        ) ||
+        (
+          link.a ===
+            id &&
+          link.b ===
+            linkSource
+        )
+    );
+
+  if(!exists){
+
+    db.links.push({
+
+      a:
+        linkSource,
+
+      b:
+        id
+    });
+
+    saveDB();
+
+    renderLines();
+
+    toast(
+      "Nodes linked"
+    );
+  }
+
+  linkSource =
+    null;
+
+  clearHighlights();
+}
+
+
+function highlightNode(
+  id
+){
+
+  clearHighlights();
+
+  const el =
+    world.querySelector(
+      `[data-id="${id}"]`
+    );
+
+  if(el)
+    el.classList.add(
+      "highlight"
+    );
+}
+
+
+function clearHighlights(){
+
+  world
+    .querySelectorAll(
+      ".node.highlight"
+    )
+    .forEach(
+      el =>
+        el.classList.remove(
+          "highlight"
+        )
+    );
+}
+
+
+/* ==========================================================
+   GRAPH LINES
+========================================================== */
+
+function renderLines(){
+
+  const svg =
+    $("lines");
+
+  svg.innerHTML =
+    "";
+
+  db.links.forEach(
+    link=>{
+
+      const a =
         db.nodes[
-          draggingNode.id
+          link.a
         ];
 
-      if(!n)
+      const b =
+        db.nodes[
+          link.b
+        ];
+
+      if(!a || !b)
         return;
 
-      n.x=
-        p.x+
-        draggingNode.dx;
+      const dx =
+        b.x - a.x;
 
-      n.y=
-        p.y+
-        draggingNode.dy;
+      const dy =
+        b.y - a.y;
 
-      const el=
-        document.querySelector(
-          `.node[data-id="${n.id}"]`
+      const length =
+        Math.sqrt(
+          dx*dx +
+          dy*dy
         );
 
-      if(el){
+      if(!length)
+        return;
 
-        el.style.left=
-          n.x+"px";
+      const nx =
+        -dy /
+        length;
 
-        el.style.top=
-          n.y+"px";
-      }
+      const ny =
+        dx /
+        length;
 
-      const near=
-        closestNode(
-          n.x,
-          n.y,
-          n.id
+      const bend =
+        Math.min(
+          45,
+          length *
+          .12
         );
 
-      document
-        .querySelectorAll(".node.near")
-        .forEach(
-          x=>x.classList.remove("near")
+      const mx =
+        (a.x+b.x)/2;
+
+      const my =
+        (a.y+b.y)/2;
+
+      const cx =
+        mx +
+        nx*bend;
+
+      const cy =
+        my +
+        ny*bend;
+
+      const path =
+        document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "path"
         );
 
-      nearest=null;
+      path.setAttribute(
+        "d",
+        `
+          M ${a.x} ${a.y}
+          Q ${cx} ${cy}
+            ${b.x} ${b.y}
+        `
+      );
 
-      if(
-        near&&
-        near.dist<160
-      ){
+      path.setAttribute(
+        "fill",
+        "none"
+      );
 
-        nearest=
-          near.node.id;
+      path.setAttribute(
+        "stroke",
+        "rgba(255,255,255,.16)"
+      );
 
-        const target=
-          document.querySelector(
-            `.node[data-id="${nearest}"]`
-          );
+      path.setAttribute(
+        "stroke-width",
+        "1.2"
+      );
 
-        if(target)
-          target.classList.add("near");
-      }
+      path.setAttribute(
+        "stroke-dasharray",
+        "3 6"
+      );
 
-      renderLines();
-    }
+      path.style.animation =
+        "dash 5s linear infinite";
 
-    if(linking){
-
-      const p=
-        screenToWorld(
-          e.clientX,
-          e.clientY
-        );
-
-      linking.x=p.x;
-      linking.y=p.y;
-
-      const near=
-        closestNode(
-          p.x,
-          p.y,
-          linking.id
-        );
-
-      document
-        .querySelectorAll(".node.near")
-        .forEach(
-          x=>x.classList.remove("near")
-        );
-
-      nearest=null;
-
-      if(
-        near&&
-        near.dist<150
-      ){
-
-        nearest=
-          near.node.id;
-
-        const target=
-          document.querySelector(
-            `.node[data-id="${nearest}"]`
-          );
-
-        if(target)
-          target.classList.add("near");
-      }
-
-      renderLines();
-    }
-
-    if(draggingCanvas){
-
-      panX=
-        draggingCanvas.ox+
-        e.clientX-
-        draggingCanvas.sx;
-
-      panY=
-        draggingCanvas.oy+
-        e.clientY-
-        draggingCanvas.sy;
-
-      applyGraph();
-    }
-  }
-);
-
-window.addEventListener(
-  "pointerup",
-  ()=>{
-
-    if(draggingNode){
-
-      const n=
-        db.nodes[
-          draggingNode.id
-        ];
-
-      if(n){
-
-        const near=
-          closestNode(
-            n.x,
-            n.y,
-            n.id
-          );
-
-        if(
-          near&&
-          near.dist<160
-        ){
-
-          connect(
-            n.id,
-            near.node.id
-          );
-        }
-      }
-
-      document
-        .querySelectorAll(".node.moving")
-        .forEach(
-          x=>x.classList.remove("moving")
-        );
-
-      document
-        .querySelectorAll(".node.near")
-        .forEach(
-          x=>x.classList.remove("near")
-        );
-
-      draggingNode=null;
-      nearest=null;
-
-      saveDB();
-      renderAll();
-    }
-
-    if(linking){
-
-      if(
-        nearest&&
-        !linked(
-          linking.id,
-          nearest
-        )
-      ){
-
-        connect(
-          linking.id,
-          nearest
-        );
-
-        toast("Connection created");
-      }
-
-      linking=null;
-      nearest=null;
-
-      document
-        .querySelectorAll(".node.near")
-        .forEach(
-          x=>x.classList.remove("near")
-        );
-
-      renderLines();
-    }
-
-    if(draggingCanvas){
-
-      draggingCanvas=null;
-
-      graph.classList.remove(
-        "dragging"
+      svg.appendChild(
+        path
       );
     }
-  }
-);
+  );
+}
 
-/* =========================================================
-   CANVAS PAN
-========================================================= */
+
+/* ==========================================================
+   PAN / ZOOM
+========================================================== */
 
 graph.addEventListener(
   "pointerdown",
-  e=>{
+  event=>{
 
     if(
-      e.target.closest(".node")
+      event.target.closest(
+        ".node"
+      )
     )
       return;
 
-    if(
-      e.button!==undefined&&
-      e.button!==0
-    )
-      return;
+    panning =
+      true;
 
-    draggingCanvas={
-      sx:e.clientX,
-      sy:e.clientY,
-      ox:panX,
-      oy:panY
-    };
+    panStartX =
+      event.clientX -
+      panX;
 
-    graph.classList.add("dragging");
+    panStartY =
+      event.clientY -
+      panY;
+
+    graph.setPointerCapture(
+      event.pointerId
+    );
   }
 );
 
-/* =========================================================
-   ZOOM
-========================================================= */
+
+graph.addEventListener(
+  "pointermove",
+  event=>{
+
+    if(!panning)
+      return;
+
+    panX =
+      event.clientX -
+      panStartX;
+
+    panY =
+      event.clientY -
+      panStartY;
+
+    applyWorld();
+  }
+);
+
+
+graph.addEventListener(
+  "pointerup",
+  ()=>{
+    panning =
+      false;
+
+    saveDB();
+  }
+);
+
 
 graph.addEventListener(
   "wheel",
-  e=>{
+  event=>{
 
-    e.preventDefault();
+    event.preventDefault();
 
-    const before=
-      screenToWorld(
-        e.clientX,
-        e.clientY
-      );
+    const oldZoom =
+      zoom;
 
-    scale*=
-      e.deltaY<0
-      ?1.1
-      :.9;
+    zoom +=
+      event.deltaY < 0
+        ? .08
+        : -.08;
 
-    scale=
+    zoom =
       Math.max(
         .35,
         Math.min(
           2.5,
-          scale
+          zoom
         )
       );
 
-    const after=
-      screenToWorld(
-        e.clientX,
-        e.clientY
-      );
+    if(
+      oldZoom !== zoom
+    ){
 
-    panX+=
-      (after.x-before.x)*
-      scale;
-
-    panY+=
-      (after.y-before.y)*
-      scale;
-
-    applyGraph();
+      applyWorld();
+    }
 
   },
-  {passive:false}
+  {
+    passive:false
+  }
 );
 
-/* =========================================================
-   CENTER
-========================================================= */
 
 function centerGraph(){
 
-  scale=1;
+  zoom =
+    1;
 
-  panX=
-    graph.clientWidth/2;
+  panX =
+    0;
 
-  panY=
-    graph.clientHeight/2;
+  panY =
+    0;
 
-  applyGraph();
+  applyWorld();
+
+  toast(
+    "Graph centered"
+  );
 }
 
-window.centerGraph=
-  centerGraph;
 
-/* =========================================================
+/* ==========================================================
    SEARCH
-========================================================= */
+========================================================== */
 
 $("chainSearch")
-  .addEventListener(
-    "input",
-    function(){
+.addEventListener(
+  "input",
+  event=>{
 
-      const q=
-        this.value
-          .trim()
-          .toLowerCase();
+    const query =
+      event.target.value
+        .trim()
+        .toLowerCase();
 
-      document
-        .querySelectorAll(".node")
-        .forEach(
-          el=>{
+    world
+      .querySelectorAll(
+        ".node"
+      )
+      .forEach(
+        el=>{
+
+          const id =
+            el.dataset.id;
+
+          const node =
+            db.nodes[id];
+
+          if(!query){
 
             el.classList.remove(
-              "node-found"
+              "highlight"
             );
 
-            if(!q){
-
-              el.style.opacity="1";
-              return;
-            }
-
-            const n=
-              db.nodes[
-                el.dataset.id
-              ];
-
-            if(!n)
-              return;
-
-            const text=
-              (
-                n.title+" "+
-                n.type+" "+
-                n.content
-              ).toLowerCase();
-
-            if(text.includes(q)){
-
-              el.style.opacity="1";
-              el.classList.add(
-                "node-found"
-              );
-
-            }else{
-
-              el.style.opacity=".13";
-            }
+            return;
           }
-        );
-    }
-  );
 
-/* =========================================================
-   PROFILE
-========================================================= */
+          const text =
+            (
+              node.title +
+              " " +
+              node.type +
+              " " +
+              node.content
+            )
+            .toLowerCase();
 
-function updateProfile(){
-
-  $("profileName").textContent=
-    db.profile.name||
-    "NZX User";
-
-  $("profileUsername").textContent=
-    "@"+
-    (
-      db.profile.username||
-      "nzx_user"
-    );
-
-  if(db.profile.avatar){
-
-    $("profileAvatar").src=
-      db.profile.avatar;
-
-    $("miniAvatar").src=
-      db.profile.avatar;
-
-  }else{
-
-    $("profileAvatar")
-      .removeAttribute("src");
-
-    $("miniAvatar")
-      .removeAttribute("src");
-  }
-}
-
-function chooseAvatar(){
-  $("avatarFile").click();
-}
-
-window.chooseAvatar=
-  chooseAvatar;
-
-$("avatarFile")
-  .addEventListener(
-    "change",
-    e=>{
-
-      const file=
-        e.target.files[0];
-
-      if(!file)
-        return;
-
-      if(
-        !file.type.startsWith("image/")
-      ){
-
-        toast("Выберите изображение");
-        return;
-      }
-
-      const reader=
-        new FileReader();
-
-      reader.onload=()=>{
-
-        db.profile.avatar=
-          reader.result;
-
-        saveDB();
-        updateProfile();
-
-        toast("Avatar updated");
-      };
-
-      reader.readAsDataURL(file);
-    }
-  );
-
-function editProfileName(){
-
-  const name=
-    prompt(
-      "Имя:",
-      db.profile.name||
-      "NZX User"
-    );
-
-  if(name===null)
-    return;
-
-  const username=
-    prompt(
-      "Username:",
-      db.profile.username||
-      "nzx_user"
-    );
-
-  if(username===null)
-    return;
-
-  db.profile.name=
-    name.trim()||
-    "NZX User";
-
-  db.profile.username=
-    username
-      .trim()
-      .replace(/\s+/g,"")
-      .replace(/^@/,"")||
-    "nzx_user";
-
-  saveDB();
-  updateProfile();
-
-  toast("Profile updated");
-}
-
-/* =========================================================
-   SATURN
-========================================================= */
-
-(function(){
-
-  const canvas=$("saturn");
-  const ctx=canvas.getContext("2d");
-
-  let W=0;
-  let H=0;
-  let dpr=1;
-
-  const points=[];
-  const count=1100;
-  let rotation=0;
-
-  function resize(){
-
-    const r=
-      canvas.getBoundingClientRect();
-
-    dpr=
-      Math.min(
-        window.devicePixelRatio||1,
-        2
+          el.classList.toggle(
+            "highlight",
+            text.includes(
+              query
+            )
+          );
+        }
       );
-
-    W=r.width;
-    H=r.height;
-
-    canvas.width=W*dpr;
-    canvas.height=H*dpr;
-
-    ctx.setTransform(
-      dpr,0,0,dpr,0,0
-    );
   }
-
-  function seed(){
-
-    points.length=0;
-
-    const golden=
-      Math.PI*
-      (3-Math.sqrt(5));
-
-    for(
-      let i=0;
-      i<count;
-      i++
-    ){
-
-      const y=
-        1-
-        (i/(count-1))*2;
-
-      const radius=
-        Math.sqrt(
-          Math.max(
-            0,
-            1-y*y
-          )
-        );
-
-      const a=i*golden;
-
-      points.push({
-
-        x:
-          Math.cos(a)*radius,
-
-        y:y,
-
-        z:
-          Math.sin(a)*radius,
-
-        size:
-          .35+
-          Math.random()*1.1
-      });
-    }
-  }
-
-  function draw(time){
-
-    ctx.clearRect(
-      0,0,W,H
-    );
-
-    rotation+=.00065;
-
-    const cx=W/2;
-    const cy=H/2;
-
-    const R=
-      Math.min(W,H)*.235;
-
-    const projected=[];
-
-    for(const p of points){
-
-      const c=Math.cos(rotation);
-      const s=Math.sin(rotation);
-
-      const x=
-        p.x*c-
-        p.z*s;
-
-      const z=
-        p.x*s+
-        p.z*c;
-
-      if(z<-.62)
-        continue;
-
-      const perspective=
-        2.2/
-        (2.2-z*.55);
-
-      projected.push({
-
-        x:
-          cx+
-          x*
-          R*
-          perspective,
-
-        y:
-          cy+
-          p.y*
-          R*
-          perspective,
-
-        z:z,
-
-        size:
-          p.size*
-          perspective,
-
-        alpha:
-          .13+
-          ((z+1)/2)*.57
-      });
-    }
-
-    projected.sort(
-      (a,b)=>a.z-b.z
-    );
-
-    for(const p of projected){
-
-      ctx.beginPath();
-
-      ctx.arc(
-        p.x,
-        p.y,
-        Math.max(.35,p.size),
-        0,
-        Math.PI*2
-      );
-
-      ctx.fillStyle=
-        `rgba(220,220,220,${p.alpha})`;
-
-      ctx.fill();
-    }
-
-    const ring=$("saturnRing");
-
-    const degrees=
-      (time*.012)%360;
-
-    ring.style.transform=
-      `
-      translate(-50%,-50%)
-      rotateX(67deg)
-      rotateZ(${-15+degrees}deg)
-      `;
-
-    requestAnimationFrame(draw);
-  }
-
-  resize();
-  seed();
-
-  requestAnimationFrame(draw);
-
-  addEventListener(
-    "resize",
-    resize
-  );
-
-})();
-
-/* =========================================================
-   MODALS
-========================================================= */
-
-$("nodeModal")
-  .addEventListener(
-    "pointerdown",
-    e=>{
-
-      if(
-        e.target.id==="nodeModal"
-      ){
-        closeNodeModal();
-      }
-    }
-  );
-
-/* =========================================================
-   INIT
-========================================================= */
-
-renderAll();
-
-setTimeout(
-  centerGraph,
-  80
 );
 
-updateProfile();
+
+/* ==========================================================
+   SATURN PARTICLES
+========================================================== */
+
+const canvas =
+  $("saturn");
+
+const ctx =
+  canvas.getContext(
+    "2d"
+  );
+
+let particles=[];
+
+let rotation=0;
+
+
+function resizeSaturn(){
+
+  const rect =
+    canvas.getBoundingClientRect();
+
+  const dpr =
+    window.devicePixelRatio ||
+    1;
+
+  canvas.width =
+    rect.width*dpr;
+
+  canvas.height =
+    rect.height*dpr;
+
+  ctx.setTransform(
+    dpr,
+    0,
+    0,
+    dpr,
+    0,
+    0
+  );
+
+  createParticles(
+    rect.width,
+    rect.height
+  );
+}
+
+
+function createParticles(
+  width,
+  height
+){
+
+  particles=[];
+
+  const count =
+    1100;
+
+  const radius =
+    Math.min(
+      width,
+      height
+    )*.28;
+
+  for(
+    let i=0;
+    i<count;
+    i++
+  ){
+
+    const u =
+      Math.random()*2-1;
+
+    const angle =
+      Math.random()*
+      Math.PI*2;
+
+    const r =
+      Math.sqrt(
+        1-u*u
+      );
+
+    const x =
+      r*
+      Math.cos(angle);
+
+    const y =
+      u;
+
+    const z =
+      r*
+      Math.sin(angle);
+
+    particles.push({
+
+      x,
+      y,
+      z,
+
+      size:
+        .45 +
+        Math.random()*1.15,
+
+      alpha:
+        .15 +
+        Math.random()*.65
+    });
+  }
+}
+
+
+function drawSaturn(){
+
+  const width =
+    canvas.clientWidth;
+
+  const height =
+    canvas.clientHeight;
+
+  ctx.clearRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+  const cx =
+    width/2;
+
+  const cy =
+    height/2;
+
+  const radius =
+    Math.min(
+      width,
+      height
+    )*.28;
+
+  rotation +=
+    .00065;
+
+  for(
+    const p of particles
+  ){
+
+    const c =
+      Math.cos(
+        rotation
+      );
+
+    const s =
+      Math.sin(
+        rotation
+      );
+
+    const x =
+      p.x*c -
+      p.z*s;
+
+    const z =
+      p.x*s +
+      p.z*c;
+
+    const scale =
+      .55 +
+      (
+        z+1
+      )*.23;
+
+    const px =
+      cx +
+      x*
+      radius*
+      scale;
+
+    const py =
+      cy +
+      p.y*
+      radius*
+      scale;
+
+    const alpha =
+      Math.max(
+        .04,
+        p.alpha*
+        (
+          .45 +
+          (z+1)*.28
+        )
+      );
+
+    ctx.beginPath();
+
+    ctx.arc(
+      px,
+      py,
+      p.size*
+      scale,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fillStyle =
+      `rgba(255,255,255,${alpha})`;
+
+    ctx.fill();
+  }
+
+  requestAnimationFrame(
+    drawSaturn
+  );
+}
+
+
+window.addEventListener(
+  "resize",
+  resizeSaturn
+);
+
+
+/* ==========================================================
+   RING
+========================================================== */
+
+let ringTime=0;
+
+function animateRing(){
+
+  ringTime +=
+    .016;
+
+  const degrees =
+    (
+      ringTime*
+      .75
+    ) %
+    360;
+
+  $("saturnRing")
+    .style.transform =
+      `
+        translate(-50%,-50%)
+        rotateX(67deg)
+        rotateZ(
+          ${-15+degrees}deg
+        )
+      `;
+
+  requestAnimationFrame(
+    animateRing
+  );
+}
+
+
+/* ==========================================================
+   ANIMATION STYLE
+========================================================== */
+
+const style =
+  document.createElement(
+    "style"
+  );
+
+style.textContent = `
+
+@keyframes dash{
+
+  to{
+    stroke-dashoffset:-60;
+  }
+
+}
+
+`;
+
+document.head.appendChild(
+  style
+);
+
+
+/* ==========================================================
+   INIT
+========================================================== */
+
+function init(){
+
+  updateProfileUI();
+
+  applyWorld();
+
+  renderNodes();
+
+  renderLines();
+
+  resizeSaturn();
+
+  drawSaturn();
+
+  animateRing();
+}
+
+
+init();
 
 </script>
 
