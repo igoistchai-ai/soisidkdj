@@ -21,8 +21,13 @@ html,body{
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
-button,input,textarea{font:inherit}
-button{cursor:pointer}
+button,input,textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
 
 :root{
   --bg:#050505;
@@ -40,172 +45,247 @@ button{cursor:pointer}
 
 
 /* ==========================================================
-   INTRO / ASCII BOOT
+   HACK INTRO
 ========================================================== */
 
 #bootScreen{
   position:fixed;
   inset:0;
-  z-index:99999;
+  z-index:999999;
   background:#000;
   overflow:hidden;
   display:flex;
   align-items:center;
   justify-content:center;
-  transition:
-    opacity .8s ease,
-    visibility .8s ease;
-}
-
-#bootScreen.hide{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-}
-
-.boot-stage{
-  width:100%;
-  height:100%;
-  position:relative;
-  overflow:hidden;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  color:#fff;
 }
 
 #asciiContainer{
-  width:min(1500px,96vw);
-  max-height:94vh;
+  position:absolute;
+  inset:0;
+
+  width:100%;
+  height:100%;
+
+  padding:18px;
+
   overflow:hidden;
-  color:#f5f5f5;
+
+  color:#fff;
+
   font-family:
     "Courier New",
     Courier,
     monospace;
+
   font-size:
-    clamp(2px,0.48vw,7px);
-  line-height:1;
+    clamp(3px,.47vw,7px);
+
+  line-height:.94;
+
   white-space:pre;
-  text-align:left;
-  transform:scale(1);
-  transform-origin:center;
-  opacity:.94;
-}
 
-.ascii-line{
-  display:block;
-  height:1em;
-  opacity:0;
+  text-shadow:
+    0 0 4px rgba(255,255,255,.65);
+
   transform:
-    translateY(
-      -100vh
-    )
-    translateX(
-      var(--random-x)
-    )
-    rotate(
-      var(--random-r)
-    );
-  filter:blur(4px);
-  animation:
-    asciiDrop
-    1.15s
-    cubic-bezier(.15,.75,.2,1)
-    forwards;
-  animation-delay:var(--delay);
+    scale(1.02);
+
+  transform-origin:center;
 }
 
-@keyframes asciiDrop{
+.hack-line{
+  position:absolute;
+  left:0;
+
+  width:100%;
+
+  white-space:pre;
+
+  opacity:0;
+
+  transform:
+    translateY(-100vh)
+    translateX(var(--hack-x))
+    skewX(var(--hack-skew));
+
+  animation:
+    hackDrop
+    .105s
+    cubic-bezier(.02,.9,.08,1)
+    forwards;
+
+  animation-delay:
+    var(--hack-delay);
+}
+
+@keyframes hackDrop{
+
   0%{
     opacity:0;
+
     transform:
       translateY(-100vh)
-      translateX(var(--random-x))
-      rotate(var(--random-r));
-    filter:blur(5px);
+      translateX(var(--hack-x))
+      skewX(var(--hack-skew));
   }
 
-  35%{
-    opacity:.35;
+  25%{
+    opacity:1;
+  }
+
+  55%{
+    transform:
+      translateY(8px)
+      translateX(0)
+      skewX(0);
   }
 
   72%{
-    opacity:.9;
-    filter:blur(0);
+    transform:
+      translateY(-3px)
+      translateX(0)
+      skewX(0);
   }
 
   100%{
     opacity:1;
+
     transform:
       translateY(0)
       translateX(0)
-      rotate(0);
-    filter:blur(0);
+      skewX(0);
   }
 }
 
-.boot-noise{
+#bootScreen.hack{
+  animation:
+    screenGlitch
+    .075s
+    infinite;
+}
+
+@keyframes screenGlitch{
+
+  0%{
+    transform:translate(0,0);
+    filter:none;
+  }
+
+  18%{
+    transform:translate(-4px,1px);
+    filter:contrast(1.9) brightness(1.15);
+  }
+
+  31%{
+    transform:translate(5px,-2px);
+    filter:contrast(2);
+  }
+
+  48%{
+    transform:translate(-2px,3px);
+    filter:brightness(1.5);
+  }
+
+  67%{
+    transform:translate(3px,-1px);
+    filter:contrast(1.6);
+  }
+
+  83%{
+    transform:translate(-1px,0);
+  }
+
+  100%{
+    transform:translate(0,0);
+    filter:none;
+  }
+}
+
+#bootScreen::before{
+  content:"";
+
   position:absolute;
   inset:0;
+
   pointer-events:none;
+
+  z-index:10;
+
   background:
     repeating-linear-gradient(
       0deg,
       transparent 0,
       transparent 2px,
-      rgba(255,255,255,.012) 3px
+      rgba(255,255,255,.025) 3px
     );
-  mix-blend-mode:screen;
 }
 
-.boot-vignette{
+#bootScreen::after{
+  content:"";
+
   position:absolute;
   inset:0;
+
   pointer-events:none;
+
+  z-index:11;
+
   background:
     radial-gradient(
       ellipse at center,
-      transparent 35%,
-      rgba(0,0,0,.55) 100%
+      transparent 15%,
+      rgba(0,0,0,.8) 100%
     );
 }
 
-.boot-status{
+.boot-flash{
   position:absolute;
-  left:50%;
-  bottom:34px;
-  transform:translateX(-50%);
-  color:#555;
-  font-family:
-    "Courier New",
-    monospace;
-  font-size:9px;
-  letter-spacing:.28em;
-  white-space:nowrap;
+  inset:0;
+
+  z-index:20;
+
+  pointer-events:none;
+
+  background:#fff;
+
   opacity:0;
+}
+
+#bootScreen.flash .boot-flash{
   animation:
-    statusIn .7s ease forwards;
-  animation-delay:1.15s;
+    flash .12s linear;
 }
 
-.boot-status::after{
-  content:"";
-  display:inline-block;
-  width:5px;
-  height:10px;
-  margin-left:5px;
-  background:#777;
-  vertical-align:-1px;
-  animation:
-    cursorBlink .65s infinite;
+@keyframes flash{
+
+  0%{
+    opacity:.8;
+  }
+
+  100%{
+    opacity:0;
+  }
 }
 
-@keyframes statusIn{
-  to{opacity:1}
-}
+#bootScreen.hack-end{
+  animation:none;
 
-@keyframes cursorBlink{
-  50%{opacity:0}
+  opacity:0;
+
+  transform:
+    scale(1.12);
+
+  filter:
+    blur(14px)
+    brightness(2.2);
+
+  transition:
+    opacity .15s linear,
+    transform .15s linear,
+    filter .15s linear;
+
+  pointer-events:none;
 }
 
 
@@ -217,6 +297,7 @@ button{cursor:pointer}
   width:100%;
   height:100%;
   position:relative;
+
   background:
     radial-gradient(
       circle at 50% 40%,
@@ -234,9 +315,11 @@ button{cursor:pointer}
 .topbar{
   position:fixed;
   z-index:100;
+
   top:0;
   left:0;
   right:0;
+
   height:72px;
 
   display:flex;
@@ -280,6 +363,7 @@ button{cursor:pointer}
   display:flex;
   flex-direction:column;
   gap:2px;
+
   min-width:210px;
 }
 
@@ -298,11 +382,13 @@ button{cursor:pointer}
   display:flex;
   align-items:center;
   gap:7px;
+
   margin-left:auto;
 }
 
 .top-btn{
   height:34px;
+
   padding:0 13px;
 
   color:#bbb;
@@ -333,6 +419,7 @@ button{cursor:pointer}
   border:1px solid #333;
 
   background:#111;
+
   overflow:hidden;
 
   margin-left:10px;
@@ -359,6 +446,7 @@ button{cursor:pointer}
   bottom:0;
 
   width:66px;
+
   z-index:90;
 
   display:flex;
@@ -387,6 +475,7 @@ button{cursor:pointer}
   background:transparent;
 
   font-size:19px;
+
   transition:.2s ease;
 }
 
@@ -440,6 +529,8 @@ button{cursor:pointer}
   display:flex;
   gap:8px;
   align-items:center;
+
+  flex-wrap:wrap;
 }
 
 .chain-search{
@@ -477,7 +568,7 @@ button{cursor:pointer}
   color:#aaa;
   background:#0c0c0c;
 
-  font-size:10px;
+  font-size:9px;
   font-weight:800;
 
   transition:.2s ease;
@@ -526,13 +617,6 @@ button{cursor:pointer}
 
   background-size:40px 40px;
 }
-
-
-/*
-  FIX:
-  world теперь является полноценной плоскостью.
-  SVG и nodes находятся в одной координатной системе.
-*/
 
 .world{
   position:absolute;
@@ -594,9 +678,11 @@ button{cursor:pointer}
     0 20px 60px rgba(0,0,0,.45);
 
   user-select:none;
+
   cursor:grab;
 
   z-index:5;
+
   pointer-events:auto;
 
   transition:
@@ -630,14 +716,18 @@ button{cursor:pointer}
 
 .node-type{
   color:#555;
+
   font-size:8px;
   font-weight:900;
+
   letter-spacing:.15em;
+
   margin-bottom:6px;
 }
 
 .node-title{
   color:#eee;
+
   font-size:11px;
   font-weight:800;
 
@@ -650,6 +740,7 @@ button{cursor:pointer}
   margin-top:5px;
 
   color:#777;
+
   font-size:9px;
   line-height:1.4;
 
@@ -705,7 +796,7 @@ button{cursor:pointer}
 
 
 /* ==========================================================
-   LINE ANIMATION
+   LINES
 ========================================================== */
 
 .graph-line{
@@ -713,6 +804,11 @@ button{cursor:pointer}
 
   animation:
     lineAppear .45s ease forwards;
+}
+
+.graph-line-flow{
+  animation:
+    dash 5s linear infinite;
 }
 
 @keyframes lineAppear{
@@ -725,9 +821,10 @@ button{cursor:pointer}
   }
 }
 
-.graph-line-flow{
-  animation:
-    dash 5s linear infinite;
+@keyframes dash{
+  to{
+    stroke-dashoffset:-60;
+  }
 }
 
 
@@ -846,14 +943,18 @@ button{cursor:pointer}
 
 .profile-info p{
   color:#666;
+
   margin-top:5px;
+
   font-size:12px;
 }
 
 .profile-actions{
   display:flex;
   gap:8px;
+
   margin-top:25px;
+
   flex-wrap:wrap;
 }
 
@@ -942,6 +1043,7 @@ button{cursor:pointer}
   display:flex;
   align-items:center;
   justify-content:space-between;
+
   margin-bottom:10px;
 }
 
@@ -1034,6 +1136,7 @@ button{cursor:pointer}
   flex-direction:column;
 
   gap:7px;
+
   margin-top:18px;
 }
 
@@ -1111,6 +1214,7 @@ button{cursor:pointer}
   border-radius:8px;
 
   outline:none;
+
   padding:10px;
 
   font-size:11px;
@@ -1226,12 +1330,19 @@ button{cursor:pointer}
   }
 
   .chain-toolbar{
-    left:10px;
-    right:10px;
+    left:8px;
+    right:8px;
+
+    gap:5px;
   }
 
   .chain-search{
     width:100%;
+  }
+
+  .btn{
+    font-size:7px;
+    padding:0 8px;
   }
 
   .node{
@@ -1248,48 +1359,31 @@ button{cursor:pointer}
   }
 
   #asciiContainer{
-    font-size:clamp(1.8px,.48vw,5px);
-  }
-
-  .boot-status{
-    bottom:20px;
-    font-size:7px;
+    font-size:clamp(2px,.42vw,5px);
   }
 }
-
 </style>
 </head>
-
 
 <body>
 
 
-<!-- ========================================================
-     BOOT SCREEN
-========================================================= -->
+<!-- ==========================================================
+     HACK INTRO
+========================================================== -->
 
 <div id="bootScreen">
 
-  <div class="boot-stage">
+  <div id="asciiContainer"></div>
 
-    <div id="asciiContainer"></div>
-
-    <div class="boot-noise"></div>
-
-    <div class="boot-vignette"></div>
-
-    <div class="boot-status">
-      INITIALIZING NZX OSINT WORKSPACE
-    </div>
-
-  </div>
+  <div class="boot-flash"></div>
 
 </div>
 
 
-<!-- ========================================================
-     APP
-========================================================= -->
+<!-- ==========================================================
+     MAIN APP
+========================================================== -->
 
 <div class="app">
 
@@ -1334,12 +1428,10 @@ button{cursor:pointer}
     class="profile-mini"
     onclick="openProfile()"
   >
-
     <img
       id="miniAvatar"
       alt=""
     >
-
   </button>
 
 </header>
@@ -1393,6 +1485,34 @@ button{cursor:pointer}
         onclick="centerGraph()"
       >
         ⌂
+      </button>
+
+      <button
+        class="btn"
+        onclick="createProject()"
+      >
+        CREATE PROJECT
+      </button>
+
+      <button
+        class="btn"
+        onclick="showProjects()"
+      >
+        MY PROJECTS
+      </button>
+
+      <button
+        class="btn"
+        onclick="deleteProject()"
+      >
+        DELETE PROJECT
+      </button>
+
+      <button
+        class="btn"
+        onclick="deleteAllNodes()"
+      >
+        DELETE ALL NODES
       </button>
 
     </div>
@@ -1509,7 +1629,9 @@ button{cursor:pointer}
 </section>
 
 
-<!-- TOOL MODAL -->
+<!-- ==========================================================
+     TOOL MODAL
+========================================================== -->
 
 <div
   class="tool-modal"
@@ -1574,7 +1696,9 @@ button{cursor:pointer}
 </div>
 
 
-<!-- NODE MODAL -->
+<!-- ==========================================================
+     NODE MODAL
+========================================================== -->
 
 <div id="nodeModal">
 
@@ -1659,6 +1783,7 @@ button{cursor:pointer}
   id="toast"
 ></div>
 
+
 </div>
 
 
@@ -1666,12 +1791,12 @@ button{cursor:pointer}
 
 
 /* ==========================================================
-   ASCII BOOT
+   ASCII HACK ART
 ========================================================== */
 
 const ASCII_ART = String.raw`
           *#++++*++***********++**#######*+++++++**********#*+++**********+++++++=****++++==++=-+******#**+==++++++=+++*++=+++++*+=--:..
-  .-=+++***++++*+*+*******##*++*#####**++++++++*****+**#**+****+=+******++++==++==**==+=*=-***********+**++++++=++++++=++**+++***+=++*=:                           
+  .-=+++***++++*+*+*******##*++*#####**++++++++*****+**#**+****+=+******++++==++==**==+=*=-***********+**++++++=+++++**+++***+=++*=:                           
 :-+.  =*++**++***###**#####**+*####*****+****+***+#*#****===********+*+++++=-+*+=+*=--:+*-***##****+**++*+****++*****+*#**********#******++==-::
 :-:-++++**###*#*##*#####*##**+#######**+**++*+++*****+#*++===**####**+=++-==-=+*==*+-::-=+******#************#*#####**#*****#*#**+++++++++=+=.
 .:-+****#####*##++****##**#*++*###*******+**+=++****++#*+++=****#*#**=--+=-=+*+*=***+++***+****+++*******#####*#****+-. .:----:.    .::-:.
@@ -1722,12 +1847,28 @@ const ASCII_ART = String.raw`
 `;
 
 
+/* ==========================================================
+   BOOT
+========================================================== */
+
 function initBoot(){
+
+  const screen =
+    document.getElementById(
+      "bootScreen"
+    );
 
   const container =
     document.getElementById(
       "asciiContainer"
     );
+
+  if(!screen || !container)
+    return;
+
+
+  container.innerHTML="";
+
 
   const lines =
     ASCII_ART
@@ -1735,92 +1876,136 @@ function initBoot(){
       .split("\n")
       .filter(
         line =>
-          line.trim().length > 0
+          line.length > 0
       );
 
-  container.innerHTML = "";
 
   lines.forEach(
     (line,index)=>{
 
-      const span =
+      const el =
         document.createElement(
-          "span"
+          "div"
         );
 
-      span.className =
-        "ascii-line";
+      el.className =
+        "hack-line";
 
-      span.textContent =
+      el.textContent =
         line;
 
-      const randomX =
+
+      const x =
         (
-          Math.random() * 80 -
-          40
+          Math.random()*90-45
         ).toFixed(1);
 
-      const randomR =
+      const skew =
         (
-          Math.random() * 4 -
-          2
-        ).toFixed(2);
+          Math.random()*16-8
+        ).toFixed(1);
+
 
       const delay =
         (
-          index * .018 +
-          Math.random() * .12
+          index*.003 +
+          Math.random()*.055
         ).toFixed(3);
 
-      span.style.setProperty(
-        "--random-x",
-        randomX + "px"
+
+      el.style.top =
+        (
+          index /
+          Math.max(
+            lines.length-1,
+            1
+          ) *
+          100
+        ) + "%";
+
+
+      el.style.setProperty(
+        "--hack-x",
+        x+"px"
       );
 
-      span.style.setProperty(
-        "--random-r",
-        randomR + "deg"
+      el.style.setProperty(
+        "--hack-skew",
+        skew+"deg"
       );
 
-      span.style.setProperty(
-        "--delay",
-        delay + "s"
+      el.style.setProperty(
+        "--hack-delay",
+        delay+"s"
       );
+
 
       container.appendChild(
-        span
+        el
       );
     }
   );
 
 
-  const total =
-    Math.max(
-      2300,
-      lines.length * 18 + 900
+  /*
+    Очень короткий резкий
+    glitch/freeze.
+  */
+
+  screen.classList.add(
+    "hack"
+  );
+
+
+  setTimeout(
+    ()=>{
+      screen.classList.add(
+        "flash"
+      );
+    },
+    500
+  );
+
+
+  setTimeout(
+    ()=>{
+      screen.classList.remove(
+        "hack"
+      );
+    },
+    720
+  );
+
+
+  /*
+    Резкий выход.
+  */
+
+  const duration =
+    Math.min(
+      2100,
+      1050 +
+      lines.length*4
     );
+
 
   setTimeout(
     ()=>{
 
-      const screen =
-        document.getElementById(
-          "bootScreen"
-        );
-
       screen.classList.add(
-        "hide"
+        "hack-end"
       );
+
 
       setTimeout(
         ()=>{
           screen.remove();
         },
-        900
+        200
       );
 
     },
-    total
+    duration
   );
 }
 
@@ -1889,6 +2074,461 @@ try{
     error
   );
 }
+
+
+/* ==========================================================
+   PROJECT SYSTEM
+========================================================== */
+
+let currentProject =
+  localStorage.getItem(
+    "nzx-current-project"
+  ) ||
+  "Default Project";
+
+
+function getProjects(){
+
+  try{
+
+    return JSON.parse(
+      localStorage.getItem(
+        "nzx-projects"
+      ) || "{}"
+    );
+
+  }catch{
+
+    return {};
+  }
+}
+
+
+function saveProjects(
+  projects
+){
+
+  localStorage.setItem(
+    "nzx-projects",
+    JSON.stringify(
+      projects
+    )
+  );
+}
+
+
+function saveCurrentProject(){
+
+  const projects =
+    getProjects();
+
+
+  projects[currentProject] = {
+
+    nodes:
+      db.nodes,
+
+    links:
+      db.links,
+
+    createdAt:
+      projects[currentProject]?.createdAt ||
+      Date.now()
+
+  };
+
+
+  saveProjects(
+    projects
+  );
+}
+
+
+function createProject(){
+
+  const name =
+    prompt(
+      "PROJECT NAME:"
+    );
+
+  if(name === null)
+    return;
+
+
+  const clean =
+    name.trim();
+
+
+  if(!clean){
+
+    toast(
+      "PROJECT NAME REQUIRED"
+    );
+
+    return;
+  }
+
+
+  const projects =
+    getProjects();
+
+
+  if(
+    projects[clean]
+  ){
+
+    toast(
+      "PROJECT ALREADY EXISTS"
+    );
+
+    return;
+  }
+
+
+  saveCurrentProject();
+
+
+  projects[clean] = {
+
+    nodes:{},
+
+    links:[],
+
+    createdAt:
+      Date.now()
+
+  };
+
+
+  saveProjects(
+    projects
+  );
+
+
+  currentProject =
+    clean;
+
+
+  localStorage.setItem(
+    "nzx-current-project",
+    currentProject
+  );
+
+
+  db.nodes={};
+
+  db.links=[];
+
+
+  saveDB();
+
+  renderNodes();
+
+  renderLines();
+
+  centerGraph();
+
+
+  toast(
+    "PROJECT CREATED"
+  );
+}
+
+
+function showProjects(){
+
+  const projects =
+    getProjects();
+
+
+  const names =
+    Object.keys(
+      projects
+    );
+
+
+  if(!names.length){
+
+    toast(
+      "NO PROJECTS"
+    );
+
+    return;
+  }
+
+
+  const list =
+    names
+      .map(
+        (name,index)=>
+          `${index+1}. ${name}`
+      )
+      .join("\n");
+
+
+  const selected =
+    prompt(
+      "MY PROJECTS:\n\n" +
+      list +
+      "\n\nENTER PROJECT NAME:"
+    );
+
+
+  if(
+    selected === null
+  )
+    return;
+
+
+  const name =
+    selected.trim();
+
+
+  if(!projects[name]){
+
+    toast(
+      "PROJECT NOT FOUND"
+    );
+
+    return;
+  }
+
+
+  saveCurrentProject();
+
+
+  const project =
+    projects[name];
+
+
+  db.nodes =
+    project.nodes || {};
+
+  db.links =
+    project.links || [];
+
+
+  currentProject =
+    name;
+
+
+  localStorage.setItem(
+    "nzx-current-project",
+    currentProject
+  );
+
+
+  saveDB();
+
+  renderNodes();
+
+  renderLines();
+
+  centerGraph();
+
+
+  toast(
+    "PROJECT LOADED"
+  );
+}
+
+
+function deleteProject(){
+
+  const projects =
+    getProjects();
+
+
+  const names =
+    Object.keys(
+      projects
+    );
+
+
+  if(!names.length){
+
+    toast(
+      "NO PROJECTS"
+    );
+
+    return;
+  }
+
+
+  const list =
+    names
+      .map(
+        (name,index)=>
+          `${index+1}. ${name}`
+      )
+      .join("\n");
+
+
+  const selected =
+    prompt(
+      "DELETE PROJECT:\n\n" +
+      list +
+      "\n\nENTER PROJECT NAME:"
+    );
+
+
+  if(
+    selected === null
+  )
+    return;
+
+
+  const name =
+    selected.trim();
+
+
+  if(!projects[name]){
+
+    toast(
+      "PROJECT NOT FOUND"
+    );
+
+    return;
+  }
+
+
+  if(
+    !confirm(
+      `DELETE PROJECT "${name}"?`
+    )
+  )
+    return;
+
+
+  delete projects[name];
+
+
+  saveProjects(
+    projects
+  );
+
+
+  if(
+    currentProject ===
+    name
+  ){
+
+    const remaining =
+      Object.keys(
+        projects
+      );
+
+
+    if(remaining.length){
+
+      currentProject =
+        remaining[0];
+
+      const project =
+        projects[
+          currentProject
+        ];
+
+
+      db.nodes =
+        project.nodes || {};
+
+      db.links =
+        project.links || {};
+
+      if(
+        !Array.isArray(
+          db.links
+        )
+      ){
+        db.links=[];
+      }
+
+    }else{
+
+      currentProject =
+        "Default Project";
+
+      db.nodes={};
+
+      db.links=[];
+    }
+
+
+    localStorage.setItem(
+      "nzx-current-project",
+      currentProject
+    );
+
+
+    saveDB();
+
+    renderNodes();
+
+    renderLines();
+
+    centerGraph();
+  }
+
+
+  toast(
+    "PROJECT DELETED"
+  );
+}
+
+
+function deleteAllNodes(){
+
+  const count =
+    Object.keys(
+      db.nodes
+    ).length;
+
+
+  if(!count){
+
+    toast(
+      "NO NODES"
+    );
+
+    return;
+  }
+
+
+  if(
+    !confirm(
+      `DELETE ALL ${count} NODES?`
+    )
+  )
+    return;
+
+
+  db.nodes={};
+
+  db.links=[];
+
+
+  saveDB();
+
+  saveCurrentProject();
+
+  renderNodes();
+
+  renderLines();
+
+
+  toast(
+    "ALL NODES DELETED"
+  );
+}
+
+
+setInterval(
+  ()=>{
+    saveCurrentProject();
+  },
+  3000
+);
 
 
 /* ==========================================================
@@ -1979,21 +2619,26 @@ function uid(){
 
 let toastTimer=null;
 
+
 function toast(message){
 
   const el =
     $("toast");
 
+
   el.textContent =
     message;
+
 
   el.classList.add(
     "show"
   );
 
+
   clearTimeout(
     toastTimer
   );
+
 
   toastTimer =
     setTimeout(
@@ -2014,7 +2659,9 @@ function toast(message){
 function showPage(page){
 
   document
-    .querySelectorAll(".page")
+    .querySelectorAll(
+      ".page"
+    )
     .forEach(
       el=>{
         el.classList.remove(
@@ -2023,8 +2670,10 @@ function showPage(page){
       }
     );
 
+
   const target =
     $("page-"+page);
+
 
   if(target){
 
@@ -2033,14 +2682,18 @@ function showPage(page){
     );
   }
 
+
   document
-    .querySelectorAll(".side-btn")
+    .querySelectorAll(
+      ".side-btn"
+    )
     .forEach(
       button=>{
 
         button.classList.toggle(
           "active",
-          button.dataset.page === page
+          button.dataset.page ===
+            page
         );
 
       }
@@ -2050,7 +2703,9 @@ function showPage(page){
 
 function openProfile(){
 
-  showPage("profile");
+  showPage(
+    "profile"
+  );
 
   updateProfileUI();
 }
@@ -2076,16 +2731,19 @@ function avatarFallback(){
           height="200"
           fill="#111"
         />
+
         <circle
           cx="100"
           cy="78"
           r="38"
           fill="#333"
         />
+
         <path
           d="M35 190c7-49 36-69 65-69s58 20 65 69"
           fill="#333"
         />
+
         <text
           x="100"
           y="30"
@@ -2108,14 +2766,17 @@ function updateProfileUI(){
     db.profile.avatar ||
     avatarFallback();
 
+
   $("miniAvatar").src =
     avatar;
 
   $("profileAvatar").src =
     avatar;
 
+
   $("profileName").textContent =
     db.profile.name;
+
 
   $("profileUsername").textContent =
     "@" +
@@ -2137,11 +2798,14 @@ $("avatarFile")
     const file =
       event.target.files?.[0];
 
+
     if(!file)
       return;
 
+
     const reader =
       new FileReader();
+
 
     reader.onload =
       ()=>{
@@ -2149,14 +2813,17 @@ $("avatarFile")
         db.profile.avatar =
           reader.result;
 
+
         saveDB();
 
         updateProfileUI();
 
+
         toast(
-          "Avatar updated"
+          "AVATAR UPDATED"
         );
       };
+
 
     reader.readAsDataURL(
       file
@@ -2169,28 +2836,34 @@ function editProfileName(){
 
   const name =
     prompt(
-      "Enter profile name:",
+      "ENTER PROFILE NAME:",
       db.profile.name
     );
+
 
   if(name === null)
     return;
 
-  const cleaned =
+
+  const clean =
     name.trim();
 
-  if(!cleaned)
+
+  if(!clean)
     return;
 
+
   db.profile.name =
-    cleaned;
+    clean;
+
 
   saveDB();
 
   updateProfileUI();
 
+
   toast(
-    "Profile updated"
+    "PROFILE UPDATED"
   );
 }
 
@@ -2230,29 +2903,40 @@ function openTool(type){
   const config =
     toolConfig[type];
 
+
   if(!config)
     return;
+
 
   currentTool =
     type;
 
+
   $("toolTitle").textContent =
     config.title;
+
 
   $("toolDescription").textContent =
     config.description;
 
+
   $("toolInput").placeholder =
     config.placeholder;
+
 
   $("toolInput").value =
     "";
 
+
   $("toolResults").innerHTML =
     "";
 
+
   $("toolModal")
-    .classList.add("open");
+    .classList.add(
+      "open"
+    );
+
 
   setTimeout(
     ()=>{
@@ -2266,10 +2950,12 @@ function openTool(type){
 function closeTool(){
 
   $("toolModal")
-    .classList.remove("open");
+    .classList.remove(
+      "open"
+    );
 
-  currentTool =
-    null;
+
+  currentTool=null;
 }
 
 
@@ -2289,7 +2975,10 @@ $("toolInput")
   "keydown",
   event=>{
 
-    if(event.key === "Enter"){
+    if(
+      event.key ===
+      "Enter"
+    ){
 
       event.preventDefault();
 
@@ -2304,39 +2993,49 @@ async function runTool(){
   if(!currentTool)
     return;
 
+
   const value =
     $("toolInput")
       .value
       .trim();
 
+
   if(!value){
 
     toast(
-      "Введите значение"
+      "ENTER A VALUE"
     );
 
     return;
   }
 
+
   $("toolRun").disabled =
     true;
+
 
   $("toolRun").textContent =
     "CHECKING...";
 
+
   $("toolResults").innerHTML =
     "";
 
+
   try{
 
-    if(currentTool === "phone"){
+    if(
+      currentTool ===
+      "phone"
+    ){
 
       await checkPhoneReal(
         value
       );
 
     }else if(
-      currentTool === "address"
+      currentTool ===
+      "address"
     ){
 
       await checkAddressReal(
@@ -2371,20 +3070,26 @@ function addResult(
       "div"
     );
 
+
   let cls =
     "result";
+
 
   if(status === "OK")
     cls += " good";
 
+
   if(status === "WARNING")
     cls += " warn";
+
 
   if(status === "ERROR")
     cls += " bad";
 
+
   box.className =
     cls;
+
 
   box.innerHTML = `
 
@@ -2408,33 +3113,41 @@ function addResult(
 
   `;
 
+
   $("toolResults")
-    .appendChild(box);
+    .appendChild(
+      box
+    );
 }
 
 
 /* ==========================================================
-   PHONE
+   PHONE API
 ========================================================== */
 
-async function checkPhoneReal(value){
+async function checkPhoneReal(
+  value
+){
 
   addResult(
     "REQUEST",
-    "Проверка номера...",
+    "Checking number...",
     "INFO",
     "•"
   );
+
 
   try{
 
     const form =
       new URLSearchParams();
 
+
     form.append(
       "phone",
       value
     );
+
 
     const response =
       await fetch(
@@ -2451,7 +3164,9 @@ async function checkPhoneReal(value){
         }
       );
 
+
     let data=null;
+
 
     try{
 
@@ -2463,9 +3178,11 @@ async function checkPhoneReal(value){
       data=null;
     }
 
+
     $("toolResults")
       .innerHTML =
       "";
+
 
     if(!response.ok){
 
@@ -2481,11 +3198,12 @@ async function checkPhoneReal(value){
       return;
     }
 
+
     if(!data){
 
       addResult(
         "RESPONSE",
-        "Backend не вернул JSON.",
+        "Backend did not return JSON.",
         "ERROR",
         "!"
       );
@@ -2493,15 +3211,19 @@ async function checkPhoneReal(value){
       return;
     }
 
+
     renderPhoneResult(
       data
     );
+
 
     createPhoneGraph(
       data
     );
 
+
     db.searches++;
+
 
     saveDB();
 
@@ -2511,10 +3233,11 @@ async function checkPhoneReal(value){
       .innerHTML =
       "";
 
+
     addResult(
       "CONNECTION",
       error?.message ||
-        "Не удалось связаться с backend.",
+        "Could not connect to backend.",
       "ERROR",
       "!"
     );
@@ -2526,10 +3249,12 @@ function renderPhoneResult(data){
 
   addResult(
     "PHONE",
-    data.phone || "UNKNOWN",
+    data.phone ||
+      "UNKNOWN",
     "OK",
     "☎"
   );
+
 
   addResult(
     "VALID",
@@ -2547,6 +3272,7 @@ function renderPhoneResult(data){
     "✓"
   );
 
+
   addResult(
     "POSSIBLE",
     data.possible === null ||
@@ -2561,14 +3287,18 @@ function renderPhoneResult(data){
     "?"
   );
 
+
   addResult(
     "CONFIDENCE",
-    data.confidence || "UNKNOWN",
-    data.confidence === "verified"
+    data.confidence ||
+      "UNKNOWN",
+    data.confidence ===
+      "verified"
       ? "OK"
       : "WARNING",
     "◆"
   );
+
 
   if(
     data.score !== null &&
@@ -2583,105 +3313,120 @@ function renderPhoneResult(data){
     );
   }
 
+
   addResult(
     "COUNTRY",
-    data.country || "UNKNOWN",
+    data.country ||
+      "UNKNOWN",
     "INFO",
     "◎"
   );
 
+
   addResult(
     "COUNTRY CODE",
-    data.country_code || "UNKNOWN",
+    data.country_code ||
+      "UNKNOWN",
     "INFO",
     "+"
   );
 
+
   addResult(
     "REGION",
-    data.region || "UNKNOWN",
+    data.region ||
+      "UNKNOWN",
     "INFO",
     "⌖"
   );
 
+
   addResult(
     "CARRIER",
-    data.carrier || "UNKNOWN",
+    data.carrier ||
+      "UNKNOWN",
     "INFO",
     "◉"
   );
 
+
   addResult(
     "LINE TYPE",
-    data.line_type || "UNKNOWN",
+    data.line_type ||
+      "UNKNOWN",
     "INFO",
     "▣"
   );
 
+
   addResult(
     "DISPOSABLE / VOIP",
-    data.disposable || "UNKNOWN",
-    data.disposable === "YES"
+    data.disposable ||
+      "UNKNOWN",
+    data.disposable ===
+      "YES"
       ? "WARNING"
       : "INFO",
     "!"
   );
 
+
   addResult(
     "NATIONAL",
-    data.national || "UNKNOWN",
+    data.national ||
+      "UNKNOWN",
     "INFO",
     "N"
   );
 
+
   addResult(
     "INTERNATIONAL",
-    data.international || "UNKNOWN",
+    data.international ||
+      "UNKNOWN",
     "INFO",
     "I"
   );
 
+
   addResult(
     "E.164",
-    data.e164 || "UNKNOWN",
+    data.e164 ||
+      "UNKNOWN",
     "INFO",
     "E"
   );
 
+
   addResult(
     "PROVIDER",
-    data.source || "UNKNOWN",
+    data.source ||
+      "UNKNOWN",
     "INFO",
     "S"
   );
 
-  const providerStatus =
-    data.provider_status ||
-    "UNKNOWN";
-
-  const providerStatusType =
-    providerStatus === "OK"
-      ? "OK"
-      : providerStatus === "NO_API_KEY"
-        ? "WARNING"
-        : providerStatus === "API_KEY_REJECTED"
-          ? "ERROR"
-          : providerStatus === "QUOTA_EXCEEDED"
-            ? "WARNING"
-            : "INFO";
 
   addResult(
     "PROVIDER STATUS",
-    providerStatus,
-    providerStatusType,
-    providerStatus === "OK"
+    data.provider_status ||
+      "UNKNOWN",
+    data.provider_status ===
+      "OK"
+      ? "OK"
+      : "WARNING",
+    data.provider_status ===
+      "OK"
       ? "✓"
       : "!"
   );
 
+
   if(
-    data.credits_remaining !== null &&
-    data.credits_remaining !== undefined
+    data.credits_remaining !==
+      null &&
+    data.credits_remaining !==
+      undefined
   ){
 
     addResult(
@@ -2692,6 +3437,7 @@ function renderPhoneResult(data){
     );
   }
 
+
   if(data.provider_error){
 
     addResult(
@@ -2701,6 +3447,7 @@ function renderPhoneResult(data){
       "!"
     );
   }
+
 
   if(
     data.diagnostics &&
@@ -2717,9 +3464,11 @@ function renderPhoneResult(data){
     );
   }
 
+
   if(
     data.city &&
-    data.city !== "UNKNOWN"
+    data.city !==
+      "UNKNOWN"
   ){
 
     addResult(
@@ -2748,6 +3497,7 @@ function createNode(
   const id =
     uid();
 
+
   db.nodes[id] = {
 
     id,
@@ -2765,29 +3515,27 @@ function createNode(
     ...extra
   };
 
+
   return id;
 }
 
 
 /* ==========================================================
    PHONE GRAPH
-   LEFT -> RIGHT
 ========================================================== */
 
-function createPhoneGraph(data){
+function createPhoneGraph(
+  data
+){
 
   const phone =
     data.e164 ||
     data.phone;
 
+
   if(!phone)
     return;
 
-
-  /*
-    Удаляем старую автоматически
-    созданную ветку этого телефона.
-  */
 
   const phoneKey =
     "phone:" +
@@ -2796,38 +3544,38 @@ function createPhoneGraph(data){
       .toLowerCase();
 
 
-  Object.keys(db.nodes)
-    .forEach(
-      id=>{
+  Object.keys(
+    db.nodes
+  )
+  .forEach(
+    id=>{
 
-        const node =
-          db.nodes[id];
+      const node =
+        db.nodes[id];
 
-        if(
-          node.group ===
-          phoneKey
-        ){
 
-          delete db.nodes[id];
+      if(
+        node.group ===
+        phoneKey
+      ){
 
-          db.links =
-            db.links.filter(
-              link =>
-                link.a !== id &&
-                link.b !== id
-            );
-        }
+        delete db.nodes[id];
+
+
+        db.links =
+          db.links.filter(
+            link =>
+              link.a !== id &&
+              link.b !== id
+          );
       }
-    );
+    }
+  );
 
 
   const center =
     getGraphCenter();
 
-
-  /*
-    ROOT
-  */
 
   const phoneId =
     createNode(
@@ -2940,45 +3688,22 @@ function createPhoneGraph(data){
         const value =
           item[2];
 
-        if(
+
+        return !(
           value === null ||
           value === undefined ||
           value === "" ||
           value === "UNKNOWN"
-        ){
-          return false;
-        }
-
-        return true;
+        );
       }
     );
 
 
-  /*
-    5 элементов на колонку.
+  const PER_COLUMN=5;
 
-    root
-       |
-       +-- A
-       +-- B
-       +-- C
-       +-- D
-       +-- E
+  const COLUMN_GAP=400;
 
-             +-- F
-             +-- G
-             ...
-
-    Получается аккуратный
-    горизонтальный граф.
-  */
-
-  const PER_COLUMN = 5;
-
-  const COLUMN_GAP = 400;
-
-  const ROW_GAP = 125;
-
+  const ROW_GAP=125;
 
   const columns=[];
 
@@ -3002,12 +3727,17 @@ function createPhoneGraph(data){
 
 
   columns.forEach(
-    (column,columnIndex)=>{
+    (
+      column,
+      columnIndex
+    )=>{
 
       const columnNodes=[];
 
+
       const total =
         column.length;
+
 
       const startY =
         center.y -
@@ -3019,18 +3749,22 @@ function createPhoneGraph(data){
 
 
       column.forEach(
-        (item,rowIndex)=>{
+        (
+          item,
+          rowIndex
+        )=>{
 
           const x =
             center.x +
             COLUMN_GAP *
             (
-              columnIndex + 1
+              columnIndex+1
             );
+
 
           const y =
             startY +
-            rowIndex *
+            rowIndex*
             ROW_GAP;
 
 
@@ -3050,8 +3784,12 @@ function createPhoneGraph(data){
               y,
               {
                 group:phoneKey,
-                column:columnIndex,
-                row:rowIndex
+
+                column:
+                  columnIndex,
+
+                row:
+                  rowIndex
               }
             );
 
@@ -3061,18 +3799,15 @@ function createPhoneGraph(data){
           );
 
 
-          /*
-            Первая колонка
-            соединяется с телефоном.
-          */
-
-          if(columnIndex === 0){
+          if(
+            columnIndex ===
+            0
+          ){
 
             db.links.push({
               a:phoneId,
               b:id
             });
-
           }
 
         }
@@ -3086,19 +3821,12 @@ function createPhoneGraph(data){
   );
 
 
-  /*
-    Следующие колонки соединяются
-    с ближайшей нодой предыдущей
-    колонки.
-
-    Это делает граф визуально
-    похожим на цепочку.
-  */
-
   for(
     let columnIndex=1;
+
     columnIndex<
       createdColumns.length;
+
     columnIndex++
   ){
 
@@ -3106,6 +3834,7 @@ function createPhoneGraph(data){
       createdColumns[
         columnIndex-1
       ];
+
 
     const current =
       createdColumns[
@@ -3132,6 +3861,7 @@ function createPhoneGraph(data){
                 node.y
               );
 
+
             if(
               distance < best
             ){
@@ -3149,18 +3879,23 @@ function createPhoneGraph(data){
         if(nearest){
 
           db.links.push({
-            a:nearest.id,
-            b:node.id
+
+            a:
+              nearest.id,
+
+            b:
+              node.id
+
           });
-
         }
-
       }
     );
   }
 
 
   saveDB();
+
+  saveCurrentProject();
 
   renderNodes();
 
@@ -3176,26 +3911,26 @@ function createPhoneGraph(data){
    ADDRESS
 ========================================================== */
 
-async function checkAddressReal(value){
+async function checkAddressReal(
+  value
+){
 
   addResult(
     "SEARCH",
-    "Ищем адрес...",
+    "Searching address...",
     "INFO",
     "•"
   );
 
-  try{
 
-    const url =
-      "/api/map/search?q=" +
-      encodeURIComponent(
-        value
-      );
+  try{
 
     const response =
       await fetch(
-        url,
+        "/api/map/search?q="+
+        encodeURIComponent(
+          value
+        ),
         {
           headers:{
             "Accept":
@@ -3204,12 +3939,15 @@ async function checkAddressReal(value){
         }
       );
 
+
     const data =
       await response.json();
+
 
     $("toolResults")
       .innerHTML =
       "";
+
 
     if(
       !response.ok ||
@@ -3219,7 +3957,7 @@ async function checkAddressReal(value){
       addResult(
         "ADDRESS ERROR",
         data.error ||
-          "Адрес не найден.",
+          "Address not found.",
         "ERROR",
         "!"
       );
@@ -3227,14 +3965,16 @@ async function checkAddressReal(value){
       return;
     }
 
+
     const results =
       data.results || [];
+
 
     if(!results.length){
 
       addResult(
         "RESULT",
-        "Ничего не найдено.",
+        "Nothing found.",
         "WARNING",
         "?"
       );
@@ -3242,13 +3982,17 @@ async function checkAddressReal(value){
       return;
     }
 
+
     results
       .slice(0,10)
       .forEach(
-        (item,index)=>{
+        (
+          item,
+          index
+        )=>{
 
           addResult(
-            "RESULT " +
+            "RESULT "+
               (index+1),
             item.display_name,
             "OK",
@@ -3296,6 +4040,7 @@ async function checkAddressReal(value){
         }
       );
 
+
     createAddressGraph(
       results[0]
     );
@@ -3306,10 +4051,11 @@ async function checkAddressReal(value){
       .innerHTML =
       "";
 
+
     addResult(
       "CONNECTION",
       error?.message ||
-        "Ошибка соединения.",
+        "Connection error.",
       "ERROR",
       "!"
     );
@@ -3317,23 +4063,29 @@ async function checkAddressReal(value){
 }
 
 
-function createAddressGraph(data){
+function createAddressGraph(
+  data
+){
 
   if(!data)
     return;
 
+
   const center =
     getGraphCenter();
+
 
   let addressNode =
     Object.values(
       db.nodes
     ).find(
-      n =>
-        n.type === "ADDRESS" &&
-        n.content ===
+      node =>
+        node.type ===
+          "ADDRESS" &&
+        node.content ===
           data.display_name
     );
+
 
   if(!addressNode){
 
@@ -3345,6 +4097,7 @@ function createAddressGraph(data){
         center.x,
         center.y
       );
+
 
     addressNode =
       db.nodes[id];
@@ -3398,23 +4151,31 @@ function createAddressGraph(data){
   ].filter(
     item =>
       item[2] &&
-      item[2] !== "UNKNOWN"
+      item[2] !==
+        "UNKNOWN"
   );
 
 
   const ROW_GAP=125;
+
   const COLUMN_GAP=400;
 
+
   values.forEach(
-    (item,index)=>{
+    (
+      item,
+      index
+    )=>{
 
       const column =
         Math.floor(
-          index / 5
+          index/5
         );
 
+
       const row =
-        index % 5;
+        index%5;
+
 
       const total =
         Math.min(
@@ -3423,13 +4184,15 @@ function createAddressGraph(data){
           column*5
         );
 
+
       const startY =
         addressNode.y -
         (
-          (total-1) *
-          ROW_GAP /
+          (total-1)*
+          ROW_GAP/
           2
         );
+
 
       const id =
         createNode(
@@ -3437,21 +4200,29 @@ function createAddressGraph(data){
           item[1],
           item[2],
           addressNode.x +
-            COLUMN_GAP *
+            COLUMN_GAP*
             (column+1),
           startY +
-            row*ROW_GAP
+            row*
+            ROW_GAP
         );
 
+
       db.links.push({
-        a:addressNode.id,
-        b:id
+
+        a:
+          addressNode.id,
+
+        b:
+          id
       });
     }
   );
 
 
   saveDB();
+
+  saveCurrentProject();
 
   renderNodes();
 
@@ -3466,10 +4237,13 @@ function createAddressGraph(data){
 let editingNode=null;
 
 
-function openNodeModal(nodeId=null){
+function openNodeModal(
+  nodeId=null
+){
 
   editingNode =
     nodeId;
+
 
   $("nodeModalTitle")
     .textContent =
@@ -3483,14 +4257,18 @@ function openNodeModal(nodeId=null){
     const node =
       db.nodes[nodeId];
 
+
     if(!node)
       return;
+
 
     $("nodeTitle").value =
       node.title || "";
 
+
     $("nodeType").value =
       node.type || "";
+
 
     $("nodeContent").value =
       node.content || "";
@@ -3507,15 +4285,21 @@ function openNodeModal(nodeId=null){
       "";
   }
 
+
   $("nodeModal")
-    .classList.add("open");
+    .classList.add(
+      "open"
+    );
 }
 
 
 function closeNodeModal(){
 
   $("nodeModal")
-    .classList.remove("open");
+    .classList.remove(
+      "open"
+    );
+
 
   editingNode=null;
 }
@@ -3528,11 +4312,13 @@ function saveNode(){
       .value
       .trim();
 
+
   const type =
     $("nodeType")
       .value
       .trim()
       .toUpperCase();
+
 
   const content =
     $("nodeContent")
@@ -3543,7 +4329,7 @@ function saveNode(){
   if(!title){
 
     toast(
-      "Введите название"
+      "ENTER NAME"
     );
 
     return;
@@ -3556,6 +4342,7 @@ function saveNode(){
       db.nodes[
         editingNode
       ];
+
 
     if(node){
 
@@ -3575,6 +4362,7 @@ function saveNode(){
     const center =
       getGraphCenter();
 
+
     const existing =
       Object.values(
         db.nodes
@@ -3583,35 +4371,20 @@ function saveNode(){
 
     const newId =
       createNode(
-
         title,
-
         type ||
           "UNKNOWN",
-
         content,
-
         center.x +
           (
             Math.random()-.5
           )*260,
-
         center.y +
           (
             Math.random()-.5
           )*180
       );
 
-
-    /*
-      Автоматическая связь.
-
-      Если это первая нода —
-      просто создаём.
-
-      Если уже есть ноды —
-      соединяем новую с ближайшей.
-    */
 
     const candidates =
       existing.filter(
@@ -3624,10 +4397,14 @@ function saveNode(){
     if(candidates.length){
 
       const newNode =
-        db.nodes[newId];
+        db.nodes[
+          newId
+        ];
+
 
       let nearest =
         candidates[0];
+
 
       let best =
         Infinity;
@@ -3640,9 +4417,11 @@ function saveNode(){
             node.x -
             newNode.x;
 
+
           const dy =
             node.y -
             newNode.y;
+
 
           const distance =
             Math.sqrt(
@@ -3650,7 +4429,10 @@ function saveNode(){
               dy*dy
             );
 
-          if(distance < best){
+
+          if(
+            distance < best
+          ){
 
             best =
               distance;
@@ -3663,8 +4445,12 @@ function saveNode(){
 
 
       db.links.push({
-        a:nearest.id,
-        b:newId
+
+        a:
+          nearest.id,
+
+        b:
+          newId
       });
     }
   }
@@ -3672,41 +4458,49 @@ function saveNode(){
 
   saveDB();
 
+  saveCurrentProject();
+
   renderNodes();
 
   renderLines();
 
   closeNodeModal();
 
+
   toast(
-    "Node saved"
+    "NODE SAVED"
   );
 }
 
 
 /* ==========================================================
-   GRAPH STATE
+   GRAPH
 ========================================================== */
 
 const graph =
   $("graph");
 
+
 const world =
   $("world");
+
 
 let zoom=1;
 
 let panX=0;
+
 let panY=0;
 
 let draggingNode=null;
 
 let dragOffsetX=0;
+
 let dragOffsetY=0;
 
 let panning=false;
 
 let panStartX=0;
+
 let panStartY=0;
 
 let linkSource=null;
@@ -3730,10 +4524,11 @@ function getGraphCenter(){
   return {
 
     x:
-      -panX / zoom,
+      -panX/zoom,
 
     y:
-      -panY / zoom
+      -panY/zoom
+
   };
 }
 
@@ -3749,13 +4544,15 @@ function renderNodes(){
       ".node"
     )
     .forEach(
-      el=>el.remove()
+      el =>
+        el.remove()
     );
 
 
   Object.values(
     db.nodes
-  ).forEach(
+  )
+  .forEach(
     node=>{
 
       const el =
@@ -3763,21 +4560,25 @@ function renderNodes(){
           "div"
         );
 
+
       el.className =
         "node";
+
 
       el.dataset.id =
         node.id;
 
+
       el.style.left =
         (
-          node.x + 5000
-        ) + "px";
+          node.x+5000
+        )+"px";
+
 
       el.style.top =
         (
-          node.y + 5000
-        ) + "px";
+          node.y+5000
+        )+"px";
 
 
       el.innerHTML = `
@@ -3826,6 +4627,7 @@ function renderNodes(){
           ".node-delete"
         );
 
+
       deleteBtn.onclick =
         event=>{
 
@@ -3841,6 +4643,7 @@ function renderNodes(){
         el.querySelector(
           ".node-dot"
         );
+
 
       dot.onclick =
         event=>{
@@ -3867,6 +4670,7 @@ function renderNodes(){
           )
             return;
 
+
           openNodeModal(
             node.id
           );
@@ -3888,12 +4692,14 @@ function renderNodes(){
           )
             return;
 
+
           startNodeDrag(
             event,
             node
           );
         }
       );
+
     }
   );
 
@@ -3903,7 +4709,7 @@ function renderNodes(){
 
 
 /* ==========================================================
-   NODE DRAG
+   DRAG
 ========================================================== */
 
 function startNodeDrag(
@@ -3913,8 +4719,10 @@ function startNodeDrag(
 
   event.preventDefault();
 
+
   draggingNode =
     node;
+
 
   node._dragging =
     true;
@@ -3930,7 +4738,7 @@ function startNodeDrag(
       rect.left -
       rect.width/2 -
       panX
-    ) / zoom;
+    )/zoom;
 
 
   const graphY =
@@ -3939,12 +4747,13 @@ function startNodeDrag(
       rect.top -
       rect.height/2 -
       panY
-    ) / zoom;
+    )/zoom;
 
 
   dragOffsetX =
     node.x -
     graphX;
+
 
   dragOffsetY =
     node.y -
@@ -3956,16 +4765,20 @@ function startNodeDrag(
       `[data-id="${node.id}"]`
     );
 
-  if(el)
+
+  if(el){
+
     el.classList.add(
       "dragging"
     );
+  }
 
 
   window.addEventListener(
     "pointermove",
     moveNode
   );
+
 
   window.addEventListener(
     "pointerup",
@@ -3993,7 +4806,7 @@ function moveNode(event){
       rect.left -
       rect.width/2 -
       panX
-    ) / zoom;
+    )/zoom;
 
 
   const graphY =
@@ -4002,12 +4815,13 @@ function moveNode(event){
       rect.top -
       rect.height/2 -
       panY
-    ) / zoom;
+    )/zoom;
 
 
   draggingNode.x =
     graphX +
     dragOffsetX;
+
 
   draggingNode.y =
     graphY +
@@ -4024,15 +4838,16 @@ function moveNode(event){
 
     el.style.left =
       (
-        draggingNode.x +
+        draggingNode.x+
         5000
-      ) + "px";
+      )+"px";
+
 
     el.style.top =
       (
-        draggingNode.y +
+        draggingNode.y+
         5000
-      ) + "px";
+      )+"px";
   }
 
 
@@ -4052,14 +4867,17 @@ function stopNodeDrag(){
     );
 
 
-  if(el)
+  if(el){
+
     el.classList.remove(
       "dragging"
     );
+  }
 
 
   draggingNode._dragging =
     false;
+
 
   draggingNode=null;
 
@@ -4071,6 +4889,8 @@ function stopNodeDrag(){
 
 
   saveDB();
+
+  saveCurrentProject();
 
   renderLines();
 }
@@ -4085,13 +4905,14 @@ function deleteNode(id){
   const node =
     db.nodes[id];
 
+
   if(!node)
     return;
 
 
   if(
     !confirm(
-      `Delete node "${node.title}"?`
+      `DELETE NODE "${node.title}"?`
     )
   )
     return;
@@ -4110,18 +4931,21 @@ function deleteNode(id){
 
   saveDB();
 
+  saveCurrentProject();
+
   renderNodes();
 
   renderLines();
 
+
   toast(
-    "Node deleted"
+    "NODE DELETED"
   );
 }
 
 
 /* ==========================================================
-   LINKING
+   LINK
 ========================================================== */
 
 function handleLinkDot(id){
@@ -4131,19 +4955,25 @@ function handleLinkDot(id){
     linkSource =
       id;
 
+
     highlightNode(
       id
     );
 
+
     toast(
-      "Select another node"
+      "SELECT ANOTHER NODE"
     );
+
 
     return;
   }
 
 
-  if(linkSource === id){
+  if(
+    linkSource ===
+    id
+  ){
 
     linkSource=null;
 
@@ -4180,14 +5010,19 @@ function handleLinkDot(id){
 
       b:
         id
+
     });
+
 
     saveDB();
 
+    saveCurrentProject();
+
     renderLines();
 
+
     toast(
-      "Nodes linked"
+      "NODES LINKED"
     );
   }
 
@@ -4202,15 +5037,19 @@ function highlightNode(id){
 
   clearHighlights();
 
+
   const el =
     world.querySelector(
       `[data-id="${id}"]`
     );
 
-  if(el)
+
+  if(el){
+
     el.classList.add(
       "highlight"
     );
+  }
 }
 
 
@@ -4230,13 +5069,14 @@ function clearHighlights(){
 
 
 /* ==========================================================
-   GRAPH LINES
+   LINES
 ========================================================== */
 
 function renderLines(){
 
   const svg =
     $("lines");
+
 
   if(!svg)
     return;
@@ -4247,12 +5087,16 @@ function renderLines(){
 
 
   db.links.forEach(
-    (link,index)=>{
+    (
+      link,
+      index
+    )=>{
 
       const a =
         db.nodes[
           link.a
         ];
+
 
       const b =
         db.nodes[
@@ -4264,40 +5108,33 @@ function renderLines(){
         return;
 
 
-      /*
-        Переводим координаты
-        node -> SVG.
-
-        node coordinates:
-          -5000 ... +5000
-
-        SVG:
-           0 ... 10000
-      */
-
       const ax =
-        a.x + 5000;
+        a.x+5000;
+
 
       const ay =
-        a.y + 5000;
+        a.y+5000;
+
 
       const bx =
-        b.x + 5000;
+        b.x+5000;
+
 
       const by =
-        b.y + 5000;
+        b.y+5000;
 
 
       const dx =
-        bx - ax;
+        bx-ax;
+
 
       const dy =
-        by - ay;
+        by-ay;
 
 
       const length =
         Math.sqrt(
-          dx*dx +
+          dx*dx+
           dy*dy
         );
 
@@ -4307,10 +5144,11 @@ function renderLines(){
 
 
       const nx =
-        -dy / length;
+        -dy/length;
+
 
       const ny =
-        dx / length;
+        dx/length;
 
 
       const bend =
@@ -4318,7 +5156,7 @@ function renderLines(){
           55,
           Math.max(
             20,
-            length*.10
+            length*.1
           )
         );
 
@@ -4326,16 +5164,18 @@ function renderLines(){
       const mx =
         (ax+bx)/2;
 
+
       const my =
         (ay+by)/2;
 
 
       const cx =
-        mx +
+        mx+
         nx*bend;
 
+
       const cy =
-        my +
+        my+
         ny*bend;
 
 
@@ -4388,8 +5228,8 @@ function renderLines(){
 
       path.style.animationDelay =
         (
-          index * .035
-        ) + "s";
+          index*.035
+        )+"s";
 
 
       svg.appendChild(
@@ -4401,7 +5241,7 @@ function renderLines(){
 
 
 /* ==========================================================
-   GRAPH APPEAR
+   GRAPH ANIMATION
 ========================================================== */
 
 function animateNewGraph(
@@ -4417,13 +5257,18 @@ function animateNewGraph(
 
 
   nodes.forEach(
-    (el,index)=>{
+    (
+      el,
+      index
+    )=>{
 
       el.style.opacity =
         "0";
 
+
       el.style.transform =
         "translate(-50%,-50%) scale(.82)";
+
 
       el.style.transition =
         `
@@ -4438,11 +5283,13 @@ function animateNewGraph(
           el.style.opacity =
             "1";
 
+
           el.style.transform =
             "translate(-50%,-50%) scale(1)";
 
         },
-        80 + index*45
+        80+
+        index*45
       );
     }
   );
@@ -4475,11 +5322,12 @@ graph.addEventListener(
 
 
     panStartX =
-      event.clientX -
+      event.clientX-
       panX;
 
+
     panStartY =
-      event.clientY -
+      event.clientY-
       panY;
 
 
@@ -4499,11 +5347,12 @@ graph.addEventListener(
 
 
     panX =
-      event.clientX -
+      event.clientX-
       panStartX;
 
+
     panY =
-      event.clientY -
+      event.clientY-
       panStartY;
 
 
@@ -4520,6 +5369,8 @@ graph.addEventListener(
     panning=false;
 
     saveDB();
+
+    saveCurrentProject();
   }
 );
 
@@ -4551,7 +5402,10 @@ graph.addEventListener(
       );
 
 
-    if(oldZoom !== zoom){
+    if(
+      oldZoom !==
+      zoom
+    ){
 
       applyWorld();
 
@@ -4573,13 +5427,10 @@ function centerGraph(){
 
   panY=0;
 
+
   applyWorld();
 
   renderLines();
-
-  toast(
-    "Graph centered"
-  );
 }
 
 
@@ -4608,6 +5459,7 @@ $("chainSearch")
           const id =
             el.dataset.id;
 
+
           const node =
             db.nodes[id];
 
@@ -4624,10 +5476,10 @@ $("chainSearch")
 
           const text =
             (
-              node.title +
-              " " +
-              node.type +
-              " " +
+              node.title+
+              " "+
+              node.type+
+              " "+
               node.content
             )
             .toLowerCase();
@@ -4635,7 +5487,9 @@ $("chainSearch")
 
           el.classList.toggle(
             "highlight",
-            text.includes(query)
+            text.includes(
+              query
+            )
           );
         }
       );
@@ -4644,14 +5498,18 @@ $("chainSearch")
 
 
 /* ==========================================================
-   SATURN PARTICLES
+   SATURN
 ========================================================== */
 
 const canvas =
   $("saturn");
 
+
 const ctx =
-  canvas.getContext("2d");
+  canvas.getContext(
+    "2d"
+  );
+
 
 let particles=[];
 
@@ -4663,6 +5521,7 @@ function resizeSaturn(){
   const rect =
     canvas.getBoundingClientRect();
 
+
   const dpr =
     window.devicePixelRatio ||
     1;
@@ -4670,6 +5529,7 @@ function resizeSaturn(){
 
   canvas.width =
     rect.width*dpr;
+
 
   canvas.height =
     rect.height*dpr;
@@ -4719,6 +5579,7 @@ function createParticles(
     const u =
       Math.random()*2-1;
 
+
     const angle =
       Math.random()*
       Math.PI*2;
@@ -4734,7 +5595,9 @@ function createParticles(
       r*
       Math.cos(angle);
 
+
     const y=u;
+
 
     const z =
       r*
@@ -4748,13 +5611,12 @@ function createParticles(
       z,
 
       size:
-        .45 +
+        .45+
         Math.random()*1.15,
 
       alpha:
-        .15 +
+        .15+
         Math.random()*.65
-
     });
   }
 }
@@ -4764,6 +5626,7 @@ function drawSaturn(){
 
   const width =
     canvas.clientWidth;
+
 
   const height =
     canvas.clientHeight;
@@ -4779,6 +5642,7 @@ function drawSaturn(){
 
   const cx =
     width/2;
+
 
   const cy =
     height/2;
@@ -4804,6 +5668,7 @@ function drawSaturn(){
         rotation
       );
 
+
     const s =
       Math.sin(
         rotation
@@ -4811,30 +5676,29 @@ function drawSaturn(){
 
 
     const x =
-      p.x*c -
+      p.x*c-
       p.z*s;
 
+
     const z =
-      p.x*s +
+      p.x*s+
       p.z*c;
 
 
     const scale =
-      .55 +
-      (
-        z+1
-      )*.23;
+      .55+
+      (z+1)*.23;
 
 
     const px =
-      cx +
+      cx+
       x*
       radius*
       scale;
 
 
     const py =
-      cy +
+      cy+
       p.y*
       radius*
       scale;
@@ -4845,7 +5709,7 @@ function drawSaturn(){
         .04,
         p.alpha*
         (
-          .45 +
+          .45+
           (z+1)*.28
         )
       );
@@ -4885,7 +5749,7 @@ window.addEventListener(
 
 
 /* ==========================================================
-   RING
+   SATURN RING
 ========================================================== */
 
 let ringTime=0;
@@ -4900,7 +5764,7 @@ function animateRing(){
   const degrees =
     (
       ringTime*.75
-    ) % 360;
+    )%360;
 
 
   $("saturnRing")
@@ -4918,33 +5782,6 @@ function animateRing(){
     animateRing
   );
 }
-
-
-/* ==========================================================
-   ANIMATION STYLE
-========================================================== */
-
-const style =
-  document.createElement(
-    "style"
-  );
-
-
-style.textContent = `
-
-@keyframes dash{
-
-  to{
-    stroke-dashoffset:-60;
-  }
-
-}
-`;
-
-
-document.head.appendChild(
-  style
-);
 
 
 /* ==========================================================
