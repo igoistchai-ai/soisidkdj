@@ -1,4302 +1,3258 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1,maximum-scale=1"
-/>
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>NZX OSINT TOOL</title>
 
 <style>
+:root{
+    --bg:#050505;
+    --panel:rgba(10,10,10,.94);
+    --panel2:rgba(15,15,15,.96);
+    --card:#111;
+    --card2:#161616;
+    --text:#f5f5f5;
+    --muted:#777;
+    --dim:#444;
+    --line:rgba(255,255,255,.12);
+    --line2:rgba(255,255,255,.28);
+    --good:#baffc2;
+    --warn:#ffe4a3;
+    --bad:#ff9696;
+    --accent:#fff;
+}
 
 *{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
 }
 
-html,
-body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#050505;
-  color:#f5f5f5;
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+html,body{
+    width:100%;
+    height:100%;
+    margin:0;
+    overflow:hidden;
+    background:#000;
+    color:var(--text);
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
 
-button,
-input,
-textarea{
-  font:inherit;
+button,input{
+    font:inherit;
 }
 
 button{
-  cursor:pointer;
+    cursor:pointer;
 }
-
-:root{
-  --bg:#050505;
-  --panel:rgba(10,10,10,.92);
-  --card:#111;
-  --text:#f5f5f5;
-  --muted:#777;
-  --dim:#444;
-  --line:rgba(255,255,255,.10);
-  --line2:rgba(255,255,255,.22);
-  --good:#d9ffd9;
-  --warn:#ffe7a3;
-  --bad:#ff9b9b;
-}
-
-
-/* ==========================================================
-   APP
-========================================================== */
 
 .app{
-  width:100%;
-  height:100%;
-  position:relative;
-  background:
-    radial-gradient(
-      circle at 50% 40%,
-      rgba(255,255,255,.025),
-      transparent 45%
-    ),
-    #050505;
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 50% 45%,rgba(255,255,255,.025),transparent 32%),
+        #050505;
 }
 
-
-/* ==========================================================
-   TOPBAR
-========================================================== */
+/* ================= TOP ================= */
 
 .topbar{
-  position:fixed;
-  z-index:100;
-  top:0;
-  left:0;
-  right:0;
-  height:72px;
-
-  display:flex;
-  align-items:center;
-
-  padding:0 18px;
-
-  background:
-    linear-gradient(
-      180deg,
-      rgba(8,8,8,.98),
-      rgba(8,8,8,.88)
-    );
-
-  border-bottom:1px solid var(--line);
-
-  backdrop-filter:blur(18px);
+    position:absolute;
+    z-index:100;
+    top:0;
+    left:0;
+    right:0;
+    height:74px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:12px 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(5,5,5,.76);
+    backdrop-filter:blur(20px);
 }
 
 .logo{
-  width:38px;
-  height:38px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border:1px solid #fff;
-  border-radius:11px;
-
-  font-size:19px;
-  font-weight:900;
-
-  margin-right:12px;
-
-  box-shadow:
-    0 0 25px rgba(255,255,255,.08);
+    width:43px;
+    height:43px;
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:13px;
+    display:grid;
+    place-items:center;
+    font-size:22px;
+    font-weight:900;
+    background:#090909;
+    box-shadow:0 0 30px rgba(255,255,255,.04);
 }
 
 .brand{
-  display:flex;
-  flex-direction:column;
-  gap:2px;
-  min-width:210px;
+    display:flex;
+    flex-direction:column;
+    line-height:1.05;
+    min-width:190px;
 }
 
 .brand b{
-  font-size:14px;
-  letter-spacing:.15em;
+    font-size:14px;
+    letter-spacing:.12em;
 }
 
 .brand small{
-  color:#666;
-  font-size:8px;
-  letter-spacing:.24em;
+    color:#555;
+    margin-top:5px;
+    font-size:8px;
+    letter-spacing:.18em;
 }
 
 .top-tools{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  margin-left:auto;
+    display:flex;
+    gap:8px;
+    margin-left:auto;
+}
+
+.top-btn,
+.btn,
+.side-btn,
+.profile-mini{
+    border:1px solid rgba(255,255,255,.13);
+    color:#ddd;
+    background:rgba(255,255,255,.035);
+    transition:
+        .2s ease,
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
 }
 
 .top-btn{
-  height:34px;
-
-  padding:0 13px;
-
-  color:#bbb;
-
-  background:#0c0c0c;
-
-  border:1px solid var(--line2);
-
-  border-radius:8px;
-
-  font-size:9px;
-  font-weight:800;
-  letter-spacing:.1em;
-
-  transition:
-    .2s ease;
+    padding:10px 13px;
+    border-radius:10px;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.08em;
 }
 
-.top-btn:hover{
-  color:#fff;
-  background:#161616;
-  border-color:#666;
-  transform:translateY(-1px);
+.top-btn:hover,
+.btn:hover,
+.side-btn:hover{
+    border-color:rgba(255,255,255,.38);
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    transform:translateY(-1px);
 }
 
 .profile-mini{
-  width:38px;
-  height:38px;
-
-  border-radius:50%;
-
-  border:1px solid #333;
-
-  background:#111;
-
-  overflow:hidden;
-
-  margin-left:10px;
-
-  padding:0;
+    margin-left:4px;
+    width:42px;
+    height:42px;
+    padding:0;
+    overflow:hidden;
+    border-radius:13px;
 }
 
 .profile-mini img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
 }
 
-
-/* ==========================================================
-   SIDEBAR
-========================================================== */
+/* ================= SIDEBAR ================= */
 
 .sidebar{
-  position:fixed;
-
-  left:0;
-  top:72px;
-  bottom:0;
-
-  width:66px;
-
-  z-index:90;
-
-  display:flex;
-  align-items:center;
-  flex-direction:column;
-
-  padding-top:18px;
-
-  background:
-    rgba(6,6,6,.94);
-
-  border-right:1px solid var(--line);
-
-  backdrop-filter:blur(18px);
+    position:absolute;
+    z-index:100;
+    top:90px;
+    left:16px;
+    width:48px;
+    padding:7px;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:15px;
+    background:rgba(8,8,8,.78);
+    backdrop-filter:blur(18px);
 }
 
 .side-btn{
-  width:42px;
-  height:42px;
-
-  margin-bottom:8px;
-
-  border:1px solid transparent;
-
-  border-radius:10px;
-
-  color:#555;
-
-  background:transparent;
-
-  font-size:19px;
-
-  transition:.2s ease;
+    width:34px;
+    height:34px;
+    border-radius:10px;
+    color:#666;
+    font-size:17px;
 }
 
-.side-btn:hover,
 .side-btn.active{
-  color:#fff;
-  background:#111;
-  border-color:#292929;
+    color:#fff;
+    background:rgba(255,255,255,.11);
+    border-color:rgba(255,255,255,.25);
 }
 
-
-/* ==========================================================
-   PAGES
-========================================================== */
+/* ================= PAGES ================= */
 
 .page{
-  display:none;
-
-  position:absolute;
-
-  top:72px;
-  left:66px;
-  right:0;
-  bottom:0;
+    position:absolute;
+    inset:74px 0 0 0;
+    display:none;
 }
 
 .page.active{
-  display:block;
+    display:block;
 }
 
-
-/* ==========================================================
-   CHAIN
-========================================================== */
-
-.chain-page{
-  width:100%;
-  height:100%;
-  position:relative;
-}
-
-.chain-toolbar{
-  position:absolute;
-
-  top:17px;
-  left:18px;
-  right:18px;
-
-  z-index:30;
-
-  display:flex;
-  gap:8px;
-  align-items:center;
-}
-
-.chain-search{
-  width:240px;
-  height:37px;
-
-  padding:0 12px;
-
-  border-radius:9px;
-
-  border:1px solid var(--line2);
-
-  background:
-    rgba(10,10,10,.86);
-
-  color:#fff;
-
-  outline:none;
-
-  font-size:11px;
-}
-
-.chain-search:focus{
-  border-color:#666;
-}
-
-.chain-search::placeholder{
-  color:#555;
-}
-
-.btn{
-  height:37px;
-
-  padding:0 13px;
-
-  border-radius:9px;
-
-  border:1px solid var(--line2);
-
-  color:#aaa;
-
-  background:#0c0c0c;
-
-  font-size:10px;
-  font-weight:800;
-
-  transition:.2s ease;
-}
-
-.btn:hover{
-  color:#fff;
-  background:#151515;
-  border-color:#777;
-}
-
-.btn.primary{
-  color:#050505;
-  background:#fff;
-  border-color:#fff;
-}
-
-.btn.primary:hover{
-  background:#ddd;
-}
-
-
-/* ==========================================================
-   GRAPH
-========================================================== */
+/* ================= GRAPH ================= */
 
 .graph{
-  width:100%;
-  height:100%;
-
-  position:relative;
-
-  overflow:hidden;
-
-  background-color:#050505;
-
-  background-image:
-    linear-gradient(
-      rgba(255,255,255,.025) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255,255,255,.025) 1px,
-      transparent 1px
-    );
-
-  background-size:40px 40px;
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at 50% 50%,rgba(255,255,255,.025),transparent 40%),
+        #030303;
 }
 
+.graph::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    opacity:.28;
+    background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:40px 40px;
+}
+
+.graph::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    z-index:2;
+    pointer-events:none;
+    background:
+        radial-gradient(circle at center,transparent 35%,rgba(0,0,0,.48) 100%);
+}
+
+/* ================= GRAPH WORLD ================= */
+
+/*
+   ВАЖНО:
+   SVG и nodes находятся В ОДНОЙ системе координат.
+   Поэтому линии больше не "пропадают".
+*/
+
 .world{
-  position:absolute;
-
-  left:50%;
-  top:50%;
-
-  width:1px;
-  height:1px;
-
-  transform:
-    translate(-50%,-50%)
-    scale(1);
-
-  transform-origin:center;
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:10000px;
+    height:10000px;
+    transform:
+        translate(-50%,-50%)
+        scale(1);
+    transform-origin:center center;
+    z-index:10;
+    will-change:transform;
 }
 
 .lines{
-  position:absolute;
-
-  left:-5000px;
-  top:-5000px;
-
-  width:10000px;
-  height:10000px;
-
-  overflow:visible;
-
-  pointer-events:none;
+    position:absolute;
+    left:0;
+    top:0;
+    width:10000px;
+    height:10000px;
+    overflow:visible;
+    pointer-events:none;
+    z-index:1;
 }
 
+.graph-line{
+    fill:none;
+    stroke:rgba(255,255,255,.45);
+    stroke-width:2;
+    vector-effect:non-scaling-stroke;
+    stroke-linecap:round;
+    filter:
+        drop-shadow(0 0 4px rgba(255,255,255,.12));
+    animation:
+        lineAppear .45s ease forwards;
+}
+
+.graph-line-bg{
+    fill:none;
+    stroke:rgba(255,255,255,.055);
+    stroke-width:7;
+    vector-effect:non-scaling-stroke;
+    stroke-linecap:round;
+}
+
+.graph-line-dot{
+    fill:#fff;
+    opacity:.65;
+    filter:drop-shadow(0 0 5px #fff);
+}
+
+@keyframes lineAppear{
+    from{
+        opacity:0;
+        stroke-dasharray:8 10;
+        stroke-dashoffset:40;
+    }
+    to{
+        opacity:1;
+        stroke-dasharray:8 10;
+        stroke-dashoffset:0;
+    }
+}
+
+/* ================= NODES ================= */
+
 .node{
-  position:absolute;
-
-  width:170px;
-  min-height:72px;
-
-  transform:
-    translate(-50%,-50%);
-
-  padding:12px 13px;
-
-  border:1px solid rgba(255,255,255,.13);
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(20,20,20,.97),
-      rgba(9,9,9,.97)
-    );
-
-  border-radius:12px;
-
-  box-shadow:
-    0 20px 60px rgba(0,0,0,.45);
-
-  user-select:none;
-
-  cursor:grab;
-
-  transition:
-    border-color .2s,
-    box-shadow .2s,
-    transform .2s;
+    position:absolute;
+    z-index:5;
+    width:220px;
+    min-height:86px;
+    padding:14px 15px;
+    border-radius:15px;
+    border:1px solid rgba(255,255,255,.13);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(25,25,25,.96),
+            rgba(7,7,7,.96)
+        );
+    box-shadow:
+        0 18px 50px rgba(0,0,0,.42),
+        inset 0 1px rgba(255,255,255,.035);
+    user-select:none;
+    cursor:grab;
+    transform:translateZ(0);
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
 }
 
 .node:hover{
-  border-color:#555;
-
-  box-shadow:
-    0 25px 70px rgba(0,0,0,.6);
+    border-color:rgba(255,255,255,.32);
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.6),
+        0 0 30px rgba(255,255,255,.035);
 }
 
-.node.dragging{
-  cursor:grabbing;
-
-  border-color:#888;
-
-  box-shadow:
-    0 30px 90px rgba(0,0,0,.8);
+.node:active{
+    cursor:grabbing;
 }
 
-.node.highlight{
-  border-color:#fff;
-
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.2),
-    0 0 40px rgba(255,255,255,.1);
+.node.selected{
+    border-color:#fff;
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,.2),
+        0 25px 70px rgba(0,0,0,.7),
+        0 0 30px rgba(255,255,255,.07);
 }
 
-.node-type{
-  color:#555;
-
-  font-size:8px;
-
-  font-weight:900;
-
-  letter-spacing:.15em;
-
-  margin-bottom:6px;
-}
-
-.node-title{
-  color:#eee;
-
-  font-size:11px;
-
-  font-weight:800;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-}
-
-.node-content{
-  margin-top:5px;
-
-  color:#777;
-
-  font-size:9px;
-
-  line-height:1.4;
-
-  max-height:28px;
-
-  overflow:hidden;
-
-  word-break:break-word;
-}
-
-.node-delete{
-  position:absolute;
-
-  right:7px;
-  top:6px;
-
-  width:20px;
-  height:20px;
-
-  border:0;
-
-  border-radius:5px;
-
-  color:#555;
-
-  background:transparent;
-
-  font-size:12px;
-}
-
-.node-delete:hover{
-  color:#fff;
-  background:#222;
+.node-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:9px;
 }
 
 .node-dot{
-  position:absolute;
-
-  width:10px;
-  height:10px;
-
-  right:-5px;
-  top:50%;
-
-  transform:translateY(-50%);
-
-  border-radius:50%;
-
-  background:#fff;
-
-  box-shadow:
-    0 0 14px rgba(255,255,255,.45);
-
-  cursor:crosshair;
+    width:8px;
+    height:8px;
+    flex:0 0 auto;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 0 12px rgba(255,255,255,.7);
 }
 
+.node-type{
+    color:#666;
+    font-size:8px;
+    font-weight:900;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+}
 
-/* ==========================================================
-   SATURN
-========================================================== */
+.node-value{
+    color:#eee;
+    font-size:13px;
+    line-height:1.4;
+    font-weight:700;
+    word-break:break-word;
+}
+
+.node-meta{
+    color:#555;
+    margin-top:7px;
+    font-size:9px;
+}
+
+.node-tools{
+    position:absolute;
+    right:8px;
+    top:8px;
+    display:flex;
+    gap:4px;
+    opacity:0;
+    transition:.2s ease;
+}
+
+.node:hover .node-tools{
+    opacity:1;
+}
+
+.node-tools button{
+    width:24px;
+    height:24px;
+    padding:0;
+    border-radius:7px;
+    color:#aaa;
+    background:#090909;
+    border:1px solid rgba(255,255,255,.1);
+}
+
+.node-tools button:hover{
+    color:#fff;
+    border-color:rgba(255,255,255,.3);
+}
+
+/* ================= SATURN ================= */
 
 .saturn{
-  position:absolute;
-
-  left:50%;
-  top:50%;
-
-  width:470px;
-  height:470px;
-
-  transform:
-    translate(-50%,-50%);
-
-  opacity:.62;
-
-  pointer-events:none;
-
-  filter:
-    drop-shadow(
-      0 0 35px rgba(255,255,255,.08)
-    );
+    position:absolute;
+    z-index:0;
+    left:50%;
+    top:50%;
+    width:360px;
+    height:360px;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    opacity:.72;
 }
 
 #saturn{
-  width:100%;
-  height:100%;
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+}
+
+.saturn-core{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:130px;
+    height:130px;
+    transform:translate(-50%,-50%);
+    border-radius:50%;
+    background:
+        radial-gradient(
+            circle at 35% 28%,
+            #aaa 0%,
+            #555 22%,
+            #191919 56%,
+            #050505 100%
+        );
+    box-shadow:
+        0 0 70px rgba(255,255,255,.06),
+        inset -22px -15px 30px rgba(0,0,0,.8),
+        inset 10px 8px 22px rgba(255,255,255,.08);
 }
 
 .saturn-ring{
-  position:absolute;
-
-  left:50%;
-  top:50%;
-
-  width:360px;
-  height:105px;
-
-  border-radius:50%;
-
-  border:
-    1px solid rgba(255,255,255,.14);
-
-  box-shadow:
-    0 0 20px rgba(255,255,255,.05);
-
-  transform:
-    translate(-50%,-50%)
-    rotateX(67deg);
-
-  transform-style:preserve-3d;
-
-  opacity:.65;
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:310px;
+    height:105px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,.16);
+    transform:
+        translate(-50%,-50%)
+        rotateX(67deg)
+        rotateZ(0deg);
+    box-shadow:
+        0 0 25px rgba(255,255,255,.03),
+        inset 0 0 20px rgba(255,255,255,.04);
+    animation:saturnRing 16s linear infinite;
 }
 
+.saturn-ring::before,
+.saturn-ring::after{
+    content:"";
+    position:absolute;
+    inset:11px 26px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.08);
+}
 
-/* ==========================================================
-   PROFILE
-========================================================== */
+.saturn-ring::after{
+    inset:22px 50px;
+    border-color:rgba(255,255,255,.06);
+}
 
-.profile{
-  width:100%;
-  height:100%;
+@keyframes saturnRing{
+    from{
+        transform:
+            translate(-50%,-50%)
+            rotateX(67deg)
+            rotateZ(0deg);
+    }
+    to{
+        transform:
+            translate(-50%,-50%)
+            rotateX(67deg)
+            rotateZ(360deg);
+    }
+}
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+/* ================= TOOLBAR ================= */
 
-  padding:30px;
+.chain-toolbar{
+    position:absolute;
+    z-index:80;
+    top:18px;
+    left:82px;
+    right:18px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+}
+
+.chain-search{
+    width:min(340px,40vw);
+    height:38px;
+    padding:0 13px;
+    outline:none;
+    color:#eee;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:10px;
+    background:rgba(10,10,10,.72);
+    backdrop-filter:blur(15px);
+}
+
+.chain-search:focus{
+    border-color:rgba(255,255,255,.28);
+}
+
+.chain-search::placeholder{
+    color:#555;
+}
+
+.btn{
+    height:38px;
+    padding:0 13px;
+    border-radius:10px;
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.06em;
+}
+
+/* ================= STATUS ================= */
+
+.status{
+    position:absolute;
+    z-index:90;
+    bottom:18px;
+    left:82px;
+    padding:9px 12px;
+    color:#666;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:10px;
+    background:rgba(5,5,5,.72);
+    backdrop-filter:blur(12px);
+    font-size:9px;
+}
+
+/* ================= PROFILE ================= */
+
+.profile-page{
+    padding:35px;
+    overflow:auto;
+    background:
+        radial-gradient(circle at 70% 20%,rgba(255,255,255,.035),transparent 30%),
+        #050505;
 }
 
 .profile-card{
-  width:min(600px,100%);
-
-  border:1px solid var(--line);
-
-  border-radius:18px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(20,20,20,.95),
-      rgba(7,7,7,.96)
-    );
-
-  box-shadow:
-    0 30px 100px rgba(0,0,0,.5);
-
-  padding:28px;
+    width:min(700px,100%);
+    margin:30px auto;
+    padding:30px;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:22px;
+    background:rgba(12,12,12,.9);
+    box-shadow:0 30px 100px rgba(0,0,0,.4);
 }
 
-.profile-head{
-  display:flex;
-  align-items:center;
-  gap:18px;
+.profile-top{
+    display:flex;
+    gap:20px;
+    align-items:center;
+    margin-bottom:30px;
 }
 
 .profile-avatar{
-  width:84px;
-  height:84px;
-
-  border-radius:50%;
-
-  object-fit:cover;
-
-  background:#111;
-
-  border:1px solid #333;
+    width:90px;
+    height:90px;
+    border-radius:22px;
+    object-fit:cover;
+    border:1px solid rgba(255,255,255,.15);
 }
 
-.profile-info h1{
-  font-size:24px;
+.profile-name{
+    font-size:23px;
+    font-weight:900;
 }
 
-.profile-info p{
-  color:#666;
-
-  margin-top:5px;
-
-  font-size:12px;
+.profile-username{
+    color:#666;
+    margin-top:5px;
+    font-size:12px;
 }
 
-.profile-actions{
-  display:flex;
-  gap:8px;
-  margin-top:25px;
-  flex-wrap:wrap;
+.profile-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
 }
 
-.profile-button{
-  height:38px;
-
-  padding:0 14px;
-
-  border-radius:8px;
-
-  border:1px solid #333;
-
-  background:#111;
-
-  color:#aaa;
-
-  font-size:10px;
-  font-weight:800;
+.profile-field{
+    padding:15px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:13px;
+    background:#0b0b0b;
 }
 
-.profile-button:hover{
-  color:#fff;
-  border-color:#666;
+.profile-field span{
+    display:block;
+    color:#555;
+    font-size:9px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    margin-bottom:7px;
 }
 
-.profile-button.primary{
-  color:#000;
-  background:#fff;
-  border-color:#fff;
+.profile-field b{
+    font-size:13px;
 }
 
+/* ================= MODALS ================= */
 
-/* ==========================================================
-   MODALS
-========================================================== */
-
-.tool-modal,
-#nodeModal{
-  position:fixed;
-
-  inset:0;
-
-  z-index:500;
-
-  display:none;
-
-  align-items:center;
-  justify-content:center;
-
-  padding:20px;
-
-  background:
-    rgba(0,0,0,.72);
-
-  backdrop-filter:blur(12px);
+.modal-wrap{
+    position:fixed;
+    z-index:500;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(0,0,0,.72);
+    backdrop-filter:blur(15px);
 }
 
-.tool-modal.open,
-#nodeModal.open{
-  display:flex;
+.modal-wrap.open{
+    display:flex;
+    animation:fadeIn .2s ease;
 }
 
-.modal-box,
-.node-modal-box{
-  width:min(520px,100%);
-
-  max-height:
-    calc(100vh - 40px);
-
-  overflow:auto;
-
-  border:
-    1px solid rgba(255,255,255,.14);
-
-  border-radius:16px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #151515,
-      #090909
-    );
-
-  box-shadow:
-    0 40px 120px rgba(0,0,0,.75);
-
-  padding:22px;
+@keyframes fadeIn{
+    from{opacity:0}
+    to{opacity:1}
 }
 
-.modal-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  margin-bottom:10px;
+.modal{
+    width:min(520px,100%);
+    max-height:90vh;
+    overflow:auto;
+    padding:24px;
+    border:1px solid rgba(255,255,255,.13);
+    border-radius:20px;
+    background:#0b0b0b;
+    box-shadow:0 40px 120px rgba(0,0,0,.75);
+    animation:modalIn .25s ease;
 }
 
-.modal-top h2{
-  font-size:17px;
-  letter-spacing:.04em;
+@keyframes modalIn{
+    from{
+        opacity:0;
+        transform:translateY(12px) scale(.97);
+    }
+    to{
+        opacity:1;
+        transform:none;
+    }
 }
 
-.close{
-  width:32px;
-  height:32px;
-
-  border:0;
-
-  border-radius:8px;
-
-  background:#111;
-
-  color:#777;
-
-  font-size:20px;
+.modal-title{
+    font-size:18px;
+    font-weight:900;
+    letter-spacing:.05em;
 }
 
-.close:hover{
-  color:#fff;
-}
-
-.modal-description{
-  color:#666;
-
-  font-size:10px;
-
-  line-height:1.5;
-
-  margin-bottom:16px;
+.modal-desc{
+    color:#666;
+    margin-top:7px;
+    font-size:11px;
+    line-height:1.5;
 }
 
 .modal-input{
-  width:100%;
-  height:45px;
-
-  padding:0 13px;
-
-  color:#fff;
-
-  background:#080808;
-
-  border:1px solid #2b2b2b;
-
-  border-radius:9px;
-
-  outline:none;
+    width:100%;
+    height:46px;
+    margin-top:20px;
+    padding:0 14px;
+    outline:none;
+    color:#eee;
+    background:#050505;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:11px;
 }
 
 .modal-input:focus{
-  border-color:#777;
+    border-color:rgba(255,255,255,.4);
 }
 
 .modal-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:8px;
-
-  margin-top:12px;
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+    margin-top:18px;
 }
 
-.modal-actions button{
-  height:36px;
-
-  padding:0 14px;
-
-  border-radius:8px;
-
-  border:1px solid #333;
-
-  color:#aaa;
-
-  background:#111;
-
-  font-size:9px;
-  font-weight:900;
+.modal-result{
+    margin-top:18px;
+    padding:14px;
+    border-radius:12px;
+    background:#070707;
+    border:1px solid rgba(255,255,255,.08);
+    font-size:11px;
+    line-height:1.6;
+    white-space:pre-wrap;
 }
 
-.modal-actions button:hover{
-  color:#fff;
-  border-color:#777;
+.close-btn{
+    float:right;
+    width:30px;
+    height:30px;
+    border-radius:9px;
+    border:1px solid rgba(255,255,255,.1);
+    color:#888;
+    background:#090909;
 }
 
-.modal-actions button.primary{
-  background:#fff;
-  color:#000;
-  border-color:#fff;
+.close-btn:hover{
+    color:#fff;
 }
 
-.results{
-  display:flex;
-  flex-direction:column;
+/* ================= ADDRESS RESULTS ================= */
 
-  gap:7px;
-
-  margin-top:18px;
+.address-results{
+    margin-top:12px;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
 }
 
-.result{
-  padding:11px 12px;
-
-  border-radius:9px;
-
-  border:1px solid #202020;
-
-  background:#0c0c0c;
+.address-item{
+    padding:11px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.08);
+    background:#080808;
+    cursor:pointer;
+    transition:.2s;
 }
 
-.result-head{
-  display:flex;
-  align-items:center;
-  gap:7px;
-
-  color:#777;
-
-  font-size:8px;
-  font-weight:900;
-
-  letter-spacing:.12em;
+.address-item:hover{
+    border-color:rgba(255,255,255,.3);
+    background:#101010;
 }
 
-.result-value{
-  margin-top:5px;
-
-  color:#ddd;
-
-  font-size:11px;
-
-  line-height:1.45;
-
-  white-space:pre-wrap;
-
-  word-break:break-word;
+.address-item b{
+    display:block;
+    font-size:11px;
 }
 
-.result.good{
-  border-color:
-    rgba(170,255,170,.18);
+.address-item small{
+    color:#555;
 }
 
-.result.warn{
-  border-color:
-    rgba(255,220,100,.18);
-}
-
-.result.bad{
-  border-color:
-    rgba(255,100,100,.18);
-}
-
-.field{
-  margin-bottom:13px;
-}
-
-.field label{
-  display:block;
-
-  color:#555;
-
-  font-size:8px;
-  font-weight:900;
-
-  letter-spacing:.13em;
-
-  margin-bottom:6px;
-}
-
-.field input,
-.field textarea{
-  width:100%;
-
-  color:#fff;
-
-  background:#080808;
-
-  border:1px solid #292929;
-
-  border-radius:8px;
-
-  outline:none;
-
-  padding:10px;
-
-  font-size:11px;
-}
-
-.field input{
-  height:40px;
-}
-
-.field textarea{
-  min-height:100px;
-  resize:vertical;
-}
-
-.field input:focus,
-.field textarea:focus{
-  border-color:#666;
-}
-
-
-/* ==========================================================
-   TOAST
-========================================================== */
+/* ================= TOAST ================= */
 
 .toast{
-  position:fixed;
-
-  z-index:900;
-
-  left:50%;
-  bottom:22px;
-
-  transform:
-    translate(-50%,20px);
-
-  opacity:0;
-
-  pointer-events:none;
-
-  padding:10px 15px;
-
-  border:1px solid #333;
-
-  border-radius:9px;
-
-  background:#111;
-
-  color:#ddd;
-
-  font-size:10px;
-
-  transition:.25s ease;
+    position:fixed;
+    z-index:900;
+    right:20px;
+    bottom:20px;
+    max-width:330px;
+    padding:12px 15px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;
+    background:#0a0a0a;
+    color:#ddd;
+    box-shadow:0 20px 70px rgba(0,0,0,.55);
+    font-size:11px;
+    opacity:0;
+    transform:translateY(10px);
+    pointer-events:none;
+    transition:.25s;
 }
 
 .toast.show{
-  opacity:1;
-
-  transform:
-    translate(-50%,0);
+    opacity:1;
+    transform:none;
 }
 
+/* ================= MOBILE ================= */
 
-/* ==========================================================
-   MOBILE
-========================================================== */
+@media(max-width:700px){
 
-@media(max-width:760px){
+    .topbar{
+        height:64px;
+        padding:9px 11px;
+    }
 
-  .topbar{
-    height:62px;
-    padding:0 10px;
-  }
+    .logo{
+        width:38px;
+        height:38px;
+    }
 
-  .brand{
-    min-width:0;
-  }
+    .brand{
+        min-width:0;
+    }
 
-  .brand b{
-    font-size:11px;
-  }
+    .brand b{
+        font-size:11px;
+    }
 
-  .brand small{
-    display:none;
-  }
+    .brand small{
+        display:none;
+    }
 
-  .top-tools{
-    margin-left:auto;
-  }
+    .top-tools{
+        gap:5px;
+    }
 
-  .top-btn{
-    width:35px;
-    padding:0;
-    overflow:hidden;
-    font-size:0;
-  }
+    .top-btn{
+        padding:8px 7px;
+        font-size:8px;
+    }
 
-  .top-btn:first-child::after{
-    content:"☎";
-    font-size:14px;
-  }
+    .profile-mini{
+        width:38px;
+        height:38px;
+    }
 
-  .top-btn:nth-child(2)::after{
-    content:"✉";
-    font-size:14px;
-  }
+    .page{
+        inset:64px 0 0 0;
+    }
 
-  .top-btn:nth-child(3)::after{
-    content:"⌖";
-    font-size:14px;
-  }
+    .sidebar{
+        top:78px;
+        left:9px;
+        width:43px;
+    }
 
-  .sidebar{
-    top:62px;
-    width:54px;
-  }
+    .chain-toolbar{
+        left:61px;
+        top:13px;
+        right:10px;
+    }
 
-  .page{
-    top:62px;
-    left:54px;
-  }
+    .chain-search{
+        width:100%;
+    }
 
-  .chain-toolbar{
-    left:10px;
-    right:10px;
-  }
+    .chain-toolbar .btn{
+        display:none;
+    }
 
-  .chain-search{
-    width:100%;
-  }
+    .node{
+        width:190px;
+        min-height:78px;
+        padding:12px;
+    }
 
-  .node{
-    width:150px;
-  }
+    .status{
+        left:61px;
+    }
 
-  .saturn{
-    width:330px;
-    height:330px;
-  }
+    .profile-page{
+        padding:15px;
+    }
 
-  .saturn-ring{
-    width:270px;
-  }
-
+    .profile-grid{
+        grid-template-columns:1fr;
+    }
 }
-
 </style>
 </head>
-
 
 <body>
 
 <div class="app">
 
-  <!-- =====================================================
-       TOPBAR
-  ====================================================== -->
+<header class="topbar">
 
-  <header class="topbar">
-
-    <div class="logo">
-      N
-    </div>
+    <div class="logo">N</div>
 
     <div class="brand">
-
-      <b>
-        NZX OSINT TOOL
-      </b>
-
-      <small>
-        INTELLIGENCE WORKSPACE
-      </small>
-
+        <b>NZX OSINT TOOL</b>
+        <small>INTELLIGENCE WORKSPACE</small>
     </div>
-
 
     <div class="top-tools">
+        <button class="top-btn" onclick="openTool('phone')">
+            CHECK NUMBER
+        </button>
 
-      <button
-        class="top-btn"
-        onclick="openTool('phone')"
-      >
-        CHECK NUMBER
-      </button>
-
-      <button
-        class="top-btn"
-        onclick="openTool('address')"
-      >
-        CHECK ADDRESS
-      </button>
-
+        <button class="top-btn" onclick="openTool('address')">
+            CHECK ADDRESS
+        </button>
     </div>
 
-
-    <button
-      class="profile-mini"
-      onclick="openProfile()"
-    >
-
-      <img
-        id="miniAvatar"
-        alt=""
-      >
-
+    <button class="profile-mini" onclick="openProfile()">
+        <img id="miniAvatar" alt="">
     </button>
 
-  </header>
+</header>
 
 
-  <!-- =====================================================
-       SIDEBAR
-  ====================================================== -->
-
-  <aside class="sidebar">
+<aside class="sidebar">
 
     <button
-      class="side-btn active"
-      data-page="chain"
-      onclick="showPage('chain')"
-    >
-      ⌘
-    </button>
+        class="side-btn active"
+        data-page="chain"
+        onclick="showPage('chain')"
+        title="Chain"
+    >⌘</button>
 
     <button
-      class="side-btn"
-      data-page="profile"
-      onclick="openProfile()"
-    >
-      ◎
-    </button>
+        class="side-btn"
+        data-page="profile"
+        onclick="openProfile()"
+        title="Profile"
+    >◎</button>
 
-  </aside>
-
-
-  <!-- =====================================================
-       CHAIN
-  ====================================================== -->
-
-  <section
-    class="page active"
-    id="page-chain"
-  >
-
-    <div class="chain-page">
-
-      <div class="chain-toolbar">
-
-        <input
-          class="chain-search"
-          id="chainSearch"
-          placeholder="Search chain or node..."
-        >
-
-        <button
-          class="btn"
-          onclick="openNodeModal()"
-        >
-          ＋ Node
-        </button>
-
-        <button
-          class="btn"
-          onclick="centerGraph()"
-        >
-          ⌂
-        </button>
-
-      </div>
+</aside>
 
 
-      <div
-        class="graph"
-        id="graph"
-      >
+<!-- ================= CHAIN ================= -->
+
+<section class="page active" id="chainPage">
+
+    <div class="graph" id="graph">
 
         <div class="saturn">
 
-          <canvas
-            id="saturn"
-          ></canvas>
+            <canvas id="saturn"></canvas>
 
-          <div
-            class="saturn-ring"
-            id="saturnRing"
-          ></div>
+            <div class="saturn-core"></div>
+
+            <div
+                class="saturn-ring"
+                id="saturnRing"
+            ></div>
 
         </div>
 
+        <div class="world" id="world">
+
+            <!-- ЛИНИИ НАХОДЯТСЯ В ТОЙ ЖЕ СИСТЕМЕ КООРДИНАТ -->
+            <svg
+                id="lines"
+                class="lines"
+                viewBox="0 0 10000 10000"
+                preserveAspectRatio="none"
+            ></svg>
+
+        </div>
+
+    </div>
+
+
+    <div class="chain-toolbar">
+
+        <input
+            class="chain-search"
+            id="chainSearch"
+            placeholder="Search chain or node..."
+            autocomplete="off"
+        >
+
+        <button
+            class="btn"
+            onclick="openNodeModal()"
+        >
+            ＋ NODE
+        </button>
+
+        <button
+            class="btn"
+            onclick="centerGraph()"
+        >
+            ⌂
+        </button>
+
+    </div>
+
+
+    <div class="status" id="graphStatus">
+        0 NODES · 0 LINKS
+    </div>
+
+</section>
+
+
+<!-- ================= PROFILE ================= -->
+
+<section class="page profile-page" id="profilePage">
+
+    <div class="profile-card">
+
+        <div class="profile-top">
+
+            <img
+                id="profileAvatar"
+                class="profile-avatar"
+                alt=""
+            >
+
+            <div>
+                <div
+                    class="profile-name"
+                    id="profileName"
+                >
+                    NZX User
+                </div>
+
+                <div
+                    class="profile-username"
+                    id="profileUsername"
+                >
+                    @nzx_user
+                </div>
+            </div>
+
+        </div>
+
+        <div class="profile-grid">
+
+            <div class="profile-field">
+                <span>Nodes</span>
+                <b id="profileNodes">0</b>
+            </div>
+
+            <div class="profile-field">
+                <span>Connections</span>
+                <b id="profileLinks">0</b>
+            </div>
+
+            <div class="profile-field">
+                <span>Searches</span>
+                <b id="profileSearches">0</b>
+            </div>
+
+            <div class="profile-field">
+                <span>Workspace</span>
+                <b>NZX OSINT</b>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= TOOL MODAL ================= -->
+
+<div
+    class="modal-wrap"
+    id="toolModal"
+    onclick="modalOutside(event,'toolModal')"
+>
+
+    <div class="modal">
+
+        <button
+            class="close-btn"
+            onclick="closeModal('toolModal')"
+        >×</button>
 
         <div
-          class="world"
-          id="world"
+            class="modal-title"
+            id="toolTitle"
+        >
+            CHECK
+        </div>
+
+        <div
+            class="modal-desc"
+            id="toolDescription"
+        ></div>
+
+        <input
+            class="modal-input"
+            id="toolInput"
+            autocomplete="off"
         >
 
-          <svg
-            class="lines"
-            id="lines"
-            viewBox="-5000 -5000 10000 10000"
-          ></svg>
+        <div
+            class="modal-actions"
+            id="toolActions"
+        ></div>
+
+        <div
+            class="modal-result"
+            id="toolResult"
+            style="display:none"
+        ></div>
+
+        <div
+            class="address-results"
+            id="addressResults"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= NODE MODAL ================= -->
+
+<div
+    class="modal-wrap"
+    id="nodeModal"
+    onclick="modalOutside(event,'nodeModal')"
+>
+
+    <div class="modal">
+
+        <button
+            class="close-btn"
+            onclick="closeModal('nodeModal')"
+        >×</button>
+
+        <div class="modal-title">
+            CREATE NODE
+        </div>
+
+        <div class="modal-desc">
+            Добавьте собственный узел в граф.
+        </div>
+
+        <input
+            class="modal-input"
+            id="nodeTypeInput"
+            placeholder="Node type"
+        >
+
+        <input
+            class="modal-input"
+            id="nodeValueInput"
+            placeholder="Node value"
+        >
+
+        <div class="modal-actions">
+
+            <button
+                class="btn"
+                onclick="closeModal('nodeModal')"
+            >
+                CANCEL
+            </button>
+
+            <button
+                class="btn"
+                onclick="createManualNode()"
+            >
+                CREATE
+            </button>
 
         </div>
 
-      </div>
-
     </div>
 
-  </section>
+</div>
 
 
-  <!-- =====================================================
-       PROFILE
-  ====================================================== -->
-
-  <section
-    class="page"
-    id="page-profile"
-  >
-
-    <div class="profile">
-
-      <div class="profile-card">
-
-        <div class="profile-head">
-
-          <img
-            class="profile-avatar"
-            id="profileAvatar"
-            alt=""
-          >
-
-          <div class="profile-info">
-
-            <h1 id="profileName">
-              NZX User
-            </h1>
-
-            <p id="profileUsername">
-              @nzx_user
-            </p>
-
-          </div>
-
-        </div>
-
-
-        <div class="profile-actions">
-
-          <button
-            class="profile-button primary"
-            onclick="chooseAvatar()"
-          >
-            Choose avatar
-          </button>
-
-          <button
-            class="profile-button"
-            onclick="editProfileName()"
-          >
-            Edit name
-          </button>
-
-          <button
-            class="profile-button"
-            onclick="showPage('chain')"
-          >
-            Back to Chain
-          </button>
-
-        </div>
-
-
-        <input
-          id="avatarFile"
-          type="file"
-          accept="image/*"
-          style="display:none"
-        >
-
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- =====================================================
-       TOOL MODAL
-  ====================================================== -->
-
-  <div
-    class="tool-modal"
-    id="toolModal"
-    onclick="outsideToolModal(event)"
-  >
-
-    <div
-      class="modal-box"
-      onclick="event.stopPropagation()"
-    >
-
-      <div class="modal-top">
-
-        <h2 id="toolTitle">
-          Check
-        </h2>
-
-        <button
-          class="close"
-          onclick="closeTool()"
-        >
-          ×
-        </button>
-
-      </div>
-
-
-      <div
-        class="modal-description"
-        id="toolDescription"
-      ></div>
-
-
-      <input
-        class="modal-input"
-        id="toolInput"
-        autocomplete="off"
-      >
-
-
-      <div class="modal-actions">
-
-        <button
-          onclick="closeTool()"
-        >
-          CLOSE
-        </button>
-
-        <button
-          class="primary"
-          id="toolRun"
-          onclick="runTool()"
-        >
-          CHECK
-        </button>
-
-      </div>
-
-
-      <div
-        class="results"
-        id="toolResults"
-      ></div>
-
-    </div>
-
-  </div>
-
-
-  <!-- =====================================================
-       NODE MODAL
-  ====================================================== -->
-
-  <div id="nodeModal">
-
-    <div class="node-modal-box">
-
-      <h2
-        id="nodeModalTitle"
-        style="margin:0 0 18px"
-      >
-        New Node
-      </h2>
-
-
-      <div class="field">
-
-        <label>
-          NAME
-        </label>
-
-        <input
-          id="nodeTitle"
-          placeholder="Username"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          TYPE
-        </label>
-
-        <input
-          id="nodeType"
-          placeholder="PHONE / USERNAME / LOCATION"
-        >
-
-      </div>
-
-
-      <div class="field">
-
-        <label>
-          CONTENT
-        </label>
-
-        <textarea
-          id="nodeContent"
-          placeholder="Information..."
-        ></textarea>
-
-      </div>
-
-
-      <div
-        style="
-          display:flex;
-          gap:8px;
-          margin-top:17px;
-        "
-      >
-
-        <button
-          class="btn"
-          style="margin-left:auto"
-          onclick="closeNodeModal()"
-        >
-          Cancel
-        </button>
-
-        <button
-          class="btn primary"
-          onclick="saveNode()"
-        >
-          Save
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div
-    class="toast"
-    id="toast"
-  ></div>
+<div class="toast" id="toast"></div>
 
 </div>
 
 
 <script>
+"use strict";
 
-/* ==========================================================
+/* =========================================================
    STORAGE
-========================================================== */
+========================================================= */
 
-const STORAGE_KEY =
-  "nzx-osint-real-v4";
-
+const STORAGE_KEY = "nzx-osint-real-v5";
 
 let db = {
-
-  nodes:{},
-
-  links:[],
-
-  profile:{
-
-    name:"NZX User",
-
-    username:"nzx_user",
-
-    avatar:""
-  },
-
-  searches:0
+    nodes:{},
+    links:[],
+    profile:{
+        name:"NZX User",
+        username:"nzx_user",
+        avatar:""
+    },
+    searches:0
 };
 
-
 try{
+    const saved = localStorage.getItem(STORAGE_KEY);
 
-  const saved =
-    localStorage.getItem(
-      STORAGE_KEY
-    );
+    if(saved){
+        const parsed = JSON.parse(saved);
 
-  if(saved){
-
-    const parsed =
-      JSON.parse(saved);
-
-    db = {
-
-      ...db,
-
-      ...parsed,
-
-      nodes:
-        parsed.nodes || {},
-
-      links:
-        parsed.links || {},
-
-      profile:{
-        ...db.profile,
-        ...(parsed.profile || {})
-      }
-
-    };
-  }
-
+        db = {
+            ...db,
+            ...parsed,
+            nodes:parsed.nodes || {},
+            links:Array.isArray(parsed.links) ? parsed.links : [],
+            profile:{
+                ...db.profile,
+                ...(parsed.profile || {})
+            }
+        };
+    }
 }catch(error){
-
-  console.warn(
-    "Storage error",
-    error
-  );
+    console.warn("Storage error:",error);
 }
 
 
-/* ==========================================================
+/* =========================================================
+   DOM
+========================================================= */
+
+const world = document.getElementById("world");
+const lines = document.getElementById("lines");
+const graph = document.getElementById("graph");
+const graphStatus = document.getElementById("graphStatus");
+
+const toolModal = document.getElementById("toolModal");
+const toolInput = document.getElementById("toolInput");
+const toolTitle = document.getElementById("toolTitle");
+const toolDescription = document.getElementById("toolDescription");
+const toolResult = document.getElementById("toolResult");
+const toolActions = document.getElementById("toolActions");
+const addressResults = document.getElementById("addressResults");
+
+const nodeModal = document.getElementById("nodeModal");
+
+
+/* =========================================================
+   GRAPH VIEW
+========================================================= */
+
+let view = {
+    scale:1,
+    x:0,
+    y:0
+};
+
+let draggingNode = null;
+
+let panState = {
+    active:false,
+    startX:0,
+    startY:0,
+    originX:0,
+    originY:0
+};
+
+let selectedNodeId = null;
+
+
+/* =========================================================
    HELPERS
-========================================================== */
+========================================================= */
 
 function saveDB(){
-
-  try{
-
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify(db)
-    );
-
-  }catch(error){
-
-    console.warn(
-      "Could not save database",
-      error
-    );
-  }
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
+    updateStatus();
+    updateProfileStats();
 }
 
-
-function $(id){
-
-  return document.getElementById(id);
+function uid(prefix="node"){
+    return prefix + "_" +
+        Date.now().toString(36) +
+        "_" +
+        Math.random().toString(36).slice(2,8);
 }
-
 
 function escapeHTML(value){
+    return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+}
 
-  return String(
-    value ?? ""
-  )
-  .replaceAll("&","&amp;")
-  .replaceAll("<","&lt;")
-  .replaceAll(">","&gt;")
-  .replaceAll('"',"&quot;")
-  .replaceAll("'","&#039;");
+function showToast(message){
+    const el = document.getElementById("toast");
+
+    el.textContent = message;
+    el.classList.add("show");
+
+    clearTimeout(showToast.timer);
+
+    showToast.timer = setTimeout(()=>{
+        el.classList.remove("show");
+    },2400);
+}
+
+function normalizeValue(value){
+    return String(value ?? "")
+        .trim()
+        .replace(/\s+/g," ");
+}
+
+function nodeCenter(node){
+
+    const width = 220;
+    const height = 86;
+
+    return {
+        x:node.x + width / 2 + 5000,
+        y:node.y + height / 2 + 5000
+    };
 }
 
 
-function objectToText(value){
-
-  if(value === null ||
-     value === undefined){
-
-    return "UNKNOWN";
-  }
-
-  if(
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean"
-  ){
-
-    return String(value);
-  }
-
-  try{
-
-    return JSON.stringify(
-      value,
-      null,
-      2
-    );
-
-  }catch{
-
-    return String(value);
-  }
-}
-
-
-function uid(){
-
-  return (
-    "node_" +
-    Date.now() +
-    "_" +
-    Math.random()
-      .toString(36)
-      .slice(2,8)
-  );
-}
-
-
-let toastTimer=null;
-
-function toast(message){
-
-  const el =
-    $("toast");
-
-  el.textContent =
-    message;
-
-  el.classList.add(
-    "show"
-  );
-
-  clearTimeout(
-    toastTimer
-  );
-
-  toastTimer =
-    setTimeout(
-      ()=>{
-        el.classList.remove(
-          "show"
-        );
-      },
-      2200
-    );
-}
-
-
-/* ==========================================================
+/* =========================================================
    PAGE
-========================================================== */
+========================================================= */
 
 function showPage(page){
 
-  document
-    .querySelectorAll(".page")
-    .forEach(
-      el=>{
-        el.classList.remove(
-          "active"
-        );
-      }
-    );
+    document
+        .querySelectorAll(".page")
+        .forEach(el=>el.classList.remove("active"));
 
-  const target =
-    $("page-"+page);
+    document
+        .querySelectorAll(".side-btn")
+        .forEach(el=>el.classList.remove("active"));
 
-  if(target){
+    if(page === "profile"){
 
-    target.classList.add(
-      "active"
-    );
-  }
+        document
+            .getElementById("profilePage")
+            .classList.add("active");
 
-  document
-    .querySelectorAll(".side-btn")
-    .forEach(
-      button=>{
+        document
+            .querySelector('.side-btn[data-page="profile"]')
+            ?.classList.add("active");
 
-        button.classList.toggle(
-          "active",
-          button.dataset.page === page
-        );
+        updateProfileStats();
 
-      }
-    );
+    }else{
+
+        document
+            .getElementById("chainPage")
+            .classList.add("active");
+
+        document
+            .querySelector('.side-btn[data-page="chain"]')
+            ?.classList.add("active");
+    }
 }
-
 
 function openProfile(){
-
-  showPage(
-    "profile"
-  );
-
-  updateProfileUI();
+    showPage("profile");
 }
 
 
-/* ==========================================================
-   PROFILE
-========================================================== */
+/* =========================================================
+   MODALS
+========================================================= */
 
-function avatarFallback(){
+function closeModal(id){
+    document.getElementById(id).classList.remove("open");
+}
 
-  return (
-    "data:image/svg+xml," +
-    encodeURIComponent(`
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="200"
-        height="200"
-        viewBox="0 0 200 200"
-      >
-        <rect
-          width="200"
-          height="200"
-          fill="#111"
-        />
-        <circle
-          cx="100"
-          cy="78"
-          r="38"
-          fill="#333"
-        />
-        <path
-          d="M35 190c7-49 36-69 65-69s58 20 65 69"
-          fill="#333"
-        />
-        <text
-          x="100"
-          y="30"
-          fill="#777"
-          text-anchor="middle"
-          font-size="13"
-          font-family="Arial"
-        >
-          NZX
-        </text>
-      </svg>
-    `)
-  );
+function modalOutside(event,id){
+    if(event.target.id === id){
+        closeModal(id);
+    }
 }
 
 
-function updateProfileUI(){
-
-  const avatar =
-    db.profile.avatar ||
-    avatarFallback();
-
-  $("miniAvatar").src =
-    avatar;
-
-  $("profileAvatar").src =
-    avatar;
-
-  $("profileName").textContent =
-    db.profile.name;
-
-  $("profileUsername").textContent =
-    "@" +
-    db.profile.username;
-}
-
-
-function chooseAvatar(){
-
-  $("avatarFile").click();
-}
-
-
-$("avatarFile")
-.addEventListener(
-  "change",
-  event=>{
-
-    const file =
-      event.target.files?.[0];
-
-    if(!file)
-      return;
-
-    const reader =
-      new FileReader();
-
-    reader.onload =
-      ()=>{
-
-        db.profile.avatar =
-          reader.result;
-
-        saveDB();
-
-        updateProfileUI();
-
-        toast(
-          "Avatar updated"
-        );
-      };
-
-    reader.readAsDataURL(
-      file
-    );
-  }
-);
-
-
-function editProfileName(){
-
-  const name =
-    prompt(
-      "Enter profile name:",
-      db.profile.name
-    );
-
-  if(
-    name === null
-  )
-    return;
-
-  const cleaned =
-    name.trim();
-
-  if(!cleaned)
-    return;
-
-  db.profile.name =
-    cleaned;
-
-  saveDB();
-
-  updateProfileUI();
-
-  toast(
-    "Profile updated"
-  );
-}
-
-
-/* ==========================================================
+/* =========================================================
    TOOLS
-========================================================== */
+========================================================= */
 
 const toolConfig = {
 
-  phone:{
+    phone:{
+        title:"CHECK NUMBER",
+        placeholder:"+374 XX XXX XXX",
+        description:
+            "Проверка номера через PhoneValidation API. " +
+            "В граф добавляются только реально полученные данные."
+    },
 
-    title:
-      "CHECK NUMBER",
-
-    placeholder:
-      "+374 XX XXX XXX",
-
-    description:
-      "Проверка номера через PhoneValidation API. Показываются только данные, которые реально вернул провайдер."
-  },
-
-  address:{
-
-    title:
-      "CHECK ADDRESS",
-
-    placeholder:
-      "Yerevan, Armenia",
-
-    description:
-      "Поиск адреса через OpenStreetMap Nominatim."
-  }
+    address:{
+        title:"CHECK ADDRESS",
+        placeholder:"Yerevan, Armenia",
+        description:
+            "Поиск адреса через OpenStreetMap Nominatim."
+    }
 
 };
 
+let currentTool = null;
 
-let currentTool =
-  null;
+function openTool(tool){
 
+    currentTool = tool;
 
-function openTool(type){
+    const config = toolConfig[tool];
 
-  const config =
-    toolConfig[type];
+    toolTitle.textContent = config.title;
+    toolDescription.textContent = config.description;
 
-  if(!config)
-    return;
+    toolInput.value = "";
+    toolInput.placeholder = config.placeholder;
 
-  currentTool =
-    type;
+    toolResult.style.display = "none";
+    toolResult.textContent = "";
 
-  $("toolTitle").textContent =
-    config.title;
+    addressResults.innerHTML = "";
 
-  $("toolDescription").textContent =
-    config.description;
+    if(tool === "phone"){
 
-  $("toolInput").placeholder =
-    config.placeholder;
+        toolActions.innerHTML = `
+            <button class="btn" onclick="closeModal('toolModal')">
+                CANCEL
+            </button>
 
-  $("toolInput").value =
-    "";
+            <button class="btn" onclick="runTool()">
+                CHECK
+            </button>
+        `;
 
-  $("toolResults").innerHTML =
-    "";
+    }else{
 
-  $("toolModal")
-    .classList.add(
-      "open"
-    );
+        toolActions.innerHTML = `
+            <button class="btn" onclick="closeModal('toolModal')">
+                CANCEL
+            </button>
 
-  setTimeout(
-    ()=>{
-      $("toolInput").focus();
-    },
-    50
-  );
-}
-
-
-function closeTool(){
-
-  $("toolModal")
-    .classList.remove(
-      "open"
-    );
-
-  currentTool =
-    null;
-}
-
-
-function outsideToolModal(event){
-
-  if(
-    event.target ===
-    $("toolModal")
-  ){
-
-    closeTool();
-  }
-}
-
-
-$("toolInput")
-.addEventListener(
-  "keydown",
-  event=>{
-
-    if(
-      event.key === "Enter"
-    ){
-
-      event.preventDefault();
-
-      runTool();
+            <button class="btn" onclick="runTool()">
+                SEARCH
+            </button>
+        `;
     }
-  }
-);
+
+    toolModal.classList.add("open");
+
+    setTimeout(()=>{
+        toolInput.focus();
+    },80);
+}
+
+toolInput.addEventListener("keydown",event=>{
+    if(event.key === "Enter"){
+        runTool();
+    }
+});
 
 
 async function runTool(){
 
-  if(!currentTool)
-    return;
+    const value = normalizeValue(toolInput.value);
 
-  const value =
-    $("toolInput")
-      .value
-      .trim();
-
-  if(!value){
-
-    toast(
-      "Введите значение"
-    );
-
-    return;
-  }
-
-  $("toolRun").disabled =
-    true;
-
-  $("toolRun").textContent =
-    "CHECKING...";
-
-  $("toolResults")
-    .innerHTML =
-      "";
-
-  try{
-
-    if(
-      currentTool === "phone"
-    ){
-
-      await checkPhoneReal(
-        value
-      );
-
-    }else if(
-      currentTool === "address"
-    ){
-
-      await checkAddressReal(
-        value
-      );
+    if(!value){
+        showToast("Введите значение");
+        return;
     }
 
-  }finally{
+    if(currentTool === "phone"){
+        await checkPhoneReal(value);
+    }
 
-    $("toolRun").disabled =
-      false;
-
-    $("toolRun").textContent =
-      "CHECK";
-  }
+    if(currentTool === "address"){
+        await checkAddressReal(value);
+    }
 }
 
 
-/* ==========================================================
-   RESULT UI
-========================================================== */
+/* =========================================================
+   PHONE API
+========================================================= */
 
-function addResult(
-  title,
-  value,
-  status="INFO",
-  icon="•"
-){
+async function checkPhoneReal(value){
 
-  const box =
-    document.createElement(
-      "div"
-    );
-
-  let cls =
-    "result";
-
-  if(status === "OK")
-    cls += " good";
-
-  if(status === "WARNING")
-    cls += " warn";
-
-  if(status === "ERROR")
-    cls += " bad";
-
-  box.className =
-    cls;
-
-  box.innerHTML = `
-
-    <div class="result-head">
-
-      <span>
-        ${escapeHTML(icon)}
-      </span>
-
-      <span>
-        ${escapeHTML(title)}
-      </span>
-
-    </div>
-
-    <div class="result-value">
-      ${escapeHTML(
-        objectToText(value)
-      )}
-    </div>
-
-  `;
-
-  $("toolResults")
-    .appendChild(
-      box
-    );
-}
-
-
-/* ==========================================================
-   PHONE
-========================================================== */
-
-async function checkPhoneReal(
-  value
-){
-
-  addResult(
-    "REQUEST",
-    "Проверка номера...",
-    "INFO",
-    "•"
-  );
-
-  try{
-
-    /*
-      Backend ожидает FormData.
-    */
-
-    const form =
-      new URLSearchParams();
-
-    form.append(
-      "phone",
-      value
-    );
-
-    const response =
-      await fetch(
-        "/api/osint/phone",
-        {
-          method:"POST",
-
-          headers:{
-            "Accept":
-              "application/json"
-          },
-
-          body:form
-        }
-      );
-
-    let data=null;
+    toolResult.style.display = "block";
+    toolResult.textContent = "Проверка номера...";
 
     try{
 
-      data =
-        await response.json();
+        const form = new URLSearchParams();
 
-    }catch{
+        form.append("phone",value);
 
-      data=null;
+        const response = await fetch(
+            "/api/osint/phone",
+            {
+                method:"POST",
+                headers:{
+                    "Accept":"application/json"
+                },
+                body:form
+            }
+        );
+
+        const data = await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data?.detail ||
+                data?.message ||
+                "Ошибка проверки номера"
+            );
+        }
+
+        db.searches++;
+
+        toolResult.textContent =
+            "Проверка завершена.\n" +
+            "Полученные данные добавляются в граф.";
+
+        createPhoneGraph(data);
+
+        saveDB();
+
+        setTimeout(()=>{
+            closeModal("toolModal");
+        },500);
+
+    }catch(error){
+
+        console.error(error);
+
+        toolResult.textContent =
+            "Ошибка: " +
+            (error.message || "неизвестная ошибка");
+
     }
-
-    $("toolResults")
-      .innerHTML =
-      "";
-
-    if(!response.ok){
-
-      addResult(
-        "BACKEND ERROR",
-        data || (
-          "HTTP " +
-          response.status
-        ),
-        "ERROR",
-        "!"
-      );
-
-      return;
-    }
-
-    if(!data){
-
-      addResult(
-        "RESPONSE",
-        "Backend не вернул JSON.",
-        "ERROR",
-        "!"
-      );
-
-      return;
-    }
-
-    renderPhoneResult(
-      data
-    );
-
-    createPhoneGraph(
-      data
-    );
-
-    db.searches++;
-
-    saveDB();
-
-  }catch(error){
-
-    $("toolResults")
-      .innerHTML =
-      "";
-
-    addResult(
-      "CONNECTION",
-      error?.message ||
-        "Не удалось связаться с backend.",
-      "ERROR",
-      "!"
-    );
-  }
 }
 
 
-function renderPhoneResult(
-  data
-){
-
-  addResult(
-    "PHONE",
-    data.phone ||
-      "UNKNOWN",
-    "OK",
-    "☎"
-  );
-
-  addResult(
-    "VALID",
-    data.valid === null ||
-    data.valid === undefined
-      ? "UNKNOWN"
-      : data.valid
-        ? "YES"
-        : "NO",
-    data.valid === true
-      ? "OK"
-      : data.valid === false
-        ? "ERROR"
-        : "WARNING",
-    "✓"
-  );
-
-  addResult(
-    "POSSIBLE",
-    data.possible === null ||
-    data.possible === undefined
-      ? "UNKNOWN"
-      : data.possible
-        ? "YES"
-        : "NO",
-    data.possible === true
-      ? "OK"
-      : data.possible === false
-        ? "WARNING"
-        : "WARNING",
-    "?"
-  );
-
-  addResult(
-    "CONFIDENCE",
-    data.confidence ||
-      "UNKNOWN",
-    data.confidence === "verified"
-      ? "OK"
-      : "WARNING",
-    "◆"
-  );
-
-  if(
-    data.score !== null &&
-    data.score !== undefined
-  ){
-
-    addResult(
-      "SCORE",
-      data.score,
-      "INFO",
-      "◈"
-    );
-  }
-
-  addResult(
-    "COUNTRY",
-    data.country ||
-      "UNKNOWN",
-    "INFO",
-    "◎"
-  );
-
-  addResult(
-    "COUNTRY CODE",
-    data.country_code ||
-      "UNKNOWN",
-    "INFO",
-    "+"
-  );
-
-  addResult(
-    "REGION",
-    data.region ||
-      "UNKNOWN",
-    "INFO",
-    "⌖"
-  );
-
-  addResult(
-    "CARRIER",
-    data.carrier ||
-      "UNKNOWN",
-    "INFO",
-    "◉"
-  );
-
-  addResult(
-    "LINE TYPE",
-    data.line_type ||
-      "UNKNOWN",
-    "INFO",
-    "▣"
-  );
-
-  addResult(
-    "DISPOSABLE / VOIP",
-    data.disposable ||
-      "UNKNOWN",
-    data.disposable === "YES"
-      ? "WARNING"
-      : "INFO",
-    "!"
-  );
-
-  addResult(
-    "NATIONAL",
-    data.national ||
-      "UNKNOWN",
-    "INFO",
-    "N"
-  );
-
-  addResult(
-    "INTERNATIONAL",
-    data.international ||
-      "UNKNOWN",
-    "INFO",
-    "I"
-  );
-
-  addResult(
-    "E.164",
-    data.e164 ||
-      "UNKNOWN",
-    "INFO",
-    "E"
-  );
-
-  addResult(
-    "PROVIDER",
-    data.source ||
-      "UNKNOWN",
-    "INFO",
-    "S"
-  );
-
-  let providerStatus =
-    data.provider_status ||
-    "UNKNOWN";
-
-  let providerStatusType =
-    providerStatus === "OK"
-      ? "OK"
-      : providerStatus ===
-        "NO_API_KEY"
-        ? "WARNING"
-        : providerStatus ===
-          "API_KEY_REJECTED"
-          ? "ERROR"
-          : providerStatus ===
-            "QUOTA_EXCEEDED"
-            ? "WARNING"
-            : "INFO";
-
-  addResult(
-    "PROVIDER STATUS",
-    providerStatus,
-    providerStatusType,
-    providerStatus === "OK"
-      ? "✓"
-      : "!"
-  );
-
-  if(
-    data.credits_remaining !==
-      null &&
-    data.credits_remaining !==
-      undefined
-  ){
-
-    addResult(
-      "CREDITS REMAINING",
-      data.credits_remaining,
-      "INFO",
-      "C"
-    );
-  }
-
-  if(
-    data.provider_error
-  ){
-
-    addResult(
-      "PROVIDER RESPONSE",
-      data.provider_error,
-      "WARNING",
-      "!"
-    );
-  }
-
-  if(
-    data.diagnostics &&
-    Object.keys(
-      data.diagnostics
-    ).length
-  ){
-
-    addResult(
-      "DIAGNOSTICS",
-      data.diagnostics,
-      "INFO",
-      "D"
-    );
-  }
-
-  if(
-    data.city &&
-    data.city !== "UNKNOWN"
-  ){
-
-    addResult(
-      "CITY",
-      data.city,
-      "INFO",
-      "⌂"
-    );
-  }
-}
-
-
-/* ==========================================================
+/* =========================================================
    PHONE GRAPH
-========================================================== */
-
-function createNode(
-  title,
-  type,
-  content,
-  x,
-  y
-){
-
-  const id =
-    uid();
-
-  db.nodes[id] = {
-
-    id,
-
-    title,
-
-    type,
-
-    content,
-
-    x,
-
-    y
-  };
-
-  return id;
-}
-
-
-function createPhoneGraph(
-  data
-){
-
-  const phone =
-    data.e164 ||
-    data.phone;
-
-  if(!phone)
-    return;
-
-  let phoneNode =
-    Object.values(
-      db.nodes
-    ).find(
-      n =>
-        n.type === "PHONE" &&
-        n.content === phone
-    );
-
-  if(!phoneNode){
-
-    const center =
-      getGraphCenter();
-
-    const id =
-      createNode(
-        "Phone Number",
-        "PHONE",
-        phone,
-        center.x,
-        center.y
-      );
-
-    phoneNode =
-      db.nodes[id];
-  }
-
-  const values = [
-
-    [
-      "Country",
-      "COUNTRY",
-      data.country
-    ],
-
-    [
-      "Country Code",
-      "COUNTRY CODE",
-      data.country_code
-    ],
-
-    [
-      "Region",
-      "REGION",
-      data.region
-    ],
-
-    [
-      "Carrier",
-      "CARRIER",
-      data.carrier
-    ],
-
-    [
-      "Line Type",
-      "LINE TYPE",
-      data.line_type
-    ],
-
-    [
-      "Confidence",
-      "CONFIDENCE",
-      data.confidence
-    ],
-
-    [
-      "Valid",
-      "VALID",
-      data.valid
-    ],
-
-    [
-      "Possible",
-      "POSSIBLE",
-      data.possible
-    ],
-
-    [
-      "Disposable",
-      "DISPOSABLE",
-      data.disposable
-    ]
-
-  ];
-
-  let index=0;
-
-  for(
-    const item of values
-  ){
-
-    const title =
-      item[0];
-
-    const type =
-      item[1];
-
-    const raw =
-      item[2];
-
-    if(
-      raw === null ||
-      raw === undefined ||
-      raw === "" ||
-      raw === "UNKNOWN"
-    ){
-
-      continue;
-    }
-
-    const content =
-      typeof raw === "boolean"
-        ? (
-            raw
-              ? "YES"
-              : "NO"
-          )
-        : String(raw);
-
-    const duplicate =
-      Object.values(
-        db.nodes
-      ).find(
-        n =>
-          n.type === type &&
-          n.content === content
-      );
-
-    let target =
-      duplicate;
-
-    if(!target){
-
-      const angle =
-        index *
-        (Math.PI * 2 / 10);
-
-      const radius =
-        250 +
-        (
-          index % 3
-        ) * 70;
-
-      const id =
-        createNode(
-
-          title,
-
-          type,
-
-          content,
-
-          phoneNode.x +
-            Math.cos(angle) *
-            radius,
-
-          phoneNode.y +
-            Math.sin(angle) *
-            radius
-        );
-
-      target =
-        db.nodes[id];
-    }
-
-    const exists =
-      db.links.some(
-        link =>
-          (
-            link.a ===
-              phoneNode.id &&
-            link.b ===
-              target.id
-          ) ||
-          (
-            link.a ===
-              target.id &&
-            link.b ===
-              phoneNode.id
-          )
-      );
-
-    if(!exists){
-
-      db.links.push({
-
-        a:
-          phoneNode.id,
-
-        b:
-          target.id
-      });
-    }
-
-    index++;
-  }
-
-  saveDB();
-
-  renderNodes();
-
-  renderLines();
-}
-
-
-/* ==========================================================
-   ADDRESS
-========================================================== */
-
-async function checkAddressReal(
-  value
-){
-
-  addResult(
-    "SEARCH",
-    "Ищем адрес...",
-    "INFO",
-    "•"
-  );
-
-  try{
-
-    const url =
-      "/api/map/search?q=" +
-      encodeURIComponent(
-        value
-      );
-
-    const response =
-      await fetch(
-        url,
-        {
-          headers:{
-            "Accept":
-              "application/json"
-          }
-        }
-      );
-
-    const data =
-      await response.json();
-
-    $("toolResults")
-      .innerHTML =
-      "";
-
-    if(
-      !response.ok ||
-      !data.success
-    ){
-
-      addResult(
-        "ADDRESS ERROR",
-        data.error ||
-          "Адрес не найден.",
-        "ERROR",
-        "!"
-      );
-
-      return;
-    }
-
-    const results =
-      data.results || [];
-
-    if(!results.length){
-
-      addResult(
-        "RESULT",
-        "Ничего не найдено.",
-        "WARNING",
-        "?"
-      );
-
-      return;
-    }
-
-    results
-      .slice(0,10)
-      .forEach(
-        (item,index)=>{
-
-          addResult(
-            "RESULT " +
-              (index+1),
-            item.display_name,
-            "OK",
-            "⌖"
-          );
-
-          addResult(
-            "COORDINATES",
-            `${item.lat}, ${item.lon}`,
-            "INFO",
-            "◉"
-          );
-
-          addResult(
-            "CITY",
-            item.city ||
-              "UNKNOWN",
-            "INFO",
-            "⌂"
-          );
-
-          addResult(
-            "COUNTRY",
-            item.country ||
-              "UNKNOWN",
-            "INFO",
-            "◎"
-          );
-
-          addResult(
-            "ROAD",
-            item.road ||
-              "UNKNOWN",
-            "INFO",
-            "R"
-          );
-
-          addResult(
-            "HOUSE",
-            item.house_number ||
-              "UNKNOWN",
-            "INFO",
-            "#"
-          );
-        }
-      );
-
-    createAddressGraph(
-      results[0]
-    );
-
-  }catch(error){
-
-    $("toolResults")
-      .innerHTML =
-      "";
-
-    addResult(
-      "CONNECTION",
-      error?.message ||
-        "Ошибка соединения.",
-      "ERROR",
-      "!"
-    );
-  }
-}
-
-
-function createAddressGraph(
-  data
-){
-
-  if(!data)
-    return;
-
-  const center =
-    getGraphCenter();
-
-  let addressNode =
-    Object.values(
-      db.nodes
-    ).find(
-      n =>
-        n.type ===
-          "ADDRESS" &&
-        n.content ===
-          data.display_name
-    );
-
-  if(!addressNode){
-
-    const id =
-      createNode(
-
-        "Address",
-
-        "ADDRESS",
-
-        data.display_name,
-
-        center.x,
-        center.y
-      );
-
-    addressNode =
-      db.nodes[id];
-  }
-
-  const values = [
-
-    [
-      "City",
-      "CITY",
-      data.city
-    ],
-
-    [
-      "Country",
-      "COUNTRY",
-      data.country
-    ],
-
-    [
-      "Coordinates",
-      "COORDINATES",
-      `${data.lat}, ${data.lon}`
-    ],
-
-    [
-      "Postcode",
-      "POSTCODE",
-      data.postcode
-    ]
-
-  ];
-
-  let index=0;
-
-  values.forEach(
-    item=>{
-
-      if(
-        !item[2] ||
-        item[2] ===
-          "UNKNOWN"
-      )
-        return;
-
-      const angle =
-        index *
-        (
-          Math.PI *
-          2 /
-          values.length
-        );
-
-      const id =
-        createNode(
-
-          item[0],
-
-          item[1],
-
-          item[2],
-
-          addressNode.x +
-            Math.cos(angle) *
-            230,
-
-          addressNode.y +
-            Math.sin(angle) *
-            230
-        );
-
-      db.links.push({
-
-        a:
-          addressNode.id,
-
-        b:
-          id
-      });
-
-      index++;
-    }
-  );
-
-  saveDB();
-
-  renderNodes();
-
-  renderLines();
-}
-
-
-/* ==========================================================
-   NODE MODAL
-========================================================== */
-
-let editingNode =
-  null;
-
-
-function openNodeModal(
-  nodeId=null
-){
-
-  editingNode =
-    nodeId;
-
-  $("nodeModalTitle")
-    .textContent =
-      nodeId
-        ? "Edit Node"
-        : "New Node";
-
-  if(nodeId){
-
-    const node =
-      db.nodes[nodeId];
-
-    if(!node)
-      return;
-
-    $("nodeTitle").value =
-      node.title || "";
-
-    $("nodeType").value =
-      node.type || "";
-
-    $("nodeContent").value =
-      node.content || "";
-
-  }else{
-
-    $("nodeTitle").value =
-      "";
-
-    $("nodeType").value =
-      "";
-
-    $("nodeContent").value =
-      "";
-  }
-
-  $("nodeModal")
-    .classList.add(
-      "open"
-    );
-}
-
-
-function closeNodeModal(){
-
-  $("nodeModal")
-    .classList.remove(
-      "open"
-    );
-
-  editingNode =
-    null;
-}
-
-
-function saveNode(){
-
-  const title =
-    $("nodeTitle")
-      .value
-      .trim();
-
-  const type =
-    $("nodeType")
-      .value
-      .trim()
-      .toUpperCase();
-
-  const content =
-    $("nodeContent")
-      .value
-      .trim();
-
-  if(!title){
-
-    toast(
-      "Введите название"
-    );
-
-    return;
-  }
-
-  if(editingNode){
-
-    const node =
-      db.nodes[
-        editingNode
-      ];
-
-    if(node){
-
-      node.title =
-        title;
-
-      node.type =
-        type ||
+========================================================= */
+
+/*
+   Структура:
+
+       PHONE
+          |
+       ┌──┼──┐
+       A  B  C
+       |  |  |
+       D  E  F
+       |  |  |
+       G  H  I
+
+   То есть граф не превращается в кашу.
+   Всё строится колонками слева направо.
+*/
+
+function createPhoneGraph(data){
+
+    const phone =
+        data.phone ||
+        data.e164 ||
+        data.international ||
         "UNKNOWN";
 
-      node.content =
-        content;
+    const group =
+        "phone:" +
+        String(phone)
+            .replace(/[^\d+]/g,"");
+
+    /* Удаляем старую проверку того же номера */
+
+    removeGraphGroup(group);
+
+    const rootId = uid("phone");
+
+    const root = {
+        id:rootId,
+        type:"PHONE NUMBER",
+        value:phone,
+        x:-900,
+        y:0,
+        group,
+        level:0
+    };
+
+    db.nodes[rootId] = root;
+
+    /*
+       Собираем только существующие значения.
+       UNKNOWN и пустые значения не рисуем.
+    */
+
+    const fields = [
+
+        ["COUNTRY","country"],
+        ["COUNTRY CODE","country_code"],
+        ["REGION","region"],
+        ["CARRIER","carrier"],
+        ["LINE TYPE","line_type"],
+        ["VALID","valid"],
+        ["POSSIBLE","possible"],
+        ["CONFIDENCE","confidence"],
+        ["SCORE","score"],
+        ["DISPOSABLE","disposable"],
+        ["NATIONAL","national"],
+        ["INTERNATIONAL","international"],
+        ["E.164","e164"],
+        ["REASON","reason"],
+        ["PROVIDER STATUS","provider_status"],
+        ["CREDITS","credits_remaining"]
+
+    ];
+
+    const usable = [];
+
+    for(const [type,key] of fields){
+
+        if(!(key in data)){
+            continue;
+        }
+
+        let value = data[key];
+
+        if(
+            value === null ||
+            value === undefined ||
+            value === "" ||
+            String(value).toUpperCase() === "UNKNOWN" ||
+            String(value).toUpperCase() === "N/A"
+        ){
+            continue;
+        }
+
+        if(typeof value === "object"){
+            value = JSON.stringify(value);
+        }
+
+        usable.push({
+            type,
+            value:String(value)
+        });
     }
 
-  }else{
 
-    const center =
-      getGraphCenter();
+    /*
+       Максимум 5 элементов на колонку.
+       Поэтому получается аккуратная сетка.
+    */
 
-    createNode(
+    const PER_COLUMN = 5;
+    const COLUMN_GAP = 410;
+    const ROW_GAP = 135;
 
-      title,
+    const levels = [];
 
-      type ||
-        "UNKNOWN",
+    for(let i=0;i<usable.length;i+=PER_COLUMN){
 
-      content,
+        levels.push(
+            usable.slice(i,i+PER_COLUMN)
+        );
+    }
 
-      center.x +
-        (
-          Math.random() -
-          .5
-        ) * 260,
 
-      center.y +
-        (
-          Math.random() -
-          .5
-        ) * 180
-    );
-  }
+    /* root */
 
-  saveDB();
+    const allLevelIds = [
+        [rootId]
+    ];
 
-  renderNodes();
 
-  renderLines();
+    /* создаём колонки */
 
-  closeNodeModal();
+    levels.forEach((levelItems,levelIndex)=>{
 
-  toast(
-    "Node saved"
-  );
+        const ids = [];
+
+        const x =
+            -900 +
+            COLUMN_GAP * (levelIndex + 1);
+
+        const totalHeight =
+            (levelItems.length - 1) * ROW_GAP;
+
+        levelItems.forEach((item,index)=>{
+
+            const id = uid("phone_meta");
+
+            const y =
+                -totalHeight / 2 +
+                index * ROW_GAP;
+
+            db.nodes[id] = {
+                id,
+                type:item.type,
+                value:item.value,
+                x,
+                y,
+                group,
+                level:levelIndex + 1
+            };
+
+            ids.push(id);
+        });
+
+        allLevelIds.push(ids);
+    });
+
+
+    /*
+       АВТОМАТИЧЕСКИЕ ЛИНИИ.
+    */
+
+    for(let level=1;level<allLevelIds.length;level++){
+
+        const current = allLevelIds[level];
+        const previous = allLevelIds[level-1];
+
+        current.forEach((childId,index)=>{
+
+            let parentId;
+
+            if(level === 1){
+
+                parentId = rootId;
+
+            }else{
+
+                const child = db.nodes[childId];
+
+                /*
+                   Подключаем к ближайшему узлу предыдущей колонки.
+                */
+
+                let best = previous[0];
+                let bestDistance = Infinity;
+
+                for(const candidateId of previous){
+
+                    const candidate = db.nodes[candidateId];
+
+                    const distance =
+                        Math.abs(candidate.y - child.y);
+
+                    if(distance < bestDistance){
+
+                        bestDistance = distance;
+                        best = candidateId;
+                    }
+                }
+
+                parentId = best;
+            }
+
+            addLink(parentId,childId);
+        });
+    }
+
+
+    renderAll();
+
+    /*
+       После построения немного центрируем граф.
+    */
+
+    setTimeout(()=>{
+        centerGraphToNode(rootId);
+    },50);
 }
 
 
-/* ==========================================================
-   GRAPH STATE
-========================================================== */
+/* =========================================================
+   GROUP DELETE
+========================================================= */
 
-const graph =
-  $("graph");
+function removeGraphGroup(group){
 
-const world =
-  $("world");
+    const ids = Object
+        .values(db.nodes)
+        .filter(node=>node.group === group)
+        .map(node=>node.id);
 
-let zoom =
-  1;
+    if(!ids.length){
+        return;
+    }
 
-let panX =
-  0;
+    const set = new Set(ids);
 
-let panY =
-  0;
+    ids.forEach(id=>{
+        delete db.nodes[id];
+    });
 
-let draggingNode =
-  null;
-
-let dragOffsetX =
-  0;
-
-let dragOffsetY =
-  0;
-
-let panning =
-  false;
-
-let panStartX =
-  0;
-
-let panStartY =
-  0;
-
-let linkSource =
-  null;
-
-
-function applyWorld(){
-
-  world.style.transform =
-    `
-      translate(
-        calc(-50% + ${panX}px),
-        calc(-50% + ${panY}px)
-      )
-      scale(${zoom})
-    `;
+    db.links = db.links.filter(link=>{
+        return !set.has(link.from) &&
+               !set.has(link.to);
+    });
 }
 
 
-function getGraphCenter(){
+/* =========================================================
+   NODE CREATION
+========================================================= */
 
-  return {
+function addGraphNode({
+    type="NODE",
+    value="",
+    x=0,
+    y=0,
+    group="manual",
+    level=0,
+    autoLink=true
+}){
 
-    x:
-      -panX / zoom,
+    const id = uid("node");
 
-    y:
-      -panY / zoom
-  };
+    db.nodes[id] = {
+        id,
+        type,
+        value,
+        x,
+        y,
+        group,
+        level
+    };
+
+
+    /*
+       Если появляется второй узел —
+       автоматически соединяем его с ближайшим.
+    */
+
+    if(autoLink){
+
+        const existing =
+            Object.values(db.nodes)
+                .filter(n=>n.id !== id);
+
+        if(existing.length === 1){
+
+            addLink(existing[0].id,id);
+
+        }else if(existing.length > 1){
+
+            let closest = null;
+            let distance = Infinity;
+
+            for(const node of existing){
+
+                const dx = node.x - x;
+                const dy = node.y - y;
+
+                const d = Math.sqrt(
+                    dx*dx + dy*dy
+                );
+
+                if(d < distance){
+
+                    distance = d;
+                    closest = node;
+                }
+            }
+
+            if(closest){
+                addLink(closest.id,id);
+            }
+        }
+    }
+
+    renderAll();
+
+    return id;
 }
 
+
+/* =========================================================
+   LINKS
+========================================================= */
+
+function addLink(from,to){
+
+    if(!from || !to || from === to){
+        return;
+    }
+
+    const exists = db.links.some(link=>{
+        return (
+            (link.from === from && link.to === to) ||
+            (link.from === to && link.to === from)
+        );
+    });
+
+    if(exists){
+        return;
+    }
+
+    db.links.push({
+        id:uid("link"),
+        from,
+        to
+    });
+}
+
+
+/* =========================================================
+   RENDER
+========================================================= */
+
+function renderAll(){
+
+    renderNodes();
+    renderLines();
+
+    updateStatus();
+    updateProfileStats();
+}
+
+
+/* =========================================================
+   RENDER NODES
+========================================================= */
 
 function renderNodes(){
 
-  world
-    .querySelectorAll(
-      ".node"
-    )
-    .forEach(
-      el =>
-        el.remove()
-    );
+    world
+        .querySelectorAll(".node")
+        .forEach(el=>el.remove());
 
-  Object.values(
-    db.nodes
-  ).forEach(
-    node=>{
+    Object
+        .values(db.nodes)
+        .forEach(node=>{
 
-      const el =
-        document.createElement(
-          "div"
-        );
+            const el =
+                document.createElement("div");
 
-      el.className =
-        "node";
+            el.className = "node";
 
-      el.dataset.id =
-        node.id;
+            if(node.id === selectedNodeId){
+                el.classList.add("selected");
+            }
 
-      el.style.left =
-        node.x + "px";
+            /*
+               x/y — это центрированная координата.
+               +5000 переводит её в SVG/world plane.
+            */
 
-      el.style.top =
-        node.y + "px";
+            const left =
+                node.x + 5000;
 
-      el.innerHTML = `
+            const top =
+                node.y + 5000;
 
-        <button
-          class="node-delete"
-          title="Delete"
-        >
-          ×
-        </button>
+            el.style.left = left + "px";
+            el.style.top = top + "px";
 
-        <div class="node-type">
-          ${escapeHTML(
-            node.type ||
-            "UNKNOWN"
-          )}
-        </div>
+            el.dataset.id = node.id;
 
-        <div class="node-title">
-          ${escapeHTML(
-            node.title
-          )}
-        </div>
+            el.innerHTML = `
+                <div class="node-tools">
 
-        <div class="node-content">
-          ${escapeHTML(
-            node.content
-          )}
-        </div>
+                    <button
+                        title="Edit"
+                        data-action="edit"
+                    >✎</button>
 
-        <div
-          class="node-dot"
-          title="Link"
-        ></div>
+                    <button
+                        title="Delete"
+                        data-action="delete"
+                    >×</button>
 
-      `;
+                </div>
 
-      world.appendChild(
-        el
-      );
+                <div class="node-head">
 
-      const deleteBtn =
-        el.querySelector(
-          ".node-delete"
-        );
+                    <span class="node-dot"></span>
 
-      deleteBtn.onclick =
-        event=>{
+                    <span class="node-type">
+                        ${escapeHTML(node.type)}
+                    </span>
 
-          event.stopPropagation();
+                </div>
 
-          deleteNode(
-            node.id
-          );
-        };
+                <div class="node-value">
+                    ${escapeHTML(node.value)}
+                </div>
 
-      const dot =
-        el.querySelector(
-          ".node-dot"
-        );
+                <div class="node-meta">
+                    ${escapeHTML(node.group || "manual")}
+                </div>
+            `;
 
-      dot.onclick =
-        event=>{
 
-          event.stopPropagation();
+            el.addEventListener("pointerdown",event=>{
+                handleNodePointerDown(event,node.id);
+            });
 
-          handleLinkDot(
-            node.id
-          );
-        };
 
-      el.addEventListener(
-        "dblclick",
-        event=>{
+            el.addEventListener("click",event=>{
 
-          if(
-            event.target.closest(
-              ".node-delete"
-            ) ||
-            event.target.closest(
-              ".node-dot"
-            )
-          )
-            return;
+                if(
+                    event.target.closest(".node-tools")
+                ){
+                    return;
+                }
 
-          openNodeModal(
-            node.id
-          );
-        }
-      );
+                selectNode(node.id);
+            });
 
-      el.addEventListener(
-        "pointerdown",
-        event=>{
 
-          if(
-            event.target.closest(
-              ".node-delete"
-            ) ||
-            event.target.closest(
-              ".node-dot"
-            )
-          )
-            return;
+            el
+                .querySelector('[data-action="delete"]')
+                ?.addEventListener("click",event=>{
 
-          startNodeDrag(
-            event,
-            node
-          );
-        }
-      );
-    }
-  );
+                    event.stopPropagation();
+
+                    deleteNode(node.id);
+                });
+
+
+            el
+                .querySelector('[data-action="edit"]')
+                ?.addEventListener("click",event=>{
+
+                    event.stopPropagation();
+
+                    editNode(node.id);
+                });
+
+
+            world.appendChild(el);
+        });
 }
 
 
-function startNodeDrag(
-  event,
-  node
-){
-
-  event.preventDefault();
-
-  draggingNode =
-    node;
-
-  node._dragging =
-    true;
-
-  const rect =
-    graph.getBoundingClientRect();
-
-  const graphX =
-    (
-      event.clientX -
-      rect.left -
-      rect.width / 2 -
-      panX
-    ) / zoom;
-
-  const graphY =
-    (
-      event.clientY -
-      rect.top -
-      rect.height / 2 -
-      panY
-    ) / zoom;
-
-  dragOffsetX =
-    node.x -
-    graphX;
-
-  dragOffsetY =
-    node.y -
-    graphY;
-
-  const el =
-    world.querySelector(
-      `[data-id="${node.id}"]`
-    );
-
-  if(el)
-    el.classList.add(
-      "dragging"
-    );
-
-  window.addEventListener(
-    "pointermove",
-    moveNode
-  );
-
-  window.addEventListener(
-    "pointerup",
-    stopNodeDrag,
-    {
-      once:true
-    }
-  );
-}
-
-
-function moveNode(
-  event
-){
-
-  if(!draggingNode)
-    return;
-
-  const rect =
-    graph.getBoundingClientRect();
-
-  const graphX =
-    (
-      event.clientX -
-      rect.left -
-      rect.width / 2 -
-      panX
-    ) / zoom;
-
-  const graphY =
-    (
-      event.clientY -
-      rect.top -
-      rect.height / 2 -
-      panY
-    ) / zoom;
-
-  draggingNode.x =
-    graphX +
-    dragOffsetX;
-
-  draggingNode.y =
-    graphY +
-    dragOffsetY;
-
-  const el =
-    world.querySelector(
-      `[data-id="${draggingNode.id}"]`
-    );
-
-  if(el){
-
-    el.style.left =
-      draggingNode.x +
-      "px";
-
-    el.style.top =
-      draggingNode.y +
-      "px";
-  }
-
-  renderLines();
-}
-
-
-function stopNodeDrag(){
-
-  if(!draggingNode)
-    return;
-
-  const el =
-    world.querySelector(
-      `[data-id="${draggingNode.id}"]`
-    );
-
-  if(el)
-    el.classList.remove(
-      "dragging"
-    );
-
-  draggingNode._dragging =
-    false;
-
-  draggingNode =
-    null;
-
-  window.removeEventListener(
-    "pointermove",
-    moveNode
-  );
-
-  saveDB();
-
-  renderLines();
-}
-
-
-function deleteNode(
-  id
-){
-
-  const node =
-    db.nodes[id];
-
-  if(!node)
-    return;
-
-  if(
-    !confirm(
-      `Delete node "${node.title}"?`
-    )
-  )
-    return;
-
-  delete db.nodes[id];
-
-  db.links =
-    db.links.filter(
-      link =>
-        link.a !== id &&
-        link.b !== id
-    );
-
-  saveDB();
-
-  renderNodes();
-
-  renderLines();
-
-  toast(
-    "Node deleted"
-  );
-}
-
-
-/* ==========================================================
-   LINKING
-========================================================== */
-
-function handleLinkDot(
-  id
-){
-
-  if(!linkSource){
-
-    linkSource =
-      id;
-
-    highlightNode(
-      id
-    );
-
-    toast(
-      "Select another node"
-    );
-
-    return;
-  }
-
-  if(
-    linkSource === id
-  ){
-
-    linkSource =
-      null;
-
-    clearHighlights();
-
-    return;
-  }
-
-  const exists =
-    db.links.some(
-      link =>
-        (
-          link.a ===
-            linkSource &&
-          link.b ===
-            id
-        ) ||
-        (
-          link.a ===
-            id &&
-          link.b ===
-            linkSource
-        )
-    );
-
-  if(!exists){
-
-    db.links.push({
-
-      a:
-        linkSource,
-
-      b:
-        id
-    });
-
-    saveDB();
-
-    renderLines();
-
-    toast(
-      "Nodes linked"
-    );
-  }
-
-  linkSource =
-    null;
-
-  clearHighlights();
-}
-
-
-function highlightNode(
-  id
-){
-
-  clearHighlights();
-
-  const el =
-    world.querySelector(
-      `[data-id="${id}"]`
-    );
-
-  if(el)
-    el.classList.add(
-      "highlight"
-    );
-}
-
-
-function clearHighlights(){
-
-  world
-    .querySelectorAll(
-      ".node.highlight"
-    )
-    .forEach(
-      el =>
-        el.classList.remove(
-          "highlight"
-        )
-    );
-}
-
-
-/* ==========================================================
-   GRAPH LINES
-========================================================== */
+/* =========================================================
+   RENDER LINES — FIXED
+========================================================= */
 
 function renderLines(){
 
-  const svg =
-    $("lines");
+    /*
+       Полностью очищаем SVG.
+       Старые линии никогда не остаются.
+    */
 
-  svg.innerHTML =
-    "";
+    lines.innerHTML = "";
 
-  db.links.forEach(
-    link=>{
 
-      const a =
-        db.nodes[
-          link.a
-        ];
+    for(const link of db.links){
 
-      const b =
-        db.nodes[
-          link.b
-        ];
+        const from =
+            db.nodes[link.from];
 
-      if(!a || !b)
-        return;
+        const to =
+            db.nodes[link.to];
 
-      const dx =
-        b.x - a.x;
+        if(!from || !to){
+            continue;
+        }
 
-      const dy =
-        b.y - a.y;
 
-      const length =
-        Math.sqrt(
-          dx*dx +
-          dy*dy
+        const a = nodeCenter(from);
+        const b = nodeCenter(to);
+
+
+        /*
+           Делаем красивую горизонтальную кривую.
+           Она автоматически подстраивается под позицию узлов.
+        */
+
+        const dx = Math.abs(b.x - a.x);
+
+        const curve =
+            Math.max(
+                70,
+                Math.min(260,dx * .45)
+            );
+
+
+        const direction =
+            b.x >= a.x ? 1 : -1;
+
+
+        const c1x =
+            a.x + curve * direction;
+
+        const c1y =
+            a.y;
+
+        const c2x =
+            b.x - curve * direction;
+
+        const c2y =
+            b.y;
+
+
+        const path =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "path"
+            );
+
+
+        path.setAttribute(
+            "d",
+            `M ${a.x} ${a.y}
+             C ${c1x} ${c1y},
+               ${c2x} ${c2y},
+               ${b.x} ${b.y}`
         );
 
-      if(!length)
-        return;
-
-      const nx =
-        -dy /
-        length;
-
-      const ny =
-        dx /
-        length;
-
-      const bend =
-        Math.min(
-          45,
-          length *
-          .12
+        path.setAttribute(
+            "class",
+            "graph-line-bg"
         );
 
-      const mx =
-        (a.x+b.x)/2;
+        lines.appendChild(path);
 
-      const my =
-        (a.y+b.y)/2;
 
-      const cx =
-        mx +
-        nx*bend;
+        const visiblePath =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "path"
+            );
 
-      const cy =
-        my +
-        ny*bend;
-
-      const path =
-        document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "path"
+        visiblePath.setAttribute(
+            "d",
+            `M ${a.x} ${a.y}
+             C ${c1x} ${c1y},
+               ${c2x} ${c2y},
+               ${b.x} ${b.y}`
         );
 
-      path.setAttribute(
-        "d",
-        `
-          M ${a.x} ${a.y}
-          Q ${cx} ${cy}
-            ${b.x} ${b.y}
-        `
-      );
+        visiblePath.setAttribute(
+            "class",
+            "graph-line"
+        );
 
-      path.setAttribute(
-        "fill",
-        "none"
-      );
+        lines.appendChild(visiblePath);
 
-      path.setAttribute(
-        "stroke",
-        "rgba(255,255,255,.16)"
-      );
 
-      path.setAttribute(
-        "stroke-width",
-        "1.2"
-      );
+        /*
+           Маленькие точки на концах.
+        */
 
-      path.setAttribute(
-        "stroke-dasharray",
-        "3 6"
-      );
+        const startDot =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "circle"
+            );
 
-      path.style.animation =
-        "dash 5s linear infinite";
+        startDot.setAttribute("cx",a.x);
+        startDot.setAttribute("cy",a.y);
+        startDot.setAttribute("r","2.8");
+        startDot.setAttribute(
+            "class",
+            "graph-line-dot"
+        );
 
-      svg.appendChild(
-        path
-      );
+        lines.appendChild(startDot);
+
+
+        const endDot =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "circle"
+            );
+
+        endDot.setAttribute("cx",b.x);
+        endDot.setAttribute("cy",b.y);
+        endDot.setAttribute("r","2.8");
+        endDot.setAttribute(
+            "class",
+            "graph-line-dot"
+        );
+
+        lines.appendChild(endDot);
     }
-  );
 }
 
 
-/* ==========================================================
-   PAN / ZOOM
-========================================================== */
+/* =========================================================
+   NODE DRAG
+========================================================= */
 
-graph.addEventListener(
-  "pointerdown",
-  event=>{
+function handleNodePointerDown(event,id){
 
     if(
-      event.target.closest(
-        ".node"
-      )
-    )
-      return;
-
-    panning =
-      true;
-
-    panStartX =
-      event.clientX -
-      panX;
-
-    panStartY =
-      event.clientY -
-      panY;
-
-    graph.setPointerCapture(
-      event.pointerId
-    );
-  }
-);
-
-
-graph.addEventListener(
-  "pointermove",
-  event=>{
-
-    if(!panning)
-      return;
-
-    panX =
-      event.clientX -
-      panStartX;
-
-    panY =
-      event.clientY -
-      panStartY;
-
-    applyWorld();
-  }
-);
-
-
-graph.addEventListener(
-  "pointerup",
-  ()=>{
-    panning =
-      false;
-
-    saveDB();
-  }
-);
-
-
-graph.addEventListener(
-  "wheel",
-  event=>{
-
-    event.preventDefault();
-
-    const oldZoom =
-      zoom;
-
-    zoom +=
-      event.deltaY < 0
-        ? .08
-        : -.08;
-
-    zoom =
-      Math.max(
-        .35,
-        Math.min(
-          2.5,
-          zoom
-        )
-      );
-
-    if(
-      oldZoom !== zoom
+        event.target.closest(".node-tools")
     ){
-
-      applyWorld();
+        return;
     }
 
-  },
-  {
-    passive:false
-  }
+    event.preventDefault();
+    event.stopPropagation();
+
+    const node = db.nodes[id];
+
+    if(!node){
+        return;
+    }
+
+    selectedNodeId = id;
+
+    draggingNode = {
+        id,
+        startX:event.clientX,
+        startY:event.clientY,
+        nodeX:node.x,
+        nodeY:node.y
+    };
+
+    renderNodes();
+
+    document.addEventListener(
+        "pointermove",
+        handleNodePointerMove
+    );
+
+    document.addEventListener(
+        "pointerup",
+        handleNodePointerUp,
+        {once:true}
+    );
+}
+
+
+function handleNodePointerMove(event){
+
+    if(!draggingNode){
+        return;
+    }
+
+    const node =
+        db.nodes[draggingNode.id];
+
+    if(!node){
+        return;
+    }
+
+    /*
+       Учитываем zoom.
+    */
+
+    const dx =
+        (event.clientX - draggingNode.startX)
+        / view.scale;
+
+    const dy =
+        (event.clientY - draggingNode.startY)
+        / view.scale;
+
+    node.x =
+        draggingNode.nodeX + dx;
+
+    node.y =
+        draggingNode.nodeY + dy;
+
+
+    /*
+       Двигаем DOM node напрямую,
+       не пересоздавая всё дерево.
+    */
+
+    const el =
+        world.querySelector(
+            `.node[data-id="${CSS.escape(node.id)}"]`
+        );
+
+    if(el){
+
+        el.style.left =
+            (node.x + 5000) + "px";
+
+        el.style.top =
+            (node.y + 5000) + "px";
+    }
+
+
+    /*
+       И СРАЗУ обновляем линии.
+    */
+
+    renderLines();
+}
+
+
+function handleNodePointerUp(){
+
+    if(!draggingNode){
+        return;
+    }
+
+    draggingNode = null;
+
+    document.removeEventListener(
+        "pointermove",
+        handleNodePointerMove
+    );
+
+    saveDB();
+}
+
+
+/* =========================================================
+   DELETE NODE
+========================================================= */
+
+function deleteNode(id){
+
+    if(!db.nodes[id]){
+        return;
+    }
+
+    delete db.nodes[id];
+
+    db.links =
+        db.links.filter(link=>{
+            return (
+                link.from !== id &&
+                link.to !== id
+            );
+        });
+
+    if(selectedNodeId === id){
+        selectedNodeId = null;
+    }
+
+    renderAll();
+    saveDB();
+
+    showToast("Узел удалён");
+}
+
+
+/* =========================================================
+   EDIT NODE
+========================================================= */
+
+function editNode(id){
+
+    const node = db.nodes[id];
+
+    if(!node){
+        return;
+    }
+
+    const value =
+        prompt("Новое значение узла:",node.value);
+
+    if(value === null){
+        return;
+    }
+
+    node.value = value.trim();
+
+    renderAll();
+    saveDB();
+}
+
+
+/* =========================================================
+   SELECT
+========================================================= */
+
+function selectNode(id){
+
+    selectedNodeId = id;
+
+    renderNodes();
+}
+
+
+/* =========================================================
+   MANUAL NODE
+========================================================= */
+
+function openNodeModal(){
+
+    document.getElementById("nodeTypeInput").value = "";
+    document.getElementById("nodeValueInput").value = "";
+
+    nodeModal.classList.add("open");
+
+    setTimeout(()=>{
+        document
+            .getElementById("nodeTypeInput")
+            .focus();
+    },80);
+}
+
+
+function createManualNode(){
+
+    const type =
+        normalizeValue(
+            document.getElementById("nodeTypeInput").value
+        );
+
+    const value =
+        normalizeValue(
+            document.getElementById("nodeValueInput").value
+        );
+
+    if(!type || !value){
+
+        showToast("Заполните оба поля");
+
+        return;
+    }
+
+
+    /*
+       Если уже есть узел —
+       ставим новый справа.
+    */
+
+    const count =
+        Object.keys(db.nodes).length;
+
+    const x =
+        -250 +
+        (count % 5) * 300;
+
+    const y =
+        Math.floor(count / 5) * 150 - 300;
+
+
+    addGraphNode({
+        type,
+        value,
+        x,
+        y,
+        group:"manual",
+        autoLink:true
+    });
+
+
+    closeModal("nodeModal");
+
+    saveDB();
+
+    showToast("Узел создан");
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+document
+    .getElementById("chainSearch")
+    .addEventListener("input",event=>{
+
+        const query =
+            event.target.value
+                .trim()
+                .toLowerCase();
+
+        document
+            .querySelectorAll(".node")
+            .forEach(el=>{
+
+                const id = el.dataset.id;
+                const node = db.nodes[id];
+
+                if(!query){
+
+                    el.style.opacity = "1";
+
+                    return;
+                }
+
+                const text =
+                    `${node.type} ${node.value} ${node.group}`
+                        .toLowerCase();
+
+                el.style.opacity =
+                    text.includes(query)
+                        ? "1"
+                        : ".16";
+            });
+    });
+
+
+/* =========================================================
+   ADDRESS
+========================================================= */
+
+async function checkAddressReal(value){
+
+    toolResult.style.display = "block";
+    toolResult.textContent = "Поиск адреса...";
+
+    addressResults.innerHTML = "";
+
+    try{
+
+        const response =
+            await fetch(
+                "/api/map/search?q=" +
+                encodeURIComponent(value),
+                {
+                    headers:{
+                        "Accept":"application/json"
+                    }
+                }
+            );
+
+        const data =
+            await response.json();
+
+        if(!response.ok){
+
+            throw new Error(
+                data?.detail ||
+                "Ошибка поиска"
+            );
+        }
+
+
+        if(!Array.isArray(data) || !data.length){
+
+            toolResult.textContent =
+                "Адрес не найден.";
+
+            return;
+        }
+
+
+        toolResult.textContent =
+            "Найдено: " +
+            data.length;
+
+
+        data.forEach(item=>{
+
+            const div =
+                document.createElement("div");
+
+            div.className = "address-item";
+
+            div.innerHTML = `
+                <b>${escapeHTML(item.display_name)}</b>
+                <small>
+                    ${escapeHTML(item.type || "")}
+                    ·
+                    ${escapeHTML(item.country || "")}
+                </small>
+            `;
+
+
+            div.addEventListener("click",()=>{
+
+                createAddressGraph(item);
+
+                closeModal("toolModal");
+
+                db.searches++;
+
+                saveDB();
+            });
+
+
+            addressResults.appendChild(div);
+        });
+
+
+    }catch(error){
+
+        console.error(error);
+
+        toolResult.textContent =
+            "Ошибка: " +
+            (error.message || "неизвестная ошибка");
+    }
+}
+
+
+/* =========================================================
+   ADDRESS GRAPH
+========================================================= */
+
+function createAddressGraph(item){
+
+    const group =
+        "address:" +
+        String(item.display_name || "")
+            .slice(0,80);
+
+
+    removeGraphGroup(group);
+
+
+    const rootId = uid("address");
+
+    db.nodes[rootId] = {
+
+        id:rootId,
+
+        type:"ADDRESS",
+
+        value:
+            item.display_name ||
+            "Unknown address",
+
+        x:-900,
+
+        y:0,
+
+        group,
+
+        level:0
+    };
+
+
+    const fields = [
+
+        ["COUNTRY",item.country],
+
+        ["COUNTRY CODE",item.country_code],
+
+        ["STATE",item.state],
+
+        ["CITY",item.city],
+
+        ["ROAD",item.road],
+
+        ["HOUSE",item.house_number],
+
+        ["POSTCODE",item.postcode],
+
+        ["TYPE",item.type],
+
+        ["LATITUDE",item.lat],
+
+        ["LONGITUDE",item.lon]
+
+    ].filter(
+        ([,value]) =>
+            value !== undefined &&
+            value !== null &&
+            String(value).trim() !== ""
+    );
+
+
+    const PER_COLUMN = 5;
+
+    const COLUMN_GAP = 410;
+
+    const ROW_GAP = 135;
+
+    const columns = [];
+
+    for(
+        let i=0;
+        i<fields.length;
+        i+=PER_COLUMN
+    ){
+
+        columns.push(
+            fields.slice(i,i+PER_COLUMN)
+        );
+    }
+
+
+    let previousIds = [rootId];
+
+
+    columns.forEach((column,columnIndex)=>{
+
+        const ids = [];
+
+        const totalHeight =
+            (column.length - 1) * ROW_GAP;
+
+        column.forEach((field,index)=>{
+
+            const id =
+                uid("address_meta");
+
+            const node = {
+
+                id,
+
+                type:field[0],
+
+                value:String(field[1]),
+
+                x:
+                    -900 +
+                    COLUMN_GAP * (columnIndex + 1),
+
+                y:
+                    -totalHeight / 2 +
+                    index * ROW_GAP,
+
+                group,
+
+                level:columnIndex + 1
+            };
+
+            db.nodes[id] = node;
+
+            ids.push(id);
+
+
+            /*
+               Автоматически подключаем
+               к ближайшему узлу предыдущей колонки.
+            */
+
+            let closest = previousIds[0];
+
+            let distance = Infinity;
+
+            for(const previousId of previousIds){
+
+                const previous =
+                    db.nodes[previousId];
+
+                const d =
+                    Math.abs(
+                        previous.y - node.y
+                    );
+
+                if(d < distance){
+
+                    distance = d;
+                    closest = previousId;
+                }
+            }
+
+            addLink(closest,id);
+        });
+
+
+        previousIds = ids;
+    });
+
+
+    renderAll();
+
+    centerGraphToNode(rootId);
+}
+
+
+/* =========================================================
+   GRAPH PAN / ZOOM
+========================================================= */
+
+function applyView(){
+
+    world.style.transform =
+        `translate(calc(-50% + ${view.x}px), calc(-50% + ${view.y}px)) scale(${view.scale})`;
+}
+
+
+graph.addEventListener(
+    "wheel",
+    event=>{
+
+        event.preventDefault();
+
+        const oldScale = view.scale;
+
+        const factor =
+            event.deltaY > 0
+                ? .9
+                : 1.1;
+
+        view.scale =
+            Math.max(
+                .25,
+                Math.min(2.2,view.scale * factor)
+            );
+
+        /*
+           Масштабируем относительно центра.
+        */
+
+        if(oldScale !== view.scale){
+            applyView();
+        }
+
+    },
+    {passive:false}
 );
 
+
+/*
+   Pan — только если не тянем node.
+*/
+
+graph.addEventListener(
+    "pointerdown",
+    event=>{
+
+        if(
+            event.target.closest(".node") ||
+            event.target.closest(".chain-toolbar") ||
+            event.target.closest(".sidebar")
+        ){
+            return;
+        }
+
+        panState.active = true;
+
+        panState.startX = event.clientX;
+        panState.startY = event.clientY;
+
+        panState.originX = view.x;
+        panState.originY = view.y;
+
+        graph.setPointerCapture?.(event.pointerId);
+    }
+);
+
+
+graph.addEventListener(
+    "pointermove",
+    event=>{
+
+        if(!panState.active){
+            return;
+        }
+
+        view.x =
+            panState.originX +
+            (event.clientX - panState.startX);
+
+        view.y =
+            panState.originY +
+            (event.clientY - panState.startY);
+
+        applyView();
+    }
+);
+
+
+graph.addEventListener(
+    "pointerup",
+    ()=>{
+        panState.active = false;
+    }
+);
+
+graph.addEventListener(
+    "pointercancel",
+    ()=>{
+        panState.active = false;
+    }
+);
+
+
+/* =========================================================
+   CENTER
+========================================================= */
 
 function centerGraph(){
 
-  zoom =
-    1;
+    view.scale = 1;
+    view.x = 0;
+    view.y = 0;
 
-  panX =
-    0;
-
-  panY =
-    0;
-
-  applyWorld();
-
-  toast(
-    "Graph centered"
-  );
+    applyView();
 }
 
 
-/* ==========================================================
-   SEARCH
-========================================================== */
+function centerGraphToNode(id){
 
-$("chainSearch")
-.addEventListener(
-  "input",
-  event=>{
+    const node = db.nodes[id];
 
-    const query =
-      event.target.value
-        .trim()
-        .toLowerCase();
+    if(!node){
+        return;
+    }
 
-    world
-      .querySelectorAll(
-        ".node"
-      )
-      .forEach(
-        el=>{
+    /*
+       Node координата относительно центра world.
+       Поэтому просто двигаем view в обратную сторону.
+    */
 
-          const id =
-            el.dataset.id;
+    view.x = -node.x * view.scale;
+    view.y = -node.y * view.scale;
 
-          const node =
-            db.nodes[id];
-
-          if(!query){
-
-            el.classList.remove(
-              "highlight"
-            );
-
-            return;
-          }
-
-          const text =
-            (
-              node.title +
-              " " +
-              node.type +
-              " " +
-              node.content
-            )
-            .toLowerCase();
-
-          el.classList.toggle(
-            "highlight",
-            text.includes(
-              query
-            )
-          );
-        }
-      );
-  }
-);
+    applyView();
+}
 
 
-/* ==========================================================
-   SATURN PARTICLES
-========================================================== */
+/* =========================================================
+   STATUS
+========================================================= */
 
-const canvas =
-  $("saturn");
+function updateStatus(){
 
-const ctx =
-  canvas.getContext(
-    "2d"
-  );
+    const nodes =
+        Object.keys(db.nodes).length;
 
-let particles=[];
+    const links =
+        db.links.length;
 
-let rotation=0;
+    graphStatus.textContent =
+        `${nodes} NODES · ${links} LINKS`;
+}
+
+
+/* =========================================================
+   PROFILE
+========================================================= */
+
+function updateProfileStats(){
+
+    document.getElementById("profileNodes").textContent =
+        Object.keys(db.nodes).length;
+
+    document.getElementById("profileLinks").textContent =
+        db.links.length;
+
+    document.getElementById("profileSearches").textContent =
+        db.searches || 0;
+
+
+    const name =
+        db.profile.name ||
+        "NZX User";
+
+    const username =
+        db.profile.username ||
+        "nzx_user";
+
+    document.getElementById("profileName").textContent =
+        name;
+
+    document.getElementById("profileUsername").textContent =
+        "@" + username;
+
+
+    const avatar =
+        db.profile.avatar ||
+        makeAvatar(name);
+
+    document.getElementById("miniAvatar").src =
+        avatar;
+
+    document.getElementById("profileAvatar").src =
+        avatar;
+}
+
+
+function makeAvatar(name){
+
+    const letter =
+        String(name || "N")
+            .trim()
+            .charAt(0)
+            .toUpperCase() || "N";
+
+
+    const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="200"
+             height="200"
+             viewBox="0 0 200 200">
+
+            <rect
+                width="200"
+                height="200"
+                rx="45"
+                fill="#111"
+            />
+
+            <text
+                x="100"
+                y="125"
+                text-anchor="middle"
+                font-size="100"
+                font-family="Arial"
+                font-weight="900"
+                fill="white"
+            >
+                ${letter}
+            </text>
+
+        </svg>
+    `;
+
+    return (
+        "data:image/svg+xml;charset=UTF-8," +
+        encodeURIComponent(svg)
+    );
+}
+
+
+/* =========================================================
+   SATURN PARTICLE SYSTEM
+========================================================= */
+
+const saturnCanvas =
+    document.getElementById("saturn");
+
+const saturnCtx =
+    saturnCanvas.getContext("2d");
+
+let particles = [];
+
+let saturnRotation = 0;
 
 
 function resizeSaturn(){
 
-  const rect =
-    canvas.getBoundingClientRect();
+    const dpr =
+        Math.min(
+            window.devicePixelRatio || 1,
+            2
+        );
 
-  const dpr =
-    window.devicePixelRatio ||
-    1;
+    const rect =
+        saturnCanvas.getBoundingClientRect();
 
-  canvas.width =
-    rect.width*dpr;
+    saturnCanvas.width =
+        rect.width * dpr;
 
-  canvas.height =
-    rect.height*dpr;
+    saturnCanvas.height =
+        rect.height * dpr;
 
-  ctx.setTransform(
-    dpr,
-    0,
-    0,
-    dpr,
-    0,
-    0
-  );
-
-  createParticles(
-    rect.width,
-    rect.height
-  );
-}
-
-
-function createParticles(
-  width,
-  height
-){
-
-  particles=[];
-
-  const count =
-    1100;
-
-  const radius =
-    Math.min(
-      width,
-      height
-    )*.28;
-
-  for(
-    let i=0;
-    i<count;
-    i++
-  ){
-
-    const u =
-      Math.random()*2-1;
-
-    const angle =
-      Math.random()*
-      Math.PI*2;
-
-    const r =
-      Math.sqrt(
-        1-u*u
-      );
-
-    const x =
-      r*
-      Math.cos(angle);
-
-    const y =
-      u;
-
-    const z =
-      r*
-      Math.sin(angle);
-
-    particles.push({
-
-      x,
-      y,
-      z,
-
-      size:
-        .45 +
-        Math.random()*1.15,
-
-      alpha:
-        .15 +
-        Math.random()*.65
-    });
-  }
-}
-
-
-function drawSaturn(){
-
-  const width =
-    canvas.clientWidth;
-
-  const height =
-    canvas.clientHeight;
-
-  ctx.clearRect(
-    0,
-    0,
-    width,
-    height
-  );
-
-  const cx =
-    width/2;
-
-  const cy =
-    height/2;
-
-  const radius =
-    Math.min(
-      width,
-      height
-    )*.28;
-
-  rotation +=
-    .00065;
-
-  for(
-    const p of particles
-  ){
-
-    const c =
-      Math.cos(
-        rotation
-      );
-
-    const s =
-      Math.sin(
-        rotation
-      );
-
-    const x =
-      p.x*c -
-      p.z*s;
-
-    const z =
-      p.x*s +
-      p.z*c;
-
-    const scale =
-      .55 +
-      (
-        z+1
-      )*.23;
-
-    const px =
-      cx +
-      x*
-      radius*
-      scale;
-
-    const py =
-      cy +
-      p.y*
-      radius*
-      scale;
-
-    const alpha =
-      Math.max(
-        .04,
-        p.alpha*
-        (
-          .45 +
-          (z+1)*.28
-        )
-      );
-
-    ctx.beginPath();
-
-    ctx.arc(
-      px,
-      py,
-      p.size*
-      scale,
-      0,
-      Math.PI*2
+    saturnCtx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
     );
 
-    ctx.fillStyle =
-      `rgba(255,255,255,${alpha})`;
-
-    ctx.fill();
-  }
-
-  requestAnimationFrame(
-    drawSaturn
-  );
+    createParticles();
 }
 
+
+function createParticles(){
+
+    particles = [];
+
+    const rect =
+        saturnCanvas.getBoundingClientRect();
+
+    const cx =
+        rect.width / 2;
+
+    const cy =
+        rect.height / 2;
+
+    const radius =
+        Math.min(
+            rect.width,
+            rect.height
+        ) * .38;
+
+
+    for(let i=0;i<1050;i++){
+
+        const theta =
+            Math.random() * Math.PI * 2;
+
+        const phi =
+            Math.acos(
+                2 * Math.random() - 1
+            );
+
+        const r =
+            radius *
+            Math.cbrt(Math.random());
+
+        particles.push({
+
+            theta,
+
+            phi,
+
+            r,
+
+            cx,
+
+            cy,
+
+            size:
+                .35 +
+                Math.random() * 1.2,
+
+            alpha:
+                .08 +
+                Math.random() * .5
+
+        });
+    }
+}
+
+
+function animateSaturn(){
+
+    const rect =
+        saturnCanvas.getBoundingClientRect();
+
+    const width =
+        rect.width;
+
+    const height =
+        rect.height;
+
+    saturnCtx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+
+    saturnRotation += .00065;
+
+
+    for(const p of particles){
+
+        const sinPhi =
+            Math.sin(p.phi);
+
+        const x3 =
+            p.r *
+            sinPhi *
+            Math.cos(
+                p.theta + saturnRotation
+            );
+
+        const z3 =
+            p.r *
+            sinPhi *
+            Math.sin(
+                p.theta + saturnRotation
+            );
+
+        const y3 =
+            p.r *
+            Math.cos(p.phi);
+
+
+        const perspective =
+            1 /
+            (
+                1 +
+                z3 /
+                (p.r * 5 + 1)
+            );
+
+
+        const x =
+            p.cx +
+            x3 *
+            perspective;
+
+        const y =
+            p.cy +
+            y3 *
+            perspective;
+
+
+        const alpha =
+            p.alpha *
+            (.55 + perspective * .45);
+
+
+        saturnCtx.beginPath();
+
+        saturnCtx.arc(
+            x,
+            y,
+            p.size * perspective,
+            0,
+            Math.PI * 2
+        );
+
+        saturnCtx.fillStyle =
+            `rgba(255,255,255,${alpha})`;
+
+        saturnCtx.fill();
+    }
+
+
+    requestAnimationFrame(
+        animateSaturn
+    );
+}
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event=>{
+
+        if(event.key === "Escape"){
+
+            closeModal("toolModal");
+            closeModal("nodeModal");
+        }
+    }
+);
+
+
+/* =========================================================
+   RESIZE
+========================================================= */
 
 window.addEventListener(
-  "resize",
-  resizeSaturn
+    "resize",
+    ()=>{
+        resizeSaturn();
+        renderLines();
+    }
 );
 
 
-/* ==========================================================
-   RING
-========================================================== */
-
-let ringTime=0;
-
-function animateRing(){
-
-  ringTime +=
-    .016;
-
-  const degrees =
-    (
-      ringTime*
-      .75
-    ) %
-    360;
-
-  $("saturnRing")
-    .style.transform =
-      `
-        translate(-50%,-50%)
-        rotateX(67deg)
-        rotateZ(
-          ${-15+degrees}deg
-        )
-      `;
-
-  requestAnimationFrame(
-    animateRing
-  );
-}
-
-
-/* ==========================================================
-   ANIMATION STYLE
-========================================================== */
-
-const style =
-  document.createElement(
-    "style"
-  );
-
-style.textContent = `
-
-@keyframes dash{
-
-  to{
-    stroke-dashoffset:-60;
-  }
-
-}
-
-`;
-
-document.head.appendChild(
-  style
-);
-
-
-/* ==========================================================
+/* =========================================================
    INIT
-========================================================== */
+========================================================= */
 
 function init(){
 
-  updateProfileUI();
+    updateStatus();
 
-  applyWorld();
+    updateProfileStats();
 
-  renderNodes();
+    applyView();
 
-  renderLines();
+    renderNodes();
 
-  resizeSaturn();
+    renderLines();
 
-  drawSaturn();
+    resizeSaturn();
 
-  animateRing();
+    animateSaturn();
 }
-
 
 init();
 
