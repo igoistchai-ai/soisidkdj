@@ -1,1092 +1,375 @@
 import os
+import json
+import base64
 import re
-import sqlite3
-import hashlib
-import secrets
-from pathlib import Path
 from typing import Optional
 
 import httpx
-
-from fastapi import FastAPI, HTTPException, Form
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+INDEX_FILE = os.path.join(BASE_DIR, "index.html")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "").strip()
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview").strip()
+MAX_IMAGE_SIZE = 10 * 1024 * 1024
 
-# ============================================================
-# CONFIG
-# ============================================================
-
-BASE_DIR = Path(__file__).resolve().parent
-
-DB_PATH = os.getenv(
-    "DB_PATH",
-    str(BASE_DIR / "nzx.db")
-)
-
-PORT = int(
-    os.getenv("PORT", "10000")
-)
-
-# ============================================================
-# PHONE VALIDATION API
-# ============================================================
-
-PHONEVALIDATION_API_KEY = os.getenv(
-    "PHONEVALIDATION_API_KEY",
-    ""
-).strip()
-
-PHONEVALIDATION_URL = (
-    "https://phonevalidationapi.com/api/v1/validate"
-)
-
-
-# ============================================================
-# APP
-# ============================================================
-
-app = FastAPI(
-    title="NZX OSINT TOOL",
-    version="2.0"
-)
+app = FastAPI(title="NZX OSINT TOOL", version="2.0")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# ============================================================
-# DATABASE
-# ============================================================
-
-def db():
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
+@app.get("/")
+async def index():
+    if not os.path.exists(INDEX_FILE):
+        raise HTTPException(500, "index.html not found")
+    return FileResponse(INDEX_FILE, media_type="text/html")
 
 
-def init_db():
-
-    conn = db()
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE,
-            password_hash TEXT NOT NULL,
-            avatar TEXT DEFAULT '',
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    conn.execute("""
-        CREATE TABLE IF NOT EXISTS chains (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            name TEXT NOT NULL,
-            data TEXT NOT NULL,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-
-    conn.commit()
-    conn.close()
-
-
-init_db()
-
-
-# ============================================================
-# HELPERS
-# ============================================================
-
-def hash_password(password: str):
-    return hashlib.sha256(
-        password.encode()
-    ).hexdigest()
-
-
-def valid_phone_format(phone: str):
-
-    cleaned = re.sub(
-        r"[()\s\-]",
-        "",
-        phone
-    )
-
-    if not cleaned.startswith("+"):
-        return False, cleaned
-
-    digits = cleaned[1:]
-
-    if not digits.isdigit():
-        return False, cleaned
-
-    if not 8 <= len(digits) <= 15:
-        return False, cleaned
-
-    return True, cleaned
-
-
-def clean_email(email: str):
-    return email.strip().lower()
-
-
-def safe_value(value, default="UNKNOWN"):
-
-    if value is None:
-        return default
-
-    if isinstance(value, str):
-
-        value = value.strip()
-
-        if not value:
-            return default
-
-        return value
-
-    return value
-
-
-# ============================================================
-# BASIC
-# ============================================================
-
-@app.get(
-    "/",
-    response_class=HTMLResponse
-)
-async def home():
-
-    html_file = BASE_DIR / "index.html"
-
-    if not html_file.exists():
-
-        return HTMLResponse(
-            """
-            <h1>NZX OSINT TOOL</h1>
-            <p>index.html not found</p>
-            """,
-            status_code=500
-        )
-
-    return HTMLResponse(
-        html_file.read_text(
-            encoding="utf-8"
-        )
-    )
-
-
-@app.get("/api/health")
+@app.get("/health")
 async def health():
-
     return {
-        "status": "ok",
+        "ok": True,
         "service": "NZX OSINT TOOL",
-        "phone_provider": (
-            "configured"
-            if PHONEVALIDATION_API_KEY
-            else "not_configured"
-        )
+        "gemini_configured": bool(GEMINI_API_KEY),
+        "model": GEMINI_MODEL,
     }
 
 
-# ============================================================
-# PHONE OSINT
-# ============================================================
+# -----------------------------
+# PHONE CHECK
+# -----------------------------
+
+COUNTRY_PREFIXES = {
+    "+374": "Armenia",
+    "+7": "Russia / Kazakhstan",
+    "+1": "United States / Canada",
+    "+44": "United Kingdom",
+    "+49": "Germany",
+    "+33": "France",
+    "+39": "Italy",
+    "+34": "Spain",
+    "+380": "Ukraine",
+    "+995": "Georgia",
+    "+90": "Turkey",
+    "+971": "United Arab Emirates",
+    "+972": "Israel",
+    "+81": "Japan",
+    "+82": "South Korea",
+    "+86": "China",
+    "+91": "India",
+    "+61": "Australia",
+    "+55": "Brazil",
+    "+52": "Mexico",
+    "+31": "Netherlands",
+    "+32": "Belgium",
+    "+41": "Switzerland",
+    "+43": "Austria",
+    "+46": "Sweden",
+    "+47": "Norway",
+    "+45": "Denmark",
+    "+358": "Finland",
+    "+48": "Poland",
+    "+420": "Czech Republic",
+    "+421": "Slovakia",
+    "+359": "Bulgaria",
+    "+30": "Greece",
+}
+
+
+def normalize_phone(value: str) -> str:
+    value = value.strip()
+    if value.startswith("00"):
+        value = "+" + value[2:]
+    if not value.startswith("+"):
+        value = "+" + value
+    return "+" + re.sub(r"\D", "", value[1:])
+
+
+def phone_country(phone: str) -> str:
+    for prefix in sorted(COUNTRY_PREFIXES, key=len, reverse=True):
+        if phone.startswith(prefix):
+            return COUNTRY_PREFIXES[prefix]
+    return "UNKNOWN"
+
 
 @app.post("/api/osint/phone")
-async def phone_osint(
-    phone: str = Form(...)
-):
+async def phone_check(phone: str = Form(...)):
+    normalized = normalize_phone(phone)
+    digits = normalized[1:]
 
-    phone = phone.strip()
+    if len(digits) < 7 or len(digits) > 15:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Invalid phone number format"},
+        )
 
-    # --------------------------------------------------------
-    # BASIC LOCAL VALIDATION
-    # --------------------------------------------------------
+    country = phone_country(normalized)
 
-    valid_format, normalized = valid_phone_format(
-        phone
-    )
-
-    if not valid_format:
-
-        return {
-            "success": True,
-            "phone": phone,
-            "valid": False,
-            "possible": False,
-            "confidence": "invalid",
-            "score": 0,
-            "country": "UNKNOWN",
-            "country_code": "UNKNOWN",
-            "region": "UNKNOWN",
-            "city": "UNKNOWN",
-            "carrier": "UNKNOWN",
-            "line_type": "UNKNOWN",
-            "disposable": "UNKNOWN",
-            "national": "UNKNOWN",
-            "international": "UNKNOWN",
-            "e164": "UNKNOWN",
-            "source": "local-format-check",
-            "provider_status": "INVALID_FORMAT"
-        }
-
-    # --------------------------------------------------------
-    # BASE RESULT
-    # --------------------------------------------------------
-
-    result = {
-
+    # This endpoint deliberately does not invent subscriber identity/data.
+    return {
         "success": True,
-
         "phone": normalized,
-
-        "valid": None,
-
-        "possible": None,
-
-        "confidence": "UNKNOWN",
-
-        "score": None,
-
-        "reason": "UNKNOWN",
-
-        "country": "UNKNOWN",
-
-        "country_code": "UNKNOWN",
-
-        "region": "UNKNOWN",
-
-        "city": "UNKNOWN",
-
-        "carrier": "UNKNOWN",
-
-        "line_type": "UNKNOWN",
-
-        "disposable": "UNKNOWN",
-
-        "national": "UNKNOWN",
-
-        "international": "UNKNOWN",
-
         "e164": normalized,
-
-        "source": "none",
-
-        "provider_status": "NO_API_KEY",
-
-        "credits_remaining": None,
-
-        "diagnostics": {}
+        "number": normalized,
+        "country": country,
+        "region": "UNKNOWN",
+        "city": "UNKNOWN",
+        "timezone": "UNKNOWN",
+        "time_code": "UNKNOWN",
+        "note": "Only format/prefix information is available without a carrier/subscriber data provider.",
     }
 
-    # --------------------------------------------------------
-    # NO API KEY
-    # --------------------------------------------------------
 
-    if not PHONEVALIDATION_API_KEY:
-
-        result["source"] = "local-format-check"
-
-        result["provider_status"] = "NO_API_KEY"
-
-        result["valid"] = None
-
-        result["possible"] = True
-
-        return result
-
-    # --------------------------------------------------------
-    # PHONE VALIDATION API
-    # --------------------------------------------------------
-
-    payload = {
-        "phone": normalized,
-        "level": "basic"
-    }
-
-    headers = {
-
-        "Authorization":
-            f"Bearer {PHONEVALIDATION_API_KEY}",
-
-        "Content-Type":
-            "application/json",
-
-        "Accept":
-            "application/json",
-
-        "User-Agent":
-            "NZX-OSINT-TOOL/2.0"
-    }
-
-    try:
-
-        async with httpx.AsyncClient(
-            timeout=20,
-            follow_redirects=True
-        ) as client:
-
-            response = await client.post(
-                PHONEVALIDATION_URL,
-                headers=headers,
-                json=payload
-            )
-
-        # ----------------------------------------------------
-        # SUCCESS
-        # ----------------------------------------------------
-
-        if response.status_code == 200:
-
-            try:
-                data = response.json()
-            except Exception:
-
-                result["provider_status"] = (
-                    "INVALID_PROVIDER_RESPONSE"
-                )
-
-                return result
-
-            result["source"] = (
-                "phonevalidationapi"
-            )
-
-            result["provider_status"] = "OK"
-
-            # ------------------------------------------------
-            # MAIN
-            # ------------------------------------------------
-
-            if "valid" in data:
-                result["valid"] = data.get(
-                    "valid"
-                )
-
-            if "is_possible" in data:
-                result["possible"] = data.get(
-                    "is_possible"
-                )
-
-            result["confidence"] = safe_value(
-                data.get("confidence")
-            )
-
-            result["score"] = data.get(
-                "score"
-            )
-
-            result["reason"] = safe_value(
-                data.get("reason")
-            )
-
-            # ------------------------------------------------
-            # COUNTRY
-            # ------------------------------------------------
-
-            country = data.get(
-                "country"
-            )
-
-            if isinstance(country, dict):
-
-                result["country"] = safe_value(
-                    country.get("iso2")
-                )
-
-                result["country_code"] = safe_value(
-                    country.get("code")
-                )
-
-            elif country:
-
-                result["country"] = str(
-                    country
-                )
-
-            # ------------------------------------------------
-            # REGION
-            # ------------------------------------------------
-
-            result["region"] = safe_value(
-                data.get("region")
-            )
-
-            # ------------------------------------------------
-            # CARRIER
-            # ------------------------------------------------
-
-            result["carrier"] = safe_value(
-                data.get("carrier")
-            )
-
-            # ------------------------------------------------
-            # LINE TYPE
-            # ------------------------------------------------
-
-            result["line_type"] = safe_value(
-                data.get("line_type")
-            )
-
-            # ------------------------------------------------
-            # DISPOSABLE
-            # ------------------------------------------------
-
-            if "is_disposable" in data:
-
-                disposable = data.get(
-                    "is_disposable"
-                )
-
-                if disposable is True:
-                    result["disposable"] = "YES"
-
-                elif disposable is False:
-                    result["disposable"] = "NO"
-
-                else:
-                    result["disposable"] = (
-                        "UNKNOWN"
-                    )
-
-            # ------------------------------------------------
-            # FORMATS
-            # ------------------------------------------------
-
-            formatted = data.get(
-                "formatted"
-            )
-
-            if isinstance(
-                formatted,
-                dict
-            ):
-
-                result["e164"] = safe_value(
-                    formatted.get("e164"),
-                    normalized
-                )
-
-                result["national"] = safe_value(
-                    formatted.get("national")
-                )
-
-                result["international"] = safe_value(
-                    formatted.get(
-                        "international"
-                    )
-                )
-
-            # ------------------------------------------------
-            # DIAGNOSTICS
-            # ------------------------------------------------
-
-            diagnostics = data.get(
-                "diagnostics"
-            )
-
-            if isinstance(
-                diagnostics,
-                dict
-            ):
-
-                result["diagnostics"] = (
-                    diagnostics
-                )
-
-            # ------------------------------------------------
-            # CREDITS
-            # ------------------------------------------------
-
-            if (
-                "credits_remaining"
-                in data
-            ):
-
-                result["credits_remaining"] = (
-                    data.get(
-                        "credits_remaining"
-                    )
-                )
-
-            # ------------------------------------------------
-            # CITY
-            #
-            # API does not promise exact city.
-            # Do NOT invent it.
-            # ------------------------------------------------
-
-            result["city"] = "UNKNOWN"
-
-            return result
-
-        # ----------------------------------------------------
-        # API KEY ERROR
-        # ----------------------------------------------------
-
-        if response.status_code == 401:
-
-            result["provider_status"] = (
-                "API_KEY_REJECTED"
-            )
-
-            result["source"] = (
-                "phonevalidationapi"
-            )
-
-            return result
-
-        # ----------------------------------------------------
-        # QUOTA
-        # ----------------------------------------------------
-
-        if response.status_code == 402:
-
-            result["provider_status"] = (
-                "QUOTA_EXCEEDED"
-            )
-
-            result["source"] = (
-                "phonevalidationapi"
-            )
-
-            try:
-
-                error_data = response.json()
-
-                result["provider_error"] = (
-                    error_data
-                )
-
-            except Exception:
-                pass
-
-            return result
-
-        # ----------------------------------------------------
-        # BAD REQUEST
-        # ----------------------------------------------------
-
-        if response.status_code == 400:
-
-            result["provider_status"] = (
-                "BAD_REQUEST"
-            )
-
-            result["source"] = (
-                "phonevalidationapi"
-            )
-
-            try:
-
-                result["provider_error"] = (
-                    response.json()
-                )
-
-            except Exception:
-                pass
-
-            return result
-
-        # ----------------------------------------------------
-        # VALIDATION ERROR
-        # ----------------------------------------------------
-
-        if response.status_code == 422:
-
-            result["provider_status"] = (
-                "VALIDATION_ERROR"
-            )
-
-            result["source"] = (
-                "phonevalidationapi"
-            )
-
-            try:
-
-                result["provider_error"] = (
-                    response.json()
-                )
-
-            except Exception:
-                pass
-
-            return result
-
-        # ----------------------------------------------------
-        # RATE LIMIT
-        # ----------------------------------------------------
-
-        if response.status_code == 429:
-
-            result["provider_status"] = (
-                "RATE_LIMITED"
-            )
-
-            result["source"] = (
-                "phonevalidationapi"
-            )
-
-            return result
-
-        # ----------------------------------------------------
-        # SERVER ERRORS
-        # ----------------------------------------------------
-
-        if response.status_code in (
-            500,
-            502,
-            503,
-            504
-        ):
-
-            result["provider_status"] = (
-                f"PROVIDER_HTTP_{response.status_code}"
-            )
-
-            result["source"] = (
-                "phonevalidationapi"
-            )
-
-            return result
-
-        # ----------------------------------------------------
-        # OTHER
-        # ----------------------------------------------------
-
-        result["provider_status"] = (
-            f"PROVIDER_HTTP_{response.status_code}"
-        )
-
-        result["source"] = (
-            "phonevalidationapi"
-        )
-
-        return result
-
-    except httpx.TimeoutException:
-
-        result["provider_status"] = (
-            "PROVIDER_TIMEOUT"
-        )
-
-        result["source"] = (
-            "phonevalidationapi"
-        )
-
-        return result
-
-    except Exception as error:
-
-        result["provider_status"] = (
-            "PROVIDER_ERROR"
-        )
-
-        result["source"] = (
-            "phonevalidationapi"
-        )
-
-        result["provider_error"] = str(
-            error
-        )
-
-        return result
-
-
-# ============================================================
-# MAP SEARCH / ADDRESS
-# ============================================================
+# -----------------------------
+# ADDRESS SEARCH — OpenStreetMap Nominatim
+# -----------------------------
 
 @app.get("/api/map/search")
 async def map_search(q: str):
-
-    q = q.strip()
-
-    if not q:
-
-        return {
-            "success": False,
-            "results": []
-        }
+    query = q.strip()
+    if not query:
+        raise HTTPException(400, "Missing q")
 
     headers = {
-
-        "User-Agent":
-            "NZX-OSINT-TOOL/2.0",
-
-        "Accept":
-            "application/json"
+        "User-Agent": "NZX-OSINT-TOOL/2.0 (address search)"
     }
 
     try:
-
-        async with httpx.AsyncClient(
-            timeout=15
-        ) as client:
-
+        async with httpx.AsyncClient(timeout=15, headers=headers) as client:
             response = await client.get(
                 "https://nominatim.openstreetmap.org/search",
                 params={
-                    "q": q,
+                    "q": query,
                     "format": "jsonv2",
                     "addressdetails": 1,
-                    "limit": 10
+                    "limit": 5,
                 },
-                headers=headers
             )
+    except httpx.TimeoutException:
+        raise HTTPException(504, "Address search timed out")
+    except Exception as exc:
+        raise HTTPException(502, str(exc))
 
-        if response.status_code != 200:
-
-            return {
-                "success": False,
-                "results": []
-            }
-
-        data = response.json()
-
-        results = []
-
-        for item in data:
-
-            address = item.get(
-                "address",
-                {}
-            )
-
-            results.append({
-
-                "display_name":
-                    item.get(
-                        "display_name",
-                        "UNKNOWN"
-                    ),
-
-                "lat":
-                    item.get("lat"),
-
-                "lon":
-                    item.get("lon"),
-
-                "type":
-                    item.get("type"),
-
-                "city":
-                    (
-                        address.get("city")
-                        or address.get("town")
-                        or address.get("village")
-                        or address.get("municipality")
-                        or "UNKNOWN"
-                    ),
-
-                "country":
-                    address.get(
-                        "country",
-                        "UNKNOWN"
-                    ),
-
-                "country_code":
-                    address.get(
-                        "country_code",
-                        "UNKNOWN"
-                    ),
-
-                "postcode":
-                    address.get(
-                        "postcode",
-                        "UNKNOWN"
-                    ),
-
-                "state":
-                    address.get(
-                        "state",
-                        "UNKNOWN"
-                    ),
-
-                "road":
-                    address.get(
-                        "road",
-                        "UNKNOWN"
-                    ),
-
-                "house_number":
-                    address.get(
-                        "house_number",
-                        "UNKNOWN"
-                    )
-            })
-
-        return {
-            "success": True,
-            "results": results
-        }
-
-    except Exception as error:
-
-        return {
-            "success": False,
-            "results": [],
-            "error": str(error)
-        }
-
-
-# ============================================================
-# AUTH
-# ============================================================
-
-@app.post("/api/register")
-async def register(
-
-    username: str = Form(...),
-
-    email: str = Form(""),
-
-    password: str = Form(...)
-):
-
-    username = username.strip()
-
-    email = clean_email(
-        email
-    )
-
-    if len(username) < 3:
-
-        raise HTTPException(
-            status_code=400,
-            detail="Username is too short"
-        )
-
-    if len(password) < 6:
-
-        raise HTTPException(
-            status_code=400,
-            detail=(
-                "Password must contain "
-                "at least 6 characters"
-            )
-        )
-
-    conn = db()
+    if response.status_code >= 400:
+        raise HTTPException(response.status_code, "Address provider error")
 
     try:
+        raw = response.json()
+    except Exception:
+        raise HTTPException(502, "Invalid address provider response")
 
-        cur = conn.execute(
-            """
-            INSERT INTO users
-            (
-                username,
-                email,
-                password_hash
-            )
-            VALUES (?,?,?)
-            """,
-            (
-                username,
-                email or None,
-                hash_password(
-                    password
-                )
-            )
+    results = []
+    for item in raw:
+        address = item.get("address") or {}
+        city = (
+            address.get("city")
+            or address.get("town")
+            or address.get("village")
+            or address.get("municipality")
+            or "UNKNOWN"
         )
+        country = address.get("country") or "UNKNOWN"
+        postcode = address.get("postcode") or "UNKNOWN"
 
-        conn.commit()
+        results.append({
+            "display_name": item.get("display_name") or "UNKNOWN",
+            "lat": item.get("lat"),
+            "lon": item.get("lon"),
+            "city": city,
+            "country": country,
+            "postcode": postcode,
+        })
 
-        return {
-            "success": True,
-            "user_id":
-                cur.lastrowid
-        }
-
-    except sqlite3.IntegrityError:
-
-        raise HTTPException(
-            status_code=409,
-            detail=(
-                "Username or email "
-                "already exists"
-            )
-        )
-
-    finally:
-
-        conn.close()
+    return {"success": True, "results": results}
 
 
-@app.post("/api/login")
-async def login(
+# -----------------------------
+# GEOSINT — Gemini Vision
+# -----------------------------
 
-    username: str = Form(...),
+GEOSINT_PROMPT = """
+You are the GeoSINT visual analysis module of NZX OSINT TOOL.
 
-    password: str = Form(...)
+Analyze ONLY geographic information that is visibly supported by the image.
+
+Return ONLY valid JSON using exactly this structure:
+{
+  "country": "",
+  "city_estimate": "",
+  "region_estimate": "",
+  "latitude": null,
+  "longitude": null,
+  "environment": "",
+  "visible_clues": [],
+  "confidence": "low|medium|high",
+  "reasoning": ""
+}
+
+Rules:
+- Estimate a broad geographic area from visible evidence.
+- Never identify a private person.
+- Never infer someone's identity.
+- Never claim an exact private residential address.
+- Coordinates are optional estimates only; use null when unsupported.
+- If there is not enough evidence, use UNKNOWN and null.
+- Never invent signs, landmarks, languages, road markings or other clues.
+- Use visible clues such as public signs, public landmarks, architecture,
+  terrain, vegetation, road markings, visible language, public transport,
+  utility infrastructure and climate.
+- Keep reasoning concise and evidence-based.
+""".strip()
+
+
+def extract_gemini_text(data: dict) -> str:
+    candidates = data.get("candidates") or []
+    if not candidates:
+        return ""
+
+    content = candidates[0].get("content") or {}
+    parts = content.get("parts") or []
+
+    texts = []
+    for part in parts:
+        if isinstance(part, dict) and isinstance(part.get("text"), str):
+            texts.append(part["text"])
+    return "\n".join(texts).strip()
+
+
+def parse_json_text(text: str) -> dict:
+    text = text.strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.I)
+        text = re.sub(r"\s*```$", "", text)
+
+    try:
+        value = json.loads(text)
+        return value if isinstance(value, dict) else {"raw": value}
+    except Exception:
+        # Try to recover the first JSON object from a verbose response.
+        start = text.find("{")
+        end = text.rfind("}")
+        if start >= 0 and end > start:
+            try:
+                value = json.loads(text[start:end + 1])
+                return value if isinstance(value, dict) else {"raw": value}
+            except Exception:
+                pass
+
+    return {"raw": text}
+
+
+@app.post("/api/geosint")
+async def geosint(
+    photo: UploadFile = File(...),
+    prompt: str = Form(""),
 ):
-
-    conn = db()
-
-    user = conn.execute(
-        """
-        SELECT *
-        FROM users
-        WHERE username=?
-        """,
-        (
-            username.strip(),
-        )
-    ).fetchone()
-
-    conn.close()
-
-    if not user:
-
+    if not GEMINI_API_KEY:
         raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
+            503,
+            "GEMINI_API_KEY is not configured in Render Environment Variables",
         )
 
-    if (
-        user["password_hash"]
-        != hash_password(password)
-    ):
+    image = await photo.read()
 
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid credentials"
-        )
+    if not image:
+        raise HTTPException(400, "Empty image")
 
-    token = secrets.token_urlsafe(
-        32
+    if len(image) > MAX_IMAGE_SIZE:
+        raise HTTPException(413, "Image is larger than 10 MB")
+
+    content_type = photo.content_type or "image/jpeg"
+    if not content_type.startswith("image/"):
+        raise HTTPException(400, "Only image files are supported")
+
+    image_b64 = base64.b64encode(image).decode("ascii")
+
+    user_prompt = GEOSINT_PROMPT
+    if prompt.strip():
+        user_prompt += "\n\nAdditional task context:\n" + prompt.strip()
+
+    payload = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": [
+                    {"text": user_prompt},
+                    {
+                        "inline_data": {
+                            "mime_type": content_type,
+                            "data": image_b64,
+                        }
+                    },
+                ],
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.1,
+            "responseMimeType": "application/json",
+        },
+    }
+
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{GEMINI_MODEL}:generateContent"
     )
 
-    return {
+    try:
+        async with httpx.AsyncClient(timeout=120) as client:
+            response = await client.post(
+                url,
+                headers={
+                    "x-goog-api-key": GEMINI_API_KEY,
+                    "Content-Type": "application/json",
+                },
+                json=payload,
+            )
+    except httpx.TimeoutException:
+        raise HTTPException(504, "Gemini request timed out")
+    except Exception as exc:
+        raise HTTPException(502, f"Gemini connection error: {exc}")
 
-        "success": True,
+    try:
+        data = response.json()
+    except Exception:
+        data = {"raw": response.text}
 
-        "token": token,
-
-        "user": {
-
-            "id":
-                user["id"],
-
-            "username":
-                user["username"],
-
-            "email":
-                user["email"],
-
-            "avatar":
-                user["avatar"]
-        }
-    }
-
-
-# ============================================================
-# USER SEARCH
-# ============================================================
-
-@app.get("/api/users/search")
-async def search_users(q: str):
-
-    q = q.strip()
-
-    if not q:
-        return []
-
-    conn = db()
-
-    users = conn.execute(
-        """
-        SELECT
-            id,
-            username,
-            avatar
-        FROM users
-        WHERE username LIKE ?
-        ORDER BY username
-        LIMIT 30
-        """,
-        (
-            f"%{q}%",
+    if response.status_code >= 400:
+        error = data.get("error") if isinstance(data, dict) else None
+        message = error.get("message") if isinstance(error, dict) else None
+        raise HTTPException(
+            response.status_code,
+            message or "Gemini API error",
         )
-    ).fetchall()
 
-    conn.close()
+    text = extract_gemini_text(data)
+    result = parse_json_text(text)
 
-    return [
-
-        {
-            "id":
-                user["id"],
-
-            "username":
-                user["username"],
-
-            "avatar":
-                user["avatar"]
-        }
-
-        for user in users
-    ]
-
-
-# ============================================================
-# PROFILE
-# ============================================================
-
-class ProfileUpdate(BaseModel):
-
-    username: str
-
-    email: Optional[str] = ""
-
-    avatar: Optional[str] = ""
-
-
-@app.post("/api/profile")
-async def update_profile(
-    data: ProfileUpdate
-):
+    if not result:
+        result = {"raw": text or "Gemini returned an empty response"}
 
     return {
-
         "success": True,
-
-        "profile": {
-
-            "username":
-                data.username,
-
-            "email":
-                data.email,
-
-            "avatar":
-                data.avatar
-        }
+        "provider": "Google Gemini",
+        "model": GEMINI_MODEL,
+        "result": result,
     }
 
-
-# ============================================================
-# START
-# ============================================================
 
 if __name__ == "__main__":
-
     import uvicorn
 
+    port = int(os.getenv("PORT", "10000"))
     uvicorn.run(
         app,
         host="0.0.0.0",
-        port=PORT
-        )
+        port=port,
+        log_level="info",
+    )
