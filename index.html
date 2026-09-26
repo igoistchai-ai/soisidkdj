@@ -408,7 +408,7 @@ button{cursor:pointer}
 }
 
 .node-dot{
-  display:none;
+  display:block;
   position:absolute;
   width:16px;
   height:16px;
@@ -850,6 +850,23 @@ button{cursor:pointer}
 
   .saturn-ring{width:270px}
 }
+
+.link-mode-hint{
+  position:absolute;
+  left:50%;
+  bottom:18px;
+  transform:translateX(-50%);
+  z-index:25;
+  padding:8px 12px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
+  background:rgba(8,8,8,.82);
+  color:#666;
+  font-size:9px;
+  pointer-events:none;
+  backdrop-filter:blur(8px);
+}
+
 </style>
 </head>
 
@@ -927,6 +944,10 @@ button{cursor:pointer}
       <div class="saturn">
         <canvas id="saturn"></canvas>
         <div class="saturn-ring" id="saturnRing"></div>
+      </div>
+
+      <div class="link-mode-hint">
+        DOUBLE-TAP NODE → TAP ANOTHER NODE TO CONNECT
       </div>
 
       <div class="world" id="world">
@@ -2205,13 +2226,10 @@ Never invent clues that are not visible.
       `.trim()
     );
 
-    const response=await fetch(
-      "/api/geosint",
-      {
-        method:"POST",
-        body:form
-      }
-    );
+    const response=await fetch("/api/geosint",{
+      method:"POST",
+      body:form
+    });
 
     let data=null;
 
@@ -2225,10 +2243,13 @@ Never invent clues that are not visible.
 
     if(!response.ok){
 
+      const message =
+        data?.error ||
+        ("HTTP "+response.status);
+
       addResult(
         "GEOSINT ERROR",
-        data?.error||
-        ("HTTP "+response.status),
+        message,
         "ERROR",
         "!"
       );
@@ -2648,7 +2669,58 @@ function renderNodes(){
         )
           return;
 
-        openNodeModal(node.id);
+        event.preventDefault();
+        event.stopPropagation();
+
+        /* Double-click = choose this node as the line source. */
+        if(linkSource===node.id){
+          linkSource=null;
+          clearHighlights();
+          toast("Link mode cancelled");
+          return;
+        }
+
+        linkSource=node.id;
+        highlightNode(node.id);
+        toast("Now tap another node");
+      }
+    );
+
+    el.addEventListener(
+      "click",
+      event=>{
+
+        if(
+          event.target.closest(".node-delete")||
+          event.target.closest(".node-dot")
+        )
+          return;
+
+        /* After selecting a source with double-click,
+           one normal click on another node creates the line. */
+        if(linkSource && linkSource!==node.id){
+
+          const exists=db.links.some(link=>
+            (link.a===linkSource && link.b===node.id) ||
+            (link.a===node.id && link.b===linkSource)
+          );
+
+          if(!exists){
+            db.links.push({
+              a:linkSource,
+              b:node.id
+            });
+
+            saveDB();
+            renderLines();
+            toast("Nodes linked");
+          }else{
+            toast("Link already exists");
+          }
+
+          linkSource=null;
+          clearHighlights();
+        }
       }
     );
 
@@ -2963,15 +3035,11 @@ function drawTemporaryLink(x1,y1,x2,y2){
 
 function handleLinkDot(id){
 
-  /* Legacy fallback: linking is now drag-to-node. */
   if(!linkSource){
 
     linkSource=id;
-
     highlightNode(id);
-
-    toast("Select another node");
-
+    toast("Now tap another node");
     return;
   }
 
@@ -2979,7 +3047,6 @@ function handleLinkDot(id){
 
     linkSource=null;
     clearHighlights();
-
     return;
   }
 
@@ -2997,14 +3064,13 @@ function handleLinkDot(id){
     });
 
     saveDB();
-
     renderLines();
-
     toast("Nodes linked");
+  }else{
+    toast("Link already exists");
   }
 
   linkSource=null;
-
   clearHighlights();
 }
 
