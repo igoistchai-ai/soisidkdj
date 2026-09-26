@@ -374,7 +374,41 @@ button{cursor:pointer}
   word-break:break-word;
 }
 
+.node-photo-wrap{
+  width:100%;
+  height:108px;
+  margin:0 0 9px;
+  border-radius:10px;
+  overflow:hidden;
+  background:#080808;
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:inset 0 0 30px rgba(0,0,0,.45);
+}
+.node-photo{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.node.geo-node{
+  width:190px;
+}
+.node-photo-only{
+  width:210px;
+  padding:8px;
+}
+.node-photo-only .node-photo-wrap{
+  height:145px;
+  margin:0;
+}
+.node-photo-only .node-type,
+.node-photo-only .node-title,
+.node-photo-only .node-content{
+  display:none;
+}
+
 .node-dot{
+  display:none;
   position:absolute;
   width:16px;
   height:16px;
@@ -1792,7 +1826,8 @@ function createNode(
   type,
   content,
   x,
-  y
+  y,
+  meta={}
 ){
 
   const id=uid();
@@ -1803,7 +1838,8 @@ function createNode(
     type,
     content,
     x,
-    y
+    y,
+    ...meta
   };
 
   return id;
@@ -2309,6 +2345,8 @@ Never invent clues that are not visible.
       "◈"
     );
 
+    createGeoSINTGraph(geoSelectedFile,data);
+
   }catch(error){
 
     $("toolResults").innerHTML="";
@@ -2326,6 +2364,58 @@ Never invent clues that are not visible.
     $("toolRun").disabled=false;
     $("toolRun").textContent="ANALYZE";
   }
+}
+
+/* ==========================================================
+   GEOSINT -> GRAPH
+========================================================== */
+
+function createGeoSINTGraph(file,data){
+  if(!file || !data) return;
+
+  const center=getGraphCenter();
+  const r=data.result||data;
+  const photoURL=$("geoPreview")?.src || "";
+
+  const photoId=createNode(
+    "GEOSINT PHOTO",
+    "IMAGE",
+    file.name||"Uploaded image",
+    center.x-230,
+    center.y,
+    {photo:photoURL,photoOnly:true,geo:true}
+  );
+
+  const info=[
+    ["COUNTRY",r.country],
+    ["CITY ESTIMATE",r.city_estimate||r.city],
+    ["REGION",r.region_estimate||r.region],
+    ["ENVIRONMENT",r.environment],
+    ["CONFIDENCE",r.confidence],
+    ["VISIBLE CLUES",Array.isArray(r.visible_clues)?r.visible_clues.join(" • "):r.visible_clues]
+  ].filter(x=>x[1]!==undefined && x[1]!==null && String(x[1]).trim() && String(x[1])!=="UNKNOWN");
+
+  let previous=photoId;
+  const radius=220;
+
+  info.forEach((item,i)=>{
+    const angle=(-Math.PI/2)+(i-Math.max(0,info.length-1)/2)*0.48;
+    const id=createNode(
+      item[0],
+      item[0],
+      String(item[1]),
+      center.x+Math.cos(angle)*radius,
+      center.y+Math.sin(angle)*radius,
+      {geo:true}
+    );
+    db.links.push({a:previous,b:id});
+    previous=id;
+  });
+
+  saveDB();
+  renderNodes();
+  renderLines();
+  toast("GeoSINT добавлен на граф");
 }
 
 /* ==========================================================
@@ -2481,12 +2571,21 @@ function renderNodes(){
     el.style.left=node.x+"px";
     el.style.top=node.y+"px";
 
+    el.classList.toggle("geo-node", !!node.geo);
+    el.classList.toggle("node-photo-only", !!node.photoOnly);
+
     el.innerHTML=`
 
       <button
         class="node-delete"
         title="Delete node"
       >×</button>
+
+      ${node.photo ? `
+        <div class="node-photo-wrap">
+          <img class="node-photo" src="${node.photo}" alt="GeoSINT photo">
+        </div>
+      ` : ""}
 
       <div class="node-type">
         ${escapeHTML(node.type||"UNKNOWN")}
@@ -2856,6 +2955,7 @@ function drawTemporaryLink(x1,y1,x2,y2){
   path.setAttribute("stroke-width","2");
   path.setAttribute("stroke-dasharray","5 6");
   path.setAttribute("stroke-linecap","round");
+  path.setAttribute("marker-end","url(#nzxArrowBright)");
   path.style.filter="drop-shadow(0 0 7px rgba(255,255,255,.35))";
   svg.appendChild(path);
 }
@@ -2938,6 +3038,22 @@ function renderLines(){
   const svg=$("lines");
 
   svg.innerHTML="";
+
+  const defs=document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "defs"
+  );
+  defs.innerHTML=`
+    <marker id="nzxArrow" markerWidth="10" markerHeight="10"
+      refX="8" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L8,4 L0,8 Z" fill="rgba(255,255,255,.72)"></path>
+    </marker>
+    <marker id="nzxArrowBright" markerWidth="11" markerHeight="11"
+      refX="9" refY="4.5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,4.5 L0,9 Z" fill="rgba(255,255,255,.92)"></path>
+    </marker>
+  `;
+  svg.appendChild(defs);
 
   db.links.forEach(link=>{
 
@@ -3039,6 +3155,11 @@ function renderLines(){
     path.setAttribute(
       "stroke-linecap",
       "round"
+    );
+
+    path.setAttribute(
+      "marker-end",
+      "url(#nzxArrow)"
     );
 
     path.setAttribute(
