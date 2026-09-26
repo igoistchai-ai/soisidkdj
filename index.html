@@ -390,8 +390,8 @@ button{cursor:pointer}
   position:absolute;
   left:50%;
   top:50%;
-  width:470px;
-  height:470px;
+  width:540px;
+  height:540px;
   transform:translate(-50%,-50%);
   opacity:.62;
   pointer-events:none;
@@ -407,8 +407,8 @@ button{cursor:pointer}
   position:absolute;
   left:50%;
   top:50%;
-  width:360px;
-  height:105px;
+  width:420px;
+  height:122px;
   border-radius:50%;
   border:1px solid rgba(255,255,255,.14);
   box-shadow:0 0 20px rgba(255,255,255,.05);
@@ -804,11 +804,11 @@ button{cursor:pointer}
   .node{width:150px}
 
   .saturn{
-    width:330px;
-    height:330px;
+    width:380px;
+    height:380px;
   }
 
-  .saturn-ring{width:270px}
+  .saturn-ring{width:310px}
 }
 </style>
 </head>
@@ -2270,6 +2270,28 @@ Never invent clues that are not visible.
       );
     }
 
+    if(r.latitude!==null && r.latitude!==undefined &&
+       r.longitude!==null && r.longitude!==undefined &&
+       !Number.isNaN(Number(r.latitude)) &&
+       !Number.isNaN(Number(r.longitude))){
+
+      addResult(
+        "COORDINATES ESTIMATE",
+        `${Number(r.latitude).toFixed(5)}, ${Number(r.longitude).toFixed(5)}`,
+        "INFO",
+        "◉"
+      );
+    }
+
+    if(r.reasoning){
+      addResult(
+        "AI REASONING",
+        r.reasoning,
+        "INFO",
+        "◇"
+      );
+    }
+
     addResult(
       "CONFIDENCE",
       r.confidence||"low",
@@ -3307,4 +3329,4 @@ init();
 </script>
 
 </body>
-    </html>
+</html>
