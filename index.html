@@ -294,6 +294,8 @@ button{cursor:pointer}
   border-radius:12px;
   box-shadow:0 20px 60px rgba(0,0,0,.45);
   user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
   cursor:grab;
   touch-action:none;
   transition:border-color .2s,box-shadow .2s;
@@ -374,15 +376,19 @@ button{cursor:pointer}
 
 .node-dot{
   position:absolute;
-  width:10px;
-  height:10px;
-  right:-5px;
+  width:16px;
+  height:16px;
+  right:-8px;
   top:50%;
   transform:translateY(-50%);
   border-radius:50%;
   background:#fff;
-  box-shadow:0 0 14px rgba(255,255,255,.45);
+  box-shadow:0 0 0 3px rgba(255,255,255,.06),0 0 20px rgba(255,255,255,.7);
   cursor:crosshair;
+  z-index:30;
+  touch-action:none;
+  -webkit-user-select:none;
+  user-select:none;
 }
 
 /* SATURN */
@@ -390,8 +396,8 @@ button{cursor:pointer}
   position:absolute;
   left:50%;
   top:50%;
-  width:540px;
-  height:540px;
+  width:470px;
+  height:470px;
   transform:translate(-50%,-50%);
   opacity:.62;
   pointer-events:none;
@@ -407,8 +413,8 @@ button{cursor:pointer}
   position:absolute;
   left:50%;
   top:50%;
-  width:420px;
-  height:122px;
+  width:360px;
+  height:105px;
   border-radius:50%;
   border:1px solid rgba(255,255,255,.14);
   box-shadow:0 0 20px rgba(255,255,255,.05);
@@ -804,11 +810,11 @@ button{cursor:pointer}
   .node{width:150px}
 
   .saturn{
-    width:380px;
-    height:380px;
+    width:330px;
+    height:330px;
   }
 
-  .saturn-ring{width:310px}
+  .saturn-ring{width:270px}
 }
 </style>
 </head>
@@ -2526,16 +2532,11 @@ function renderNodes(){
     dot.addEventListener(
       "pointerdown",
       event=>{
+        event.preventDefault();
         event.stopPropagation();
-      }
-    );
-
-    dot.addEventListener(
-      "click",
-      event=>{
-        event.stopPropagation();
-        handleLinkDot(node.id);
-      }
+        startLinkDrag(event,node.id);
+      },
+      {passive:false}
     );
 
     el.addEventListener(
@@ -2739,8 +2740,130 @@ function deleteNode(id){
    LINKING
 ========================================================== */
 
+let linkDrag=null;
+
+function getGraphPoint(event){
+  const rect=graph.getBoundingClientRect();
+  return {
+    x:(event.clientX-rect.left-rect.width/2-panX)/zoom,
+    y:(event.clientY-rect.top-rect.height/2-panY)/zoom
+  };
+}
+
+function getNodeElement(id){
+  return world.querySelector(`[data-id="${CSS.escape(id)}"]`);
+}
+
+function startLinkDrag(event,id){
+  const node=db.nodes[id];
+  if(!node)return;
+
+  linkDrag={
+    source:id,
+    pointerId:event.pointerId,
+    x:node.x,
+    y:node.y
+  };
+
+  linkSource=id;
+  highlightNode(id);
+  drawTemporaryLink(node.x,node.y,node.x,node.y);
+
+  try{ graph.setPointerCapture(event.pointerId); }catch{}
+
+  window.addEventListener("pointermove",moveLinkDrag,{passive:false});
+  window.addEventListener("pointerup",finishLinkDrag,{once:true,passive:false});
+  window.addEventListener("pointercancel",cancelLinkDrag,{once:true,passive:false});
+}
+
+function moveLinkDrag(event){
+  if(!linkDrag)return;
+  event.preventDefault();
+  const point=getGraphPoint(event);
+  linkDrag.x=point.x;
+  linkDrag.y=point.y;
+  const source=db.nodes[linkDrag.source];
+  if(source)drawTemporaryLink(source.x,source.y,point.x,point.y);
+}
+
+function findNodeAtPoint(point){
+  let closest=null;
+  let best=Infinity;
+  Object.values(db.nodes).forEach(node=>{
+    if(node.id===linkDrag?.source)return;
+    const dx=point.x-node.x;
+    const dy=point.y-node.y;
+    const distance=Math.hypot(dx,dy);
+    if(distance<95 && distance<best){ closest=node; best=distance; }
+  });
+  return closest;
+}
+
+function finishLinkDrag(event){
+  if(!linkDrag)return;
+  event.preventDefault();
+  const point=getGraphPoint(event);
+  const target=findNodeAtPoint(point);
+  const sourceId=linkDrag.source;
+
+  if(target && target.id!==sourceId){
+    const exists=db.links.some(link=>
+      (link.a===sourceId&&link.b===target.id)||
+      (link.a===target.id&&link.b===sourceId)
+    );
+    if(!exists){
+      db.links.push({a:sourceId,b:target.id});
+      saveDB();
+      toast("Nodes linked");
+    }else{
+      toast("Link already exists");
+    }
+  }else{
+    toast("Перетащи точку на другой узел");
+  }
+
+  cleanupLinkDrag();
+  renderLines();
+}
+
+function cancelLinkDrag(){
+  cleanupLinkDrag();
+  renderLines();
+}
+
+function cleanupLinkDrag(){
+  linkDrag=null;
+  linkSource=null;
+  clearHighlights();
+  window.removeEventListener("pointermove",moveLinkDrag);
+}
+
+function drawTemporaryLink(x1,y1,x2,y2){
+  const svg=$("lines");
+  renderLines();
+
+  const dx=x2-x1, dy=y2-y1;
+  const length=Math.hypot(dx,dy)||1;
+  const nx=-dy/length, ny=dx/length;
+  const bend=Math.min(55,Math.max(20,length*.12));
+  const cx=(x1+x2)/2+nx*bend;
+  const cy=(y1+y2)/2+ny*bend;
+
+  const path=document.createElementNS("http://www.w3.org/2000/svg","path");
+  path.setAttribute("d",`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`);
+  path.setAttribute("fill","none");
+  path.setAttribute("stroke","rgba(255,255,255,.75)");
+  path.setAttribute("stroke-width","2");
+  path.setAttribute("stroke-dasharray","5 6");
+  path.setAttribute("stroke-linecap","round");
+  path.style.filter="drop-shadow(0 0 7px rgba(255,255,255,.35))";
+  svg.appendChild(path);
+}
+
+
 function handleLinkDot(id){
 
+  /* Legacy fallback: linking is now drag-to-node. */
   if(!linkSource){
 
     linkSource=id;
